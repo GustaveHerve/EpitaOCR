@@ -1,0 +1,9 @@
+#MacOS Trash
+.DS_Store
+
+#Compilation files
+.o
+.d
+
+#VSCode trash
+.vscode
