@@ -1,4 +1,4 @@
-#include "pixel.h"
+#include "include/pixel.h"
 
 void greyscale(SDL_Surface *image){
 	unsigned int width = image->w;
