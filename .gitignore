@@ -9,3 +9,6 @@
 .vscode
 
 Makefile
+
+#Debugging
+.dSYM

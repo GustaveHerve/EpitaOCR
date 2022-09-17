@@ -63,3 +63,14 @@ void replace_pixel(SDL_Surface *image, unsigned x, unsigned y, Uint32 pixel){
 			break;
 	}
 }
+
+void get_pixel_array(SDL_Surface *image, Uint32 r[]){
+	unsigned int width = image->w;
+	unsigned int height = image->h;
+
+	for (unsigned int i = 0; i < height; i++){
+		for (unsigned int j = 0; j < width; j++){
+			r[i * width + j] = get_pixel(image, j, i);
+		}
+	}
+}

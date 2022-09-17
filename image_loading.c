@@ -15,6 +15,7 @@ void init_sdl(){
 	}
 }
 
+//load_image: takes a path image and returns SDL_Surface* after loading
 SDL_Surface* load_image(char* path){
 	SDL_Surface* image = IMG_Load(path);
 
