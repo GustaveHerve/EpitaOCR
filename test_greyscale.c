@@ -2,7 +2,7 @@
 #include <SDL2/SDL_image.h>
 #include <stdio.h>
 #include "include/pixel.h"
-#include "include/greyscale.h"
+#include "include/image_processing.h"
 #include "include/image_loading.h"
 
 int main(int argc, char** argv){

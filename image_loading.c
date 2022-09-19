@@ -2,6 +2,8 @@
 #include <SDL2/SDL_image.h>
 #include <stdio.h>
 
+//init_sdl: initialize SDL and SDL_image before using
+//exit if one of them fails
 void init_sdl(){
 	//Init SDL2
 	if (SDL_Init(SDL_INIT_VIDEO) == -1){

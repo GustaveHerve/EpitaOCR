@@ -47,8 +47,16 @@ void mul(double m1[], double m2[], size_t r1, size_t c1, size_t c2, double r[])
 	}
 }
 
+/* convolution: apply to an image a matrix convolution with a kernel provided
+*  stores the result in r[] (so it doesn't affect the image directly)
+*	image: SDL_Surface* of the image to work with
+*	ker: kernel matrix to apply the convolution with on image
+*	rows/cols: define ker's size
+*	r: array that will store the result
+*	sym: must be 1 only if kernel is as symetric matrix, 0 otherwise
+*/
 void convolution(SDL_Surface *image, double ker[], int rows, 
-		int cols, Uint8 r[], int sym){
+		int cols, int r[], int sym){
 
 	int width = image->w;
 	int height = image->h;
@@ -65,22 +73,25 @@ void convolution(SDL_Surface *image, double ker[], int rows,
 	for (int i = 0; i < height; i++){
 		for (int j = 0; j < width; j++){
 
-			int acc = 0;
+			double acc = 0;
 			int valid = 1;
-			for (int k = -1; k < rows -1 && valid; k++){
-				for (int l = -1; l < cols - 1 && valid ; l++){
+			int roff = rows/2;
+			int coff = cols/2;
+			for (int k = -1 * roff; k < rows -1 && valid; k++){
+				for (int l = -1 * coff; l < cols - 1 && valid ; l++){
 					if (i+k >= 0 && j+l >= 0 && i+k <height && j+l < width){
-					    int res = 0;
+					    double res = 0;
 						Uint8 value = 0;
-						SDL_GetRGB(pixels[(i+k)*width+(j+l)], image->format, &value, &value, &value);
+						SDL_GetRGB(pixels[(i+k)*width+(j+l)], image->format,
+							   	&value, &value, &value);
 						
 						if (sym){
 							res =
-								ker[(k+1) * cols + l+1] * value;
+								ker[(k+roff) * cols + l+coff] * value;
 						}
 						else{
 							res =
-								kert[(k+1) * cols + l+1] * value;
+								kert[(k+roff) * cols + l+coff] * value;
 						}
 						
 						acc += res;
@@ -91,24 +102,12 @@ void convolution(SDL_Surface *image, double ker[], int rows,
 			}
 			if (!valid)
 				acc = 0;
-			else if (acc > 255)
-				acc = 255;
-			else if (acc < 0)
-				acc = 0;
-			r[i*width + j] = (Uint8)acc;
+			//else if (acc > 255)
+			//	acc = 255;
+			//else if (acc < 0)
+			//	acc = 0;
+			//r[i*width + j] = (Uint8)acc;
+			r[i*width + j] = acc;
 		}
-	}
-}
-
-void gradient(Uint8 r1[], Uint8 r2[], Uint8 res[], size_t rows, size_t cols){
-	for (size_t i = 0; i < rows; i++){
-		for (size_t j = 0; j < cols; j++){	
-			double s1 = (double)r1[i*cols+j] * (double)r1[i*cols+j];
-			double s2 = (double)r2[i*cols+j] * (double)r2[i*cols+j];
-			double temp = sqrt(s1+s2);
-			if (temp > 255)
-				temp = 255;
-			res[i*cols + j] = (Uint8)temp;
-		}	
 	}
 }
