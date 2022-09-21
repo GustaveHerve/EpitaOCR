@@ -11,7 +11,7 @@
 int main(){
 
     init_sdl();
-    SDL_Surface* test = load_image("/Users/gustave/Documents/c/images/otsutest.jpg");
+    SDL_Surface* test = load_image("/Users/gustave/Documents/c/images/town.jpg");
     //SDL_Surface* test2 = load_image("/Users/gustave/Documents/c/images/image.png");
     unsigned int width = test->w;
 	unsigned int height = test->h;
@@ -42,7 +42,7 @@ int main(){
 	//convolution(test, kerx, 3, 3, r1, 0);
     //convolution(test, kery, 3, 3, r2, 0);
 
-    //gradient(r1, r2, edges, angles, height, width);
+    ///gradient(r1, r2, edges, angles, height, width);
 
     //free(r1);
     //free(r2);

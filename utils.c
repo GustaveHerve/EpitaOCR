@@ -20,7 +20,7 @@ int max3(int a, int b, int c){
 
 void histo_init(Histo* hist){
 
-	for (unsigned int i = 0; i < 255; i++){
+	for (unsigned int i = 0; i < 256; i++){
 		hist->values[i] = 0;
 	}
 }

@@ -52,72 +52,25 @@ void threshold(SDL_Surface* image, float threshold){
 	}
 }
 
-void otsunotworking(SDL_Surface* image){
+void threshold_value(SDL_Surface* image, int threshold){
+	unsigned int width = image->w;
+	unsigned int height = image->h;
 
-	int n = image->w * image->h;
-	//int t = 0, var_max = 0, sum = 0, sumB = 0;
-	//int q1 = 0, q2 = 0, u1 = 0, u2 = 0;
+	for (unsigned int i = 0; i < height; i++){
+		for (unsigned int j = 0; j < width; j++){
+			Uint32 pixel = get_pixel(image, j, i);
+			Uint8 r = 0, g = 0, b = 0;
 
-	Histo hist;
-	histo_init(&hist);
-	histo_compute(image, &hist);
+			SDL_GetRGB(pixel, image->format, &r, &g, &b);
+			Uint8 res = 0;
+			if (r > threshold){
+				res = 255;
+			}
 
-	float varinter[256];
-
-	float proba[256];
-	for (int i = 0; i < 256; i++){
-		proba[i] = (float)hist.values[i] / n;
+			Uint32 newpixel = SDL_MapRGB(image->format, res, res, res);
+			replace_pixel(image, j, i, newpixel);
+		}
 	}
-
-	for (int j = 1; j < 256; j++){
-		float p1 = array_sum(proba, 0, j+1);
-	    float p2 = array_sum(proba, j+1, 256);
-
-		float n1[j];
-		for (int k = 0; k < j; k++){
-			n1[k] = k;
-		}
-
-		float n2[256-j];
-		for (int l = j; l < 256; l++){
-			n2[l] = l;
-		}
-
-		float moy1 = 0;
-		float sum1 = 0;
-		for (int m = 0; m < j; m++){
-			sum1 += n1[m] * proba[m];
-		}
-		moy1 = sum1 / p1;
-
-		float moy2 = 0;
-		float sum2 = 0;
-		for (int o = j; o < 256; o++){
-			sum2 += n2[o-j] * proba[o];
-		}
-		moy2 = sum2 / p2;
-
-		float var1 = 0;
-		for (int p = 0; p < j; p++){
-			var1 += (n1[p] - moy1) * (n1[p] - moy1) * proba[p];
-		}
-		var1 = var1 / p1;
-
-		float var2 = 0;
-		for (int q = j; q < 256; q++){
-			var2 += (n2[q-j] - moy2) * (n2[q-j] - moy2) * proba[q];
-		}
-		var2 = var2 / p2;
-
-		varinter[j] = var1 + var2;
-
-	}
-
-	float indice = array_min_index(varinter, 256);
-	float level = (indice-1) / 255;
-	threshold(image, level);
-
-
 }
 
 void otsu(SDL_Surface* image){
@@ -133,15 +86,15 @@ void otsu(SDL_Surface* image){
 
 
 	for (int i = 0; i <= max_intensity; i++){
-		sum += i * hist.values[i];
+		sum += (float)i * (float)hist.values[i];
 	}
 
 	for (int t = 0; t <= max_intensity; t++){
-		q1 += hist.values[t];
+		q1 += (float)hist.values[t];
 		if (q1 == 0){
 			continue;
 		}
-		q2 = n - q1;
+		q2 = (float)n - q1;
 
 		sumB += t * hist.values[t];
 		u1 = sumB / q1;
@@ -155,9 +108,8 @@ void otsu(SDL_Surface* image){
 		}
 
 	}
-	threshold(image, thresh);
+	threshold_value(image, thresh);
 
-	
 
 }
 
