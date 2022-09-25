@@ -30,11 +30,11 @@ int main(int argc, char* argv[])
     int i = 1;
     SDL_Event event;
     
-    while(i)
+    while (i)
     {
         SDL_WaitEvent(&event);
         
-        if(event.type == SDL_QUIT)    
+        if (event.type == SDL_Quit)    
             i = 0;
         
         SDL_Rect img_size = {0,0,img->w/2, img->h/2};

@@ -6,12 +6,13 @@
 #include "include/image_processing.h"
 #include "include/image_loading.h"
 #include "include/matrix.h"
+#include "include/utils.h"
 
 
 int main(){
 
     init_sdl();
-    SDL_Surface* test = load_image("/Users/gustave/Documents/c/images/town.jpg");
+    SDL_Surface* test = load_image("/Users/gustave/Documents/c/images/cacatest.png");
     //SDL_Surface* test2 = load_image("/Users/gustave/Documents/c/images/image.png");
     unsigned int width = test->w;
 	unsigned int height = test->h;
@@ -24,6 +25,7 @@ int main(){
     Uint8 *edges = malloc(sizeof(Uint8) * width * height);
     Uint8 *angles = malloc(sizeof(Uint8) * width * height);
 
+
 	double kerx[] = { -1, 0, 1, -2, 0, 2, -1, 0, 1};
     double kery[] = { -1, -2, -1, 0, 0, 0, 1, 2, 1};  
     double blur[] = {0.0625, 0.125, 0.0625, 0.125, 0.25, 0.125, 0.0625, 0.125, 0.0625};
@@ -32,32 +34,90 @@ int main(){
     //16/256, 24/256, 16/256, 4/256, 1/256, 4/256, 6/256, 4/256, 1/256};
     //double shar[] = { 0, -1, 0, -1, 5, -1, 0, -1, 0};
     
-    //convolution(test, blur, 3, 3, b, 1);
-    //apply_convolution(test, b, (size_t)height, (size_t)width);
+    //BLURRING
+    //convolution(test, blur, 3, 3, b, 0);
+    //apply_convolution_int(test, b, (size_t)height, (size_t)width);
     //free(b);
 
-    //threshold(test, 0.5);
+    //thresholding
     otsu(test);
     
-	//convolution(test, kerx, 3, 3, r1, 0);
-    //convolution(test, kery, 3, 3, r2, 0);
+    //SOBELS X AND Y
+	convolution(test, kerx, 3, 3, r1, 0);
+    convolution(test, kery, 3, 3, r2, 0);
 
-    ///gradient(r1, r2, edges, angles, height, width);
+    //FUSE SOBELS X AND Y
+    gradient(r1, r2, edges, angles, height, width);
 
-    //free(r1);
-    //free(r2);
+    free(r1);
+    free(r2);
 
-    //non_maxima_suppr(edges, angles, height, width);
+    //CANNY NON MAXIMA
+	Uint8 *maxima = malloc(sizeof(Uint8) * width * height);
+    non_maxima_suppr(edges, angles, height, width, maxima);
 
-    //apply_convolution(test, edges, (size_t)height, (size_t)width);
-    //apply_convolution(test, r, (size_t)height, (size_t)width);
-    //apply_convolution(test2, r2, (size_t)height, (size_t)width);
-    //IMG_SavePNG(test, "/Users/gustave/Documents/c/images/ouiX.jpeg");
-    //IMG_SavePNG(test2, "/Users/gustave/Documents/c/images/ouiY.jpeg");
+    apply_convolution(test, maxima, (size_t)height, (size_t)width);
     
-    IMG_SavePNG(test, "/Users/gustave/Documents/c/images/briaccursed.png");
-    //IMG_SavePNG(test2, "/Users/gustave/Documents/c/images/valveSY.png");
 
+    int rows = sqrt(height * height + width * width);
+    int *hough = malloc(sizeof(int) * 181 * rows);
+
+    hough_init(hough, rows);
+    hough_lines(test, hough);
+
+    Line *lines = malloc(sizeof(Line) * 181 * rows);
+
+    hough_filter(hough, rows, 400, lines);
+    
+    SDL_Window *window = SDL_CreateWindow("Cookin'VR",SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,test->w,test->h,SDL_WINDOW_RESIZABLE);
+    SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, 0);
+    SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, test);
+
+    int i = 1;
+    SDL_Event event;
+
+    
+    while(i)
+    {
+        SDL_WaitEvent(&event);
+        
+        if(event.type == SDL_QUIT)    
+            i = 0;
+        
+        SDL_Rect img_size = {0,0,test->w, test->h};
+
+        SDL_SetRenderDrawColor(renderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
+        SDL_RenderClear(renderer);
+        SDL_RenderCopy(renderer, texture, NULL, &img_size);
+        for (int i = 0; i < 500; i++){
+            int rho = lines[i].rho;
+            float theta = lines[i].theta * M_PI / 180;
+            double sinA = sin(theta);
+            double cosA = cos(theta);
+            float x0 = cosA * rho;
+            float y0 = sinA * rho;
+            int x1 = (x0 + 5000 * (-1 * sinA));
+            int y1 = (y0 + 5000 * (cosA));
+            int x2 = (x0 - 5000 * (-1 * sinA));
+            int y2 = (y0 - 5000 * (cosA));
+
+            SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
+
+        }
+    
+        //copy texture to output device
+        
+        SDL_RenderPresent(renderer); 
+        //it sends the renderer to window
+
+    }
+
+    SDL_DestroyTexture(texture);
+    SDL_DestroyWindow(window);
+    SDL_DestroyRenderer(renderer);
+    
+    IMG_SavePNG(test, "/Users/gustave/Documents/c/images/briacpassicursed3.png");
+    SDL_FreeSurface(test);
 
     free(edges);
     free(angles);

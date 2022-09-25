@@ -10,6 +10,11 @@ typedef struct Histo{
 	int values[256];
 } Histo;
 
+typedef struct Line{
+	int rho;
+	float theta;
+} Line;
+
 void histo_init(Histo* hist);
 void histo_compute(SDL_Surface* image, Histo* hist);
 

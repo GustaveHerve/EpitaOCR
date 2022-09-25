@@ -6,6 +6,7 @@
 #include "include/utils.h"
 
 void greyscale(SDL_Surface *image){
+
 	unsigned int width = image->w;
 	unsigned int height = image->h;
 
@@ -28,6 +29,7 @@ void greyscale(SDL_Surface *image){
 
 //threshold: applies a fixed threshold treatment to a SDL_Surface
 void threshold(SDL_Surface* image, float threshold){
+
 	unsigned int width = image->w;
 	unsigned int height = image->h;
 	Uint8 t = threshold * 255;
@@ -53,6 +55,7 @@ void threshold(SDL_Surface* image, float threshold){
 }
 
 void threshold_value(SDL_Surface* image, int threshold){
+
 	unsigned int width = image->w;
 	unsigned int height = image->h;
 
@@ -125,10 +128,33 @@ void apply_convolution(SDL_Surface *image, Uint8 r[], size_t rows, size_t cols){
         }
     }
 }
+
+//apply_convolutio_int: same as previous but accept int array and clamp between 0 and 255 to avoid
+//overflow
+void apply_convolution_int(SDL_Surface *image, int r[], size_t rows, size_t cols){
+   
+    for (size_t i = 0; i < rows; i++){
+        for (size_t j= 0; j < cols; j++){
+
+			Uint8 value;
+			if (r[i*cols+j] > 255)
+				value = 255;
+			else if (r[i*cols+j] < 0)
+				value = 0;
+			else
+				value = r[i*cols+j];
+
+            Uint32 pixel = SDL_MapRGB(image->format, value, value,
+					value);
+            replace_pixel(image, j, i, pixel);
+        }
+    }
+}
 /* gradient: computes edge and angle gradient values from two matrices of same size
 *  stores the result in edges[] and angles[] (so it doesn't affect the image directly)
 */
 void gradient(int r1[], int r2[], Uint8 edges[], Uint8 angles[], size_t rows, size_t cols){
+
 	for (size_t i = 0; i < rows; i++){
 		for (size_t j = 0; j < cols; j++){	
 			int current = i*cols + j;
@@ -159,7 +185,9 @@ void gradient(int r1[], int r2[], Uint8 edges[], Uint8 angles[], size_t rows, si
 	}
 }
 
-void non_maxima_suppr(Uint8 edges[], Uint8 angles[], size_t rows, size_t cols){
+void non_maxima_suppr(Uint8 edges[], Uint8 angles[], size_t rows, size_t cols,
+		Uint8 res[]){
+
 	for (int i = 0; i < (int)rows; i++){
 		for (int j = 0; j < (int)cols; j++){
 			unsigned int c = i * cols + j;
@@ -171,7 +199,9 @@ void non_maxima_suppr(Uint8 edges[], Uint8 angles[], size_t rows, size_t cols){
 				if (j+1 < (int)cols && j-1 >= 0){
 					int maxima = max3(edges[c-1], edges[c], edges[c+1]);
 					if (maxima != edges[c])
-						edges[c] = 0;
+						res[c] = 0;
+					else
+						res[c] = edges[c];
 				}
 				break;
 
@@ -179,7 +209,10 @@ void non_maxima_suppr(Uint8 edges[], Uint8 angles[], size_t rows, size_t cols){
 				if ((j+1 < (int)cols && i+1 < (int)rows) && (i-1 >= 0 && j-1 >= 0)){
 					int maxima = max3(edges[(i-1)*cols+j-1], edges[c], edges[(i+1)*cols+j+1]);
 					if (maxima != edges[c])
-						edges[c] = 0;
+						res[c] = 0;
+					else
+						res[c] = edges[c];
+
 				}
 				break;
 
@@ -187,7 +220,10 @@ void non_maxima_suppr(Uint8 edges[], Uint8 angles[], size_t rows, size_t cols){
 				if (i+1 < (int)cols && i-1 >= 0){
 					int maxima = max3(edges[((i-1)*cols+j)], edges[c], edges[(i+j)*cols+j]);
 					if (maxima != edges[c])
-						edges[c] = 0;
+						res[c] = 0;
+					else
+						res[c] = edges[c];
+
 				}
 				break;
 
@@ -195,12 +231,68 @@ void non_maxima_suppr(Uint8 edges[], Uint8 angles[], size_t rows, size_t cols){
 				if ((j-1 >= 0 && i+1 < (int)rows ) && (j+1 < (int)cols && i-1 >= 0)){
 					int maxima = max3(edges[(i+1)*cols+j-1], edges[c], edges[(i-1)*cols+j+1]);
 					if (maxima != edges[c])
-						edges[c] = 0;
+						res[c] = 0;
+					else
+						res[c] = edges[c];
+
 				}
 				break;
 			}
-
 		}
-
 	}
 }
+
+//HOUGH TRNASFORM RELATED METHODS
+void hough_init(int res[], int rows){
+
+	for (int i = 0; i < rows; i++){
+		for (int j = 0; j <= 180; j++){
+			res[i * 181 + j] = 0;
+		}
+	}
+}
+
+void hough_lines(SDL_Surface* image, int res[]){
+
+	unsigned int width = image->w;
+	unsigned int height = image->h;
+
+	for (unsigned int i = 0; i < height; i++){
+		for (unsigned int j = 0; j < width; j++){
+
+			Uint32 pixel = get_pixel(image, j, i);
+			Uint8 r = 0, g = 0, b = 0;
+			SDL_GetRGB(pixel, image->format, &r, &g, &b);
+			if (r > 0)
+			{
+				for (int k = 0; k <= 180; k++){
+					
+					float rad = k * M_PI / 180;
+					float rho = j * cos(rad) + i * sin(rad);
+					int rhoi = roundf(rho);
+					res[rhoi * 181 + k] += 1; 
+				
+				}
+
+			}
+
+		}
+	}
+}
+
+void hough_filter(int input[], int rows, int threshold, Line res[]){
+
+	int acc = 0;
+	for (int i = 0; i < rows; i++){
+		for (int j = 0; j <= 180; j++){
+			if (input[i * 181 + j] >= threshold){
+				Line new;
+				new.theta = j;
+				new.rho = i;
+				res[acc] = new;
+				acc++;
+			}
+		}
+	}
+}
+
