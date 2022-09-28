@@ -243,16 +243,16 @@ void non_maxima_suppr(Uint8 edges[], Uint8 angles[], size_t rows, size_t cols,
 }
 
 //HOUGH TRNASFORM RELATED METHODS
-void hough_init(int res[], int rows){
+void hough_init(int res[], int rows, int cols){
 
 	for (int i = 0; i < rows; i++){
-		for (int j = 0; j <= 180; j++){
-			res[i * 181 + j] = 0;
+		for (int j = 0; j < cols; j++){
+			res[i * cols + j] = 0;
 		}
 	}
 }
 
-void hough_lines(SDL_Surface* image, int res[]){
+void hough_lines(SDL_Surface* image, int angleNb, int step, int res[]){
 
 	unsigned int width = image->w;
 	unsigned int height = image->h;
@@ -265,12 +265,12 @@ void hough_lines(SDL_Surface* image, int res[]){
 			SDL_GetRGB(pixel, image->format, &r, &g, &b);
 			if (r > 0)
 			{
-				for (int k = 0; k <= 180; k++){
+				for (int k = 0; k < angleNb; k+=step){
 					
 					float rad = k * M_PI / 180;
 					float rho = j * cos(rad) + i * sin(rad);
 					int rhoi = roundf(rho);
-					res[rhoi * 181 + k] += 1; 
+					res[rhoi * angleNb + k] += 1; 
 				
 				}
 
@@ -280,12 +280,12 @@ void hough_lines(SDL_Surface* image, int res[]){
 	}
 }
 
-void hough_filter(int input[], int rows, int threshold, Line res[]){
+int hough_filter(int input[], int rows, int cols, int threshold, Line res[]){
 
 	int acc = 0;
 	for (int i = 0; i < rows; i++){
-		for (int j = 0; j <= 180; j++){
-			if (input[i * 181 + j] >= threshold){
+		for (int j = 0; j < cols; j++){
+			if (input[i * cols + j] >= threshold){
 				Line new;
 				new.theta = j;
 				new.rho = i;
@@ -294,5 +294,29 @@ void hough_filter(int input[], int rows, int threshold, Line res[]){
 			}
 		}
 	}
+
+	return acc+1;
+}
+
+int hough_average(Line input[], int len, int avg){
+	
+	int newlen = 0;
+	for (int i = 0; i < len; i+=avg){
+		int sum = 0;
+		float angleSum = 0;
+		for (int j = 0; j < avg; j++){
+			if (i+j < len){
+				sum += input[i+j].rho;
+				angleSum += input[i+j].theta;
+			}
+		}
+		Line new;
+		new.rho = sum / avg;
+		new.theta = angleSum / (float)avg;
+		input[newlen] = new;
+		newlen++;
+	}
+
+	return newlen+1;
 }
 
