@@ -242,7 +242,30 @@ void non_maxima_suppr(Uint8 edges[], Uint8 angles[], size_t rows, size_t cols,
 	}
 }
 
-//HOUGH TRNASFORM RELATED METHODS
+void double_thresholding(Uint8 *edges, size_t rows, size_t cols, 
+		float lowRatio, float highRatio){
+
+	int highValue = highRatio * 255;
+	int lowValue = highValue * lowRatio;
+	int weak = 100;
+	int strong = 255;
+
+	for (size_t i = 0; i < rows; i++){
+		for (size_t j = 0; j < cols; j++){
+			int c = i * cols + j;
+
+			if (edges[c] >= highValue)
+				edges[c] = strong;
+			else if (edges[c] > lowValue)
+				edges[c] = weak;
+			else
+				edges[c] = 0;
+
+		}
+	}
+}
+
+//HOUGH TRANSFORM RELATED METHODS
 void hough_init(int res[], int rows, int cols){
 
 	for (int i = 0; i < rows; i++){
@@ -261,21 +284,19 @@ void hough_lines(SDL_Surface* image, int angleNb, int step, int res[]){
 		for (unsigned int j = 0; j < width; j++){
 
 			Uint32 pixel = get_pixel(image, j, i);
-			Uint8 r = 0, g = 0, b = 0;
+			Uint8 r=0, g=0, b=0;
 			SDL_GetRGB(pixel, image->format, &r, &g, &b);
 			if (r > 0)
 			{
-				for (int k = 0; k < angleNb; k+=step){
+				for (int k = 0; k < angleNb; k++){
 					
 					float rad = k * M_PI / 180;
 					float rho = j * cos(rad) + i * sin(rad);
-					int rhoi = roundf(rho);
-					res[rhoi * angleNb + k] += 1; 
+					int rhoi = rho;
+					res[rhoi * angleNb + k]++; 
 				
 				}
-
 			}
-
 		}
 	}
 }
@@ -286,37 +307,119 @@ int hough_filter(int input[], int rows, int cols, int threshold, Line res[]){
 	for (int i = 0; i < rows; i++){
 		for (int j = 0; j < cols; j++){
 			if (input[i * cols + j] >= threshold){
-				Line new;
-				new.theta = j;
-				new.rho = i;
+				Line new = {i,j};
 				res[acc] = new;
 				acc++;
 			}
 		}
 	}
 
-	return acc+1;
+	return acc;
 }
 
-int hough_average(Line input[], int len, int avg){
-	
-	int newlen = 0;
-	for (int i = 0; i < len; i+=avg){
-		int sum = 0;
-		float angleSum = 0;
-		for (int j = 0; j < avg; j++){
-			if (i+j < len){
-				sum += input[i+j].rho;
-				angleSum += input[i+j].theta;
+TupleInt hough_filter_local(int input[], int rows, int cols, int threshold, int step, Line hor[], Line ver[]){
+
+	int horacc = 0;
+	int veracc = 0;
+
+	for (int i = 0; i < rows; i += step){
+		for (int j = 0; j < cols; j += step){
+
+			int imax = i;
+			int jmax = j;
+
+			for (int k = 0; k < step; k++){
+				for (int l = 0; l < step; l++){
+
+					if (i+k < rows && j+l < cols){
+						if (input[(i+k)*cols + j+l] > input[imax*cols + jmax]){
+							imax = i+k;
+							jmax = j+l;
+						}
+					}
+				}
+			}
+
+			if (input[imax * cols +  jmax] >= threshold){
+				Line new;
+				new.theta = jmax;
+				new.rho = imax;
+				if (jmax < 45){
+					hor[horacc] = new;
+					horacc++;
+				}
+				else{
+					ver[veracc] = new;
+					veracc++;
+				}
 			}
 		}
-		Line new;
-		new.rho = sum / avg;
-		new.theta = angleSum / (float)avg;
-		input[newlen] = new;
-		newlen++;
 	}
 
-	return newlen+1;
+	TupleInt res;
+	res.x = horacc;
+	res.y = veracc;
+	return res;
 }
 
+int hough_filter_debug(int input[], int rows, int cols, int threshold, int step, Line res[]){
+
+	int acc = 0;
+
+	for (int i = 0; i < rows; i += step){
+		for (int j = 0; j < cols; j += step){
+
+			int imax = i;
+			int jmax = j;
+
+			for (int k = 0; k < step; k++){
+				for (int l = 0; l < step; l++){
+
+					if (i+k < rows && j+l < cols){
+						if (input[(i+k)*cols + j+l] > input[imax*cols + jmax]){
+							imax = i+k;
+							jmax = j+l;
+						}
+					}
+				}
+			}
+
+			if (input[imax * cols +  jmax] >= threshold){
+				Line new;
+				new.theta = jmax;
+				new.rho = imax;
+				res[acc] = new;
+				acc++;
+			}
+		}
+	}
+
+	return acc;
+}
+
+TupleInt hough_filter_localdebug(int input[], int rows, int cols, int threshold, Line hor[], Line ver[]){
+
+	int horacc = 0;
+	int veracc = 0;
+	for (int i = 0; i < rows; i++){
+		for (int j = 0; j < cols; j++){
+			if (input[i * cols + j] >= threshold){
+				Line new;
+				new.theta = j;
+				new.rho = i;
+				if (j > 45){
+					hor[horacc] = new;
+					horacc++;
+				}
+				else{
+					ver[veracc] = new;
+					veracc++;
+				}
+			}
+		}
+	}
+	TupleInt res;
+	res.x = horacc;
+	res.y = veracc;
+	return res;
+}

@@ -15,7 +15,7 @@ void open_img_window(char* path)
     
     SDL_Window *window;
 
-    window = SDL_CreateWindow(path,SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,img->w/2,img->h/2,SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
+    window = SDL_CreateWindow(path,SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,img->w,img->h,SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
 
     if(window == NULL)
         errx(1, "Failed to create window");
@@ -33,7 +33,7 @@ void open_img_window(char* path)
         if(event.type == SDL_QUIT)    
             i = 0;
         
-        SDL_Rect img_size = {0,0,img->w/2, img->h/2};
+        SDL_Rect img_size = {0,0,img->w, img->h};
         
         SDL_RenderCopy(renderer, texture, NULL, &img_size);
         //copy texture to output device

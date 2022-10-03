@@ -8,6 +8,9 @@
 #VSCode trash
 .vscode
 
+#Vim trash
+*.swp
+
 Makefile
 
 #Debugging

@@ -15,10 +15,17 @@ typedef struct Line{
 	float theta;
 } Line;
 
+typedef struct TupleInt{
+	int x;
+	int y;
+} TupleInt;
+
 void histo_init(Histo* hist);
 void histo_compute(SDL_Surface* image, Histo* hist);
 
 float array_sum(float arr[], int begin, int end);
 int array_min_index(float arr[], size_t len);
+
+int polar_intersection(TupleInt *res, Line line1, Line line2);
 
 #endif
