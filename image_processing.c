@@ -4,6 +4,7 @@
 #include <math.h>
 #include "include/pixel.h"
 #include "include/utils.h"
+#include "include/geometry.h"
 
 void greyscale(SDL_Surface *image){
 
@@ -286,7 +287,7 @@ void hough_lines(SDL_Surface* image, int angleNb, int step, int res[]){
 			Uint32 pixel = get_pixel(image, j, i);
 			Uint8 r = 0, g = 0, b = 0;
 			SDL_GetRGB(pixel, image->format, &r, &g, &b);
-			if (r > 0)
+			if (r > 100)
 			{
 				for (int k = 0; k < angleNb; k+=step){
 					

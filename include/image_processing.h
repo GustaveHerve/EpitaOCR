@@ -3,6 +3,7 @@
 
 #include <SDL2/SDL.h>
 #include "utils.h"
+#include "geometry.h"
 
 void greyscale(SDL_Surface *image);
 void threshold(SDL_Surface* image, float threshold);
