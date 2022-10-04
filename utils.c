@@ -54,6 +54,7 @@ float array_sum(float arr[], int begin, int end){
 }
 
 int array_min_index(float arr[], size_t len){
+
 	size_t min = 0;
 	for (size_t i = 1; i < len; i++){
 		
@@ -63,4 +64,5 @@ int array_min_index(float arr[], size_t len){
 
 	return (int) min;
 }
+
 

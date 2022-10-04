@@ -4,8 +4,10 @@
 #include <math.h>
 #include "include/pixel.h"
 #include "include/utils.h"
+#include "include/geometry.h"
 
 void greyscale(SDL_Surface *image){
+
 	unsigned int width = image->w;
 	unsigned int height = image->h;
 
@@ -28,6 +30,7 @@ void greyscale(SDL_Surface *image){
 
 //threshold: applies a fixed threshold treatment to a SDL_Surface
 void threshold(SDL_Surface* image, float threshold){
+
 	unsigned int width = image->w;
 	unsigned int height = image->h;
 	Uint8 t = threshold * 255;
@@ -53,6 +56,7 @@ void threshold(SDL_Surface* image, float threshold){
 }
 
 void threshold_value(SDL_Surface* image, int threshold){
+
 	unsigned int width = image->w;
 	unsigned int height = image->h;
 
@@ -125,10 +129,33 @@ void apply_convolution(SDL_Surface *image, Uint8 r[], size_t rows, size_t cols){
         }
     }
 }
+
+//apply_convolutio_int: same as previous but accept int array and clamp between 0 and 255 to avoid
+//overflow
+void apply_convolution_int(SDL_Surface *image, int r[], size_t rows, size_t cols){
+   
+    for (size_t i = 0; i < rows; i++){
+        for (size_t j= 0; j < cols; j++){
+
+			Uint8 value;
+			if (r[i*cols+j] > 255)
+				value = 255;
+			else if (r[i*cols+j] < 0)
+				value = 0;
+			else
+				value = r[i*cols+j];
+
+            Uint32 pixel = SDL_MapRGB(image->format, value, value,
+					value);
+            replace_pixel(image, j, i, pixel);
+        }
+    }
+}
 /* gradient: computes edge and angle gradient values from two matrices of same size
 *  stores the result in edges[] and angles[] (so it doesn't affect the image directly)
 */
 void gradient(int r1[], int r2[], Uint8 edges[], Uint8 angles[], size_t rows, size_t cols){
+
 	for (size_t i = 0; i < rows; i++){
 		for (size_t j = 0; j < cols; j++){	
 			int current = i*cols + j;
@@ -159,7 +186,9 @@ void gradient(int r1[], int r2[], Uint8 edges[], Uint8 angles[], size_t rows, si
 	}
 }
 
-void non_maxima_suppr(Uint8 edges[], Uint8 angles[], size_t rows, size_t cols){
+void non_maxima_suppr(Uint8 edges[], Uint8 angles[], size_t rows, size_t cols,
+		Uint8 res[]){
+
 	for (int i = 0; i < (int)rows; i++){
 		for (int j = 0; j < (int)cols; j++){
 			unsigned int c = i * cols + j;
@@ -171,7 +200,9 @@ void non_maxima_suppr(Uint8 edges[], Uint8 angles[], size_t rows, size_t cols){
 				if (j+1 < (int)cols && j-1 >= 0){
 					int maxima = max3(edges[c-1], edges[c], edges[c+1]);
 					if (maxima != edges[c])
-						edges[c] = 0;
+						res[c] = 0;
+					else
+						res[c] = edges[c];
 				}
 				break;
 
@@ -179,7 +210,10 @@ void non_maxima_suppr(Uint8 edges[], Uint8 angles[], size_t rows, size_t cols){
 				if ((j+1 < (int)cols && i+1 < (int)rows) && (i-1 >= 0 && j-1 >= 0)){
 					int maxima = max3(edges[(i-1)*cols+j-1], edges[c], edges[(i+1)*cols+j+1]);
 					if (maxima != edges[c])
-						edges[c] = 0;
+						res[c] = 0;
+					else
+						res[c] = edges[c];
+
 				}
 				break;
 
@@ -187,7 +221,10 @@ void non_maxima_suppr(Uint8 edges[], Uint8 angles[], size_t rows, size_t cols){
 				if (i+1 < (int)cols && i-1 >= 0){
 					int maxima = max3(edges[((i-1)*cols+j)], edges[c], edges[(i+j)*cols+j]);
 					if (maxima != edges[c])
-						edges[c] = 0;
+						res[c] = 0;
+					else
+						res[c] = edges[c];
+
 				}
 				break;
 
@@ -195,12 +232,197 @@ void non_maxima_suppr(Uint8 edges[], Uint8 angles[], size_t rows, size_t cols){
 				if ((j-1 >= 0 && i+1 < (int)rows ) && (j+1 < (int)cols && i-1 >= 0)){
 					int maxima = max3(edges[(i+1)*cols+j-1], edges[c], edges[(i-1)*cols+j+1]);
 					if (maxima != edges[c])
-						edges[c] = 0;
+						res[c] = 0;
+					else
+						res[c] = edges[c];
+
 				}
 				break;
 			}
+		}
+	}
+}
+
+void double_thresholding(Uint8 *edges, size_t rows, size_t cols, 
+		float lowRatio, float highRatio){
+
+	int highValue = highRatio * 255;
+	int lowValue = highValue * lowRatio;
+	int weak = 100;
+	int strong = 255;
+
+	for (size_t i = 0; i < rows; i++){
+		for (size_t j = 0; j < cols; j++){
+			int c = i * cols + j;
+
+			if (edges[c] >= highValue)
+				edges[c] = strong;
+			else if (edges[c] > lowValue)
+				edges[c] = weak;
+			else
+				edges[c] = 0;
 
 		}
-
 	}
+}
+
+//HOUGH TRANSFORM RELATED METHODS
+void hough_init(int res[], int rows, int cols){
+
+	for (int i = 0; i < rows; i++){
+		for (int j = 0; j < cols; j++){
+			res[i * cols + j] = 0;
+		}
+	}
+}
+
+void hough_lines(SDL_Surface* image, int angleNb, int step, int res[]){
+
+	unsigned int width = image->w;
+	unsigned int height = image->h;
+
+	for (unsigned int i = 0; i < height; i++){
+		for (unsigned int j = 0; j < width; j++){
+
+			Uint32 pixel = get_pixel(image, j, i);
+			Uint8 r = 0, g = 0, b = 0;
+			SDL_GetRGB(pixel, image->format, &r, &g, &b);
+			if (r > 100)
+			{
+				for (int k = 0; k < angleNb; k+=step){
+					
+					float rad = k * M_PI / 180;
+					float rho = j * cos(rad) + i * sin(rad);
+					int rhoi = roundf(rho);
+					if (rhoi < 0)
+						break;
+					res[rhoi * angleNb + k]++; 
+				
+				}
+			}
+		}
+	}
+}
+
+int hough_filter(int input[], int rows, int cols, int threshold, Line res[]){
+
+	int acc = 0;
+	for (int i = 0; i < rows; i++){
+		for (int j = 0; j < cols; j++){
+			if (input[i * cols + j] >= threshold){
+				Line new = {i,j};
+				res[acc] = new;
+				acc++;
+			}
+		}
+	}
+
+	return acc;
+}
+
+TupleInt hough_filter_local(int input[], int rows, int cols, int threshold, int step, Line hor[], Line ver[]){
+
+	int horacc = 0;
+	int veracc = 0;
+
+	for (int i = 0; i < rows; i += step){
+		for (int j = 0; j < cols; j += step){
+
+			int imax = i;
+			int jmax = j;
+
+			for (int k = 0; k < step; k++){
+				for (int l = 0; l < step; l++){
+
+					if (i+k < rows && j+l < cols){
+						if (input[(i+k)*cols + j+l] > input[imax*cols + jmax]){
+							imax = i+k;
+							jmax = j+l;
+						}
+					}
+				}
+			}
+
+			if (input[imax * cols +  jmax] >= threshold){
+				Line new;
+				new.theta = jmax;
+				new.rho = imax;
+				if (jmax < 45){
+					hor[horacc] = new;
+					horacc++;
+				}
+				else{
+					ver[veracc] = new;
+					veracc++;
+				}
+			}
+		}
+	}
+
+	TupleInt res;
+	res.x = horacc;
+	res.y = veracc;
+	return res;
+}
+
+int hough_filter_debug(int input[], int rows, int cols, int threshold, int step, Line res[]){
+
+	int acc = 0;
+
+	for (int i = 0; i < rows; i += step){
+		for (int j = 0; j < cols; j += step){
+
+			int imax = i;
+			int jmax = j;
+
+			for (int k = 0; k < step; k++){
+				for (int l = 0; l < step; l++){
+
+					if (i+k < rows && j+l < cols){
+						if (input[(i+k)*cols + j+l] > input[imax*cols + jmax]){
+							imax = i+k;
+							jmax = j+l;
+						}
+					}
+				}
+			}
+
+			if (input[imax * cols +  jmax] >= threshold){
+				Line new;
+				new.theta = jmax;
+				new.rho = imax;
+				res[acc] = new;
+				acc++;
+			}
+		}
+	}
+
+	return acc;
+}
+
+TupleInt hough_filter_localdebug(int input[], int rows, int cols, int threshold, Line hor[], Line ver[]){
+
+	int horacc = 0;
+	int veracc = 0;
+	for (int i = 0; i < rows; i++){
+		for (int j = 0; j < cols; j++){
+			if (input[i * cols + j] >= threshold){
+				Line new;
+				new.theta = j;
+				new.rho = i;
+				if (j > 45){
+					hor[horacc] = new;
+					horacc++;
+				}
+				else{
+					ver[veracc] = new;
+					veracc++;
+				}
+			}
+		}
+	}
+	TupleInt res;
+	res.x = horacc;
+	res.y = veracc;
+	return res;
 }
