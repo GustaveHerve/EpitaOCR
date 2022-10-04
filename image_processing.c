@@ -284,15 +284,17 @@ void hough_lines(SDL_Surface* image, int angleNb, int step, int res[]){
 		for (unsigned int j = 0; j < width; j++){
 
 			Uint32 pixel = get_pixel(image, j, i);
-			Uint8 r=0, g=0, b=0;
+			Uint8 r = 0, g = 0, b = 0;
 			SDL_GetRGB(pixel, image->format, &r, &g, &b);
 			if (r > 0)
 			{
-				for (int k = 0; k < angleNb; k++){
+				for (int k = 0; k < angleNb; k+=step){
 					
 					float rad = k * M_PI / 180;
 					float rho = j * cos(rad) + i * sin(rad);
-					int rhoi = rho;
+					int rhoi = roundf(rho);
+					if (rhoi < 0)
+						break;
 					res[rhoi * angleNb + k]++; 
 				
 				}
