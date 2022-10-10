@@ -1,10 +1,13 @@
 #include <stdlib.h>
+#include <err.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <math.h>
 #include "include/pixel.h"
 #include "include/utils.h"
 #include "include/geometry.h"
+#include "include/matrix.h"
+#include "include/image_processing.h"
 
 void greyscale(SDL_Surface *image){
 
@@ -26,6 +29,39 @@ void greyscale(SDL_Surface *image){
 
 		}
 	}
+}
+
+void blur_c(SDL_Surface* image, int kersize){
+
+    int *b = malloc(sizeof(int) * image->w * image->h);
+    if (b == NULL)
+        errx(1, "blur_c: couldn't allocate memory for blurring");
+        
+    switch(kersize){
+
+        case 3:
+			{
+    		double blur[] = {0.0625, 0.125, 0.0625, 0.125, 0.25, 0.125, 0.0625, 0.125, 0.0625};
+            convolution(image, blur, 3, 3, b, 1);
+            break;}
+				
+
+        case 5:
+			{
+            double blur[] = {1/256, 4/256, 6/256, 4/256, 1/256, 4/256, 16/256,
+    		24/256, 16/256, 4/256, 6/256, 24/256, 36/256, 24/256, 6/256, 4/256,
+    		16/256, 24/256, 16/256, 4/256, 1/256, 4/256, 6/256, 4/256, 1/256};
+			convolution(image, blur, 5, 5, b, 1);
+			break;}
+
+		default:
+			errx(2, "blur_c: invalid kersize");
+
+    }
+
+	apply_convolution_int(image, b, (size_t)image->h, (size_t)image->w);
+    free(b);
+
 }
 
 //threshold: applies a fixed threshold treatment to a SDL_Surface
@@ -113,7 +149,6 @@ void otsu(SDL_Surface* image){
 
 	}
 	threshold_value(image, thresh);
-
 
 }
 
@@ -266,163 +301,4 @@ void double_thresholding(Uint8 *edges, size_t rows, size_t cols,
 	}
 }
 
-//HOUGH TRANSFORM RELATED METHODS
-void hough_init(int res[], int rows, int cols){
 
-	for (int i = 0; i < rows; i++){
-		for (int j = 0; j < cols; j++){
-			res[i * cols + j] = 0;
-		}
-	}
-}
-
-void hough_lines(SDL_Surface* image, int angleNb, int step, int res[]){
-
-	unsigned int width = image->w;
-	unsigned int height = image->h;
-
-	for (unsigned int i = 0; i < height; i++){
-		for (unsigned int j = 0; j < width; j++){
-
-			Uint32 pixel = get_pixel(image, j, i);
-			Uint8 r = 0, g = 0, b = 0;
-			SDL_GetRGB(pixel, image->format, &r, &g, &b);
-			if (r > 100)
-			{
-				for (int k = 0; k < angleNb; k+=step){
-					
-					float rad = k * M_PI / 180;
-					float rho = j * cos(rad) + i * sin(rad);
-					int rhoi = roundf(rho);
-					if (rhoi < 0)
-						break;
-					res[rhoi * angleNb + k]++; 
-				
-				}
-			}
-		}
-	}
-}
-
-int hough_filter(int input[], int rows, int cols, int threshold, Line res[]){
-
-	int acc = 0;
-	for (int i = 0; i < rows; i++){
-		for (int j = 0; j < cols; j++){
-			if (input[i * cols + j] >= threshold){
-				Line new = {i,j};
-				res[acc] = new;
-				acc++;
-			}
-		}
-	}
-
-	return acc;
-}
-
-TupleInt hough_filter_local(int input[], int rows, int cols, int threshold, int step, Line hor[], Line ver[]){
-
-	int horacc = 0;
-	int veracc = 0;
-
-	for (int i = 0; i < rows; i += step){
-		for (int j = 0; j < cols; j += step){
-
-			int imax = i;
-			int jmax = j;
-
-			for (int k = 0; k < step; k++){
-				for (int l = 0; l < step; l++){
-
-					if (i+k < rows && j+l < cols){
-						if (input[(i+k)*cols + j+l] > input[imax*cols + jmax]){
-							imax = i+k;
-							jmax = j+l;
-						}
-					}
-				}
-			}
-
-			if (input[imax * cols +  jmax] >= threshold){
-				Line new;
-				new.theta = jmax;
-				new.rho = imax;
-				if (jmax < 45){
-					hor[horacc] = new;
-					horacc++;
-				}
-				else{
-					ver[veracc] = new;
-					veracc++;
-				}
-			}
-		}
-	}
-
-	TupleInt res;
-	res.x = horacc;
-	res.y = veracc;
-	return res;
-}
-
-int hough_filter_debug(int input[], int rows, int cols, int threshold, int step, Line res[]){
-
-	int acc = 0;
-
-	for (int i = 0; i < rows; i += step){
-		for (int j = 0; j < cols; j += step){
-
-			int imax = i;
-			int jmax = j;
-
-			for (int k = 0; k < step; k++){
-				for (int l = 0; l < step; l++){
-
-					if (i+k < rows && j+l < cols){
-						if (input[(i+k)*cols + j+l] > input[imax*cols + jmax]){
-							imax = i+k;
-							jmax = j+l;
-						}
-					}
-				}
-			}
-
-			if (input[imax * cols +  jmax] >= threshold){
-				Line new;
-				new.theta = jmax;
-				new.rho = imax;
-				res[acc] = new;
-				acc++;
-			}
-		}
-	}
-
-	return acc;
-}
-
-TupleInt hough_filter_localdebug(int input[], int rows, int cols, int threshold, Line hor[], Line ver[]){
-
-	int horacc = 0;
-	int veracc = 0;
-	for (int i = 0; i < rows; i++){
-		for (int j = 0; j < cols; j++){
-			if (input[i * cols + j] >= threshold){
-				Line new;
-				new.theta = j;
-				new.rho = i;
-				if (j > 45){
-					hor[horacc] = new;
-					horacc++;
-				}
-				else{
-					ver[veracc] = new;
-					veracc++;
-				}
-			}
-		}
-	}
-	TupleInt res;
-	res.x = horacc;
-	res.y = veracc;
-	return res;
-}
