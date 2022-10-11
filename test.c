@@ -10,6 +10,7 @@
 #include "include/utils.h"
 #include "include/geometry.h"
 #include "include/grid_detection.h"
+#include "include/morph.h"
 
 int main(){
 
@@ -22,24 +23,24 @@ int main(){
 	//Convert surface to greyscale
 	greyscale(test);
 
-	//blur_c(test, 3);
+	//blur(test, 3);
 
     //thresholding
     otsu(test);
 
 	//Prepare sobel arrays and compute sobel edges and angles
-    Uint8 *edges = malloc(sizeof(Uint8) * width * height);
-    Uint8 *angles = malloc(sizeof(Uint8) * width * height);
-	sobel_c(test, edges, angles);
+    //Uint8 *edges = malloc(sizeof(Uint8) * width * height);
+    //Uint8 *angles = malloc(sizeof(Uint8) * width * height);
+	//sobel_c(test, edges, angles);
 
-    //CANNY NON MAXIMA
-	Uint8 *maxima = calloc(width * height, sizeof(Uint8));
-    non_maxima_suppr(edges, angles, height, width, maxima);
-	free(edges);
+    //CANNY
+	canny(test); 
 
+	//dilate(test, 3);
+	//erose(test, 3);
+	
 	//double_thresholding(maxima, height, width, 0.50, 0.90);
-
-    apply_convolution(test, edges, (size_t)height, (size_t)width);
+    //apply_convolution(test, edges, (size_t)height, (size_t)width);
 
 	
     int rows = sqrt(height * height + width * width);
@@ -53,7 +54,7 @@ int main(){
 	Line *linesX = calloc(angle_precision * rows, sizeof(Line));
 	Line *linesY = calloc(angle_precision * rows, sizeof(Line));
 
-    TupleInt len_li = hough_filter_local(hough, rows, angle_precision, 300, 50, linesX, linesY);
+    TupleInt len_li = hough_filter_local(hough, rows, angle_precision, 300, 60, linesX, linesY);
 
     linesX = (Line *)realloc(linesX, len_li.x * sizeof(Line));
     linesY = (Line *)realloc(linesY, len_li.y * sizeof(Line));
@@ -156,5 +157,5 @@ int main(){
     IMG_SavePNG(test, "/Users/gustave/Documents/c/images/briacpassicursed3.png");
     SDL_FreeSurface(test);
 
-    free(angles);
+    //free(angles);
 }

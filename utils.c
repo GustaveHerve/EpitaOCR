@@ -18,6 +18,21 @@ int max3(int a, int b, int c){
     return temp;
 }
 
+int min2(int a, int b){
+
+    if (a > b)
+        return b;
+    return a;
+}
+
+int min3(int a, int b, int c){
+
+    int temp = min2(a,b);
+    if (temp > c)
+        return c;
+    return temp;
+}
+
 void histo_init(Histo* hist){
 
 	for (unsigned int i = 0; i < 256; i++){

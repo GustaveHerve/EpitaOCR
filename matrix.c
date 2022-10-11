@@ -110,4 +110,5 @@ void convolution(SDL_Surface *image, double ker[], int rows,
 			r[i*width + j] = acc;
 		}
 	}
+	free(pixels);
 }
