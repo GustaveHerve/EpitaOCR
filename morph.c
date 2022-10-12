@@ -16,17 +16,19 @@ void dilate_c(SDL_Surface *image, int kersize, int r[]){
 		for (int j = 0; j < width; j++){
 
 			double acc = 0;
-			int valid = 1;
 			int roff = kersize/2;
 			int coff = kersize/2;
 
-			for (int k = -1 * roff; k < kersize -1 && valid; k++){
-				for (int l = -1 * coff; l < kersize - 1 && valid ; l++){
+			for (int k = -1 * roff; k < roff -1; k++){
+				for (int l = -1 * coff; l < roff - 1; l++){
 					if (i+k >= 0 && j+l >= 0 && i+k <height && j+l < width){
 						Uint8 value;
 						SDL_GetRGB(pixels[(i+k)*width+(j+l)], image->format,
 							   	&value, &value, &value);
-						acc = max2(acc, value);
+						if (value == 255){
+							acc = 255;
+							break;
+						}
 						
 					}
 				}
@@ -63,8 +65,8 @@ void erose_c(SDL_Surface *image, int kersize, int r[]){
 			int roff = kersize/2;
 			int coff = kersize/2;
 
-			for (int k = -1 * roff; k < kersize -1 && valid; k++){
-				for (int l = -1 * coff; l < kersize - 1 && valid ; l++){
+			for (int k = -1 * roff; k < roff -1 && valid; k++){
+				for (int l = -1 * coff; l < roff - 1 && valid ; l++){
 					if (i+k >= 0 && j+l >= 0 && i+k <height && j+l < width){
 						Uint8 value;
 						SDL_GetRGB(pixels[(i+k)*width+(j+l)], image->format,
@@ -96,4 +98,17 @@ void erose(SDL_Surface *image, int kersize){
 	apply_convolution_int(image, arr, image->h, image->w);
 	free(arr);
 
+}
+
+void opening(SDL_Surface *image, int kersize){
+
+	erose(image, kersize);
+	dilate(image, kersize);
+
+}
+
+void closing(SDL_Surface *image, int kersize){
+
+	dilate(image, kersize);
+	erose(image, kersize);
 }

@@ -16,6 +16,7 @@ int main(){
 
     init_sdl();
     SDL_Surface* test = load_image("/Users/gustave/Documents/c/images/image_03.jpeg");
+	
 
     unsigned int width = test->w;
 	unsigned int height = test->h;
@@ -36,8 +37,12 @@ int main(){
     //CANNY
 	canny(test); 
 
-	//dilate(test, 3);
-	//erose(test, 3);
+	//SDL_Surface* dil = SDL_CreateRGBSurface(0, width, height, 32, 0, 0, 0, 0);
+	//SDL_BlitSurface(test, NULL, dil, NULL);
+
+	//dilate(test, 5);
+	//erose(test, 5);
+	closing(test, 4);
 	
 	//double_thresholding(maxima, height, width, 0.50, 0.90);
     //apply_convolution(test, edges, (size_t)height, (size_t)width);
@@ -54,10 +59,12 @@ int main(){
 	Line *linesX = calloc(angle_precision * rows, sizeof(Line));
 	Line *linesY = calloc(angle_precision * rows, sizeof(Line));
 
-    TupleInt len_li = hough_filter_local(hough, rows, angle_precision, 300, 60, linesX, linesY);
+    TupleInt len_li = hough_filter_local(hough, rows, angle_precision, 300, 50, linesX, linesY);
 
     linesX = (Line *)realloc(linesX, len_li.x * sizeof(Line));
     linesY = (Line *)realloc(linesY, len_li.y * sizeof(Line));
+
+	Segment segtest = get_segment(test, &linesX[0]);
 
 	TupleInt pt = {0,0};
       

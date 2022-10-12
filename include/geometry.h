@@ -8,6 +8,12 @@ typedef struct Line{
 	float theta;
 } Line;
 
+typedef struct Segment{
+	TupleInt pt1;
+	TupleInt pt2;
+} Segment;
+
 int polar_intersection(TupleInt *res, Line line1, Line line2);
+Segment get_segment(SDL_Surface *image, Line *line);
 
 #endif
