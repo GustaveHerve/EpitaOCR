@@ -2,6 +2,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <math.h>
+#include <err.h>
 #include "include/pixel.h"
 #include "include/utils.h"
 #include "include/geometry.h"
@@ -105,4 +106,74 @@ TupleInt hough_filter_local(int input[], int rows, int cols, int threshold, int 
 	return res;
 }
 
+void line_distances(Line* lines, int len, int* res){
 
+	if (res == NULL)
+		errx(1, "line_distances: failed allocating memory ");
+	for (int i = 1; i < len; i++)
+		res[i-1] = lines[i].rho - lines[i-1].rho;
+
+}
+
+int get_grid_lines(Line* lines, int len, int* dis, int tolerance, Line* res){
+
+	int res_dist = 0;
+	int cur_dist = dis[0];
+	int res_count = 0;
+	int cur_count = 1;
+
+	for (int i = 1; i < len -1; i++){
+
+		if (dis[i] <= cur_dist + tolerance && dis[i] >= cur_dist - tolerance){
+			cur_count++;
+
+			if (i == len - 2){
+				res_count = cur_count;
+				res_dist = cur_dist;
+			}
+		}
+
+		else{
+
+			if (cur_count > res_count){
+				res_count = cur_count;
+				res_dist = cur_dist;
+			}
+
+			cur_count = 1;
+			cur_dist = dis[i];
+
+		}
+
+	}
+
+	if (res == NULL)
+		errx(2, "get_grid_lines: failed allocating memory");
+	int j = 0;
+	for (int i = 0; i < len-1; i++){
+
+		if (dis[i] <= res_dist + tolerance && dis[i] >= res_dist - tolerance){
+			if (j == 0){
+				res[j] = lines[i];
+				res[j+1] = lines[i+1];
+				j+= 2;
+			}
+			else{
+				res[j] = lines[i+1];
+				j++;
+			}
+		}
+	}
+	return j;
+
+}
+
+int get_grid(Line* lines, int len, int tolerance, Line* res){
+
+	int* gX = malloc(sizeof(int) * (len-1));
+	line_distances(lines, len, gX);
+	int n = get_grid_lines(lines, len, gX, tolerance, res);
+	free(gX);
+	return n;
+
+}

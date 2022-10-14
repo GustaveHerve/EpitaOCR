@@ -35,12 +35,12 @@ int main(int argc, char** argv){
     //CANNY
 	canny(test); 
 
-	SDL_Surface* clo = SDL_CreateRGBSurface(0, width, height, 32, 0, 0, 0, 0);
-	SDL_BlitSurface(test, NULL, clo, NULL);
+	//SDL_Surface* clo = SDL_CreateRGBSurface(0, width, height, 32, 0, 0, 0, 0);
+	//SDL_BlitSurface(test, NULL, clo, NULL);
 
 	//dilate(test, 5);
 	//erose(test, 5);
-	closing(clo, 2);
+	//closing(clo, 10);
 	
 	//double_thresholding(maxima, height, width, 0.50, 0.90);
 	
@@ -51,6 +51,7 @@ int main(int argc, char** argv){
 
     //hough_init(hough, angle_precision, rows);
     hough_lines(test, angle_precision, 1, hough);
+    free(hough);
 
 	Line *linesX = calloc(angle_precision * rows, sizeof(Line));
 	Line *linesY = calloc(angle_precision * rows, sizeof(Line));
@@ -60,12 +61,18 @@ int main(int argc, char** argv){
     linesX = (Line *)realloc(linesX, len_li.x * sizeof(Line));
     linesY = (Line *)realloc(linesY, len_li.y * sizeof(Line));
 
-	Segment segtest = get_segment(clo, &linesX[0]);
+	Line* gridX = malloc(sizeof(Line) * len_li.x);
+	Line* gridY = malloc(sizeof(Line) * len_li.y);
 
-    SDL_FreeSurface(clo);
+	int xtemp = get_grid(linesX, len_li.x, 16, gridX);
+	int ytemp = get_grid(linesY, len_li.y, 16, gridY);
+
+    //SDL_FreeSurface(clo);
 	TupleInt pt = {0,0};
       
     SDL_Window *window = SDL_CreateWindow("Cookin'VR",SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,test->w,test->h,SDL_WINDOW_RESIZABLE);
+    if (window == NULL)
+        errx(2, "couldn't create window");
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, 0);
     SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, test);
 
@@ -82,16 +89,16 @@ int main(int argc, char** argv){
         
         SDL_Rect img_size = {0,0,test->w, test->h};
 
-		//SDL_RenderSetScale(renderer, 0.667, 0.667);
+		//SDL_RenderSetScale(renderer, 0.5, 0.5);
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
         SDL_RenderClear(renderer);
 		  
         SDL_RenderCopy(renderer, texture, NULL, &img_size);
  	
-        for (int i = 0; i < len_li.x; i++){
-            int rho = linesX[i].rho;
-            float theta = linesX[i].theta * M_PI / 180;
+        for (int i = 0; i < xtemp; i++){
+            int rho = gridX[i].rho;
+            float theta = gridX[i].theta * M_PI / 180;
             double sinA = sin(theta);
             double cosA = cos(theta);
             float x0 = cosA * rho;
@@ -110,9 +117,9 @@ int main(int argc, char** argv){
 		 	//SDL_RenderDrawPoint(renderer, x1, y1);
 
         }	
-		for (int i = 0; i < len_li.y; i++){
-            int rho = linesY[i].rho;
-            float theta = linesY[i].theta * M_PI / 180;
+		for (int i = 0; i < ytemp; i++){
+            int rho = gridY[i].rho;
+            float theta = gridY[i].theta * M_PI / 180;
             double sinA = sin(theta);
             double cosA = cos(theta);
             float x0 = cosA * rho;
@@ -132,10 +139,10 @@ int main(int argc, char** argv){
 
         }
 		
-		for (int i = 0; i < len_li.x; i++){
-			for (int j = 0; j < len_li.y; j++){
+		for (int i = 0; i < xtemp; i++){
+			for (int j = 0; j < ytemp; j++){
 				TupleInt pt;
-				if (!polar_intersection(&pt, linesX[i], linesY[j])){
+				if (!polar_intersection(&pt, gridX[i], gridY[j])){
 
 					SDL_SetRenderDrawColor(renderer, 0, 255, 255, SDL_ALPHA_OPAQUE);
 					SDL_RenderDrawLine(renderer, pt.x, pt.y-10, pt.x, pt.y + 10);
@@ -160,6 +167,10 @@ int main(int argc, char** argv){
 	
     IMG_SavePNG(test, "/Users/gustave/Documents/c/images/briacpassicursed3.png");
     SDL_FreeSurface(test);
+	//SDL_FreeSurface(clo);
+	free(linesX);
+	free(linesY);
+	free(gridX);
+	free(gridY);
 
-    //free(angles);
 }
