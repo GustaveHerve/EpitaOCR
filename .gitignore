@@ -2,8 +2,8 @@
 .DS_Store
 
 #Compilation files
-.o
-.d
+*.o
+*.d
 
 #VSCode trash
 .vscode
@@ -11,7 +11,6 @@
 #Vim trash
 *.swp
 
-Makefile
 
 #Debugging
-.dSYM
+*.dSYM

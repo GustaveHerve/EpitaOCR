@@ -33,9 +33,9 @@ void hough_lines(SDL_Surface* image, int angleNb, int step, int res[]){
 					
 					float rad = k * M_PI / 180;
 					float rho = j * cos(rad) + i * sin(rad);
+					if (rho < 0)
+						continue;
 					unsigned int rhoi = roundf(rho);
-					//if (rhoi < 0)
-						//continue;
 					res[rhoi * angleNb + k]++; 
 				
 				}

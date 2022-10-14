@@ -2,6 +2,7 @@
 #include <SDL2/SDL_image.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <err.h>
 #include "include/pixel.h"
 #include "include/edge_detection.h"
 #include "include/image_processing.h"
@@ -12,10 +13,12 @@
 #include "include/grid_detection.h"
 #include "include/morph.h"
 
-int main(){
+int main(int argc, char** argv){
 
     init_sdl();
-    SDL_Surface* test = load_image("/Users/gustave/Documents/c/images/image_03.jpeg");
+	if (argc != 2)
+		errx(2, "Wrong arguments\nUsage: ./binary filepath");
+    SDL_Surface* test = load_image(argv[1]);
 	
 
     unsigned int width = test->w;
@@ -29,24 +32,17 @@ int main(){
     //thresholding
     otsu(test);
 
-	//Prepare sobel arrays and compute sobel edges and angles
-    //Uint8 *edges = malloc(sizeof(Uint8) * width * height);
-    //Uint8 *angles = malloc(sizeof(Uint8) * width * height);
-	//sobel_c(test, edges, angles);
-
     //CANNY
 	canny(test); 
 
-	//SDL_Surface* dil = SDL_CreateRGBSurface(0, width, height, 32, 0, 0, 0, 0);
-	//SDL_BlitSurface(test, NULL, dil, NULL);
+	SDL_Surface* clo = SDL_CreateRGBSurface(0, width, height, 32, 0, 0, 0, 0);
+	SDL_BlitSurface(test, NULL, clo, NULL);
 
 	//dilate(test, 5);
 	//erose(test, 5);
-	closing(test, 4);
+	closing(clo, 2);
 	
 	//double_thresholding(maxima, height, width, 0.50, 0.90);
-    //apply_convolution(test, edges, (size_t)height, (size_t)width);
-
 	
     int rows = sqrt(height * height + width * width);
 	 
@@ -64,8 +60,9 @@ int main(){
     linesX = (Line *)realloc(linesX, len_li.x * sizeof(Line));
     linesY = (Line *)realloc(linesY, len_li.y * sizeof(Line));
 
-	Segment segtest = get_segment(test, &linesX[0]);
+	Segment segtest = get_segment(clo, &linesX[0]);
 
+    SDL_FreeSurface(clo);
 	TupleInt pt = {0,0};
       
     SDL_Window *window = SDL_CreateWindow("Cookin'VR",SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,test->w,test->h,SDL_WINDOW_RESIZABLE);
