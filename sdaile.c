@@ -32,6 +32,15 @@ void open_img_window(char* path)
         
         if(event.type == SDL_QUIT)    
             i = 0;
+
+        if(event.type == SDL_WINDOWEVENT)
+        {
+            if(event.window.event == SDL_WINDOWEVENT_RESIZED)
+            {
+                img->w = event.window.data1;
+                img->h = event.window.data2;
+            }
+        }
         
         SDL_Rect img_size = {0,0,img->w, img->h};
         
