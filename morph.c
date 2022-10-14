@@ -19,8 +19,8 @@ void dilate_c(SDL_Surface *image, int kersize, int r[]){
 			int roff = kersize/2;
 			int coff = kersize/2;
 
-			for (int k = -1 * roff; k < roff -1; k++){
-				for (int l = -1 * coff; l < roff - 1; l++){
+			for (int k = -1 * roff; k <= roff; k++){
+				for (int l = -1 * coff; l <= roff; l++){
 					if (i+k >= 0 && j+l >= 0 && i+k <height && j+l < width){
 						Uint8 value;
 						SDL_GetRGB(pixels[(i+k)*width+(j+l)], image->format,
@@ -62,18 +62,19 @@ void erose_c(SDL_Surface *image, int kersize, int r[]){
 
 			double acc = 0;
 			int valid = 1;
+			int done = 0;
 			int roff = kersize/2;
 			int coff = kersize/2;
 
-			for (int k = -1 * roff; k < roff -1 && valid; k++){
-				for (int l = -1 * coff; l < roff - 1 && valid ; l++){
-					if (i+k >= 0 && j+l >= 0 && i+k <height && j+l < width){
+			for (int k = -1 * roff; k <= roff && valid && !done; k++){
+				for (int l = -1 * coff; l <= roff && valid && !done; l++){
+					if (i+k >= 0 && j+l >= 0 && i+k < height && j+l < width){
 						Uint8 value;
 						SDL_GetRGB(pixels[(i+k)*width+(j+l)], image->format,
 							   	&value, &value, &value);
 						if (value == 0){
 							acc = 0;
-							break;
+							done = 1;
 						}
 						else
 							acc = 255;
