@@ -48,9 +48,9 @@ void blur(SDL_Surface* image, int kersize){
 
         case 5:
 			{
-            double blur[] = {1/256, 4/256, 6/256, 4/256, 1/256, 4/256, 16/256,
-    		24/256, 16/256, 4/256, 6/256, 24/256, 36/256, 24/256, 6/256, 4/256,
-    		16/256, 24/256, 16/256, 4/256, 1/256, 4/256, 6/256, 4/256, 1/256};
+            double blur[] = {1.0/256, 4.0/256, 6.0/256, 4.0/256, 1.0/256, 4.0/256, 16.0/256,
+    		24.0/256, 16.0/256, 4.0/256, 6.0/256, 24.0/256, 36.0/256, 24.0/256, 6.0/256, 4.0/256,
+    		16.0/256, 24.0/256, 16.0/256, 4.0/256, 1.0/256, 4.0/256, 6.0/256, 4.0/256, 1.0/256};
 			convolution(image, blur, 5, 5, b, 1);
 			break;}
 
@@ -113,7 +113,8 @@ void threshold_value(SDL_Surface* image, int threshold){
 	}
 }
 
-void otsu(SDL_Surface* image){
+//Compute otsu global threshold and returnx it without applying it
+float otsu_threshold(SDL_Surface* image){
 
 	int n = image->w * image->h;
 	float thresh = 0, var_max = 0, sum = 0, sumB = 0;
@@ -148,6 +149,14 @@ void otsu(SDL_Surface* image){
 		}
 
 	}
+	return thresh;
+
+}
+
+//Computes otsu threshold and apply it
+void otsu(SDL_Surface* image){
+
+	float thresh = otsu_threshold(image);
 	threshold_value(image, thresh);
 
 }
@@ -186,29 +195,3 @@ void apply_convolution_int(SDL_Surface *image, int r[], size_t rows, size_t cols
         }
     }
 }
-
-
-void double_thresholding(Uint8 *edges, size_t rows, size_t cols, 
-		float lowRatio, float highRatio){
-
-	int highValue = highRatio * 255;
-	int lowValue = highValue * lowRatio;
-	int weak = 100;
-	int strong = 255;
-
-	for (size_t i = 0; i < rows; i++){
-		for (size_t j = 0; j < cols; j++){
-			int c = i * cols + j;
-
-			if (edges[c] >= highValue)
-				edges[c] = strong;
-			else if (edges[c] > lowValue)
-				edges[c] = weak;
-			else
-				edges[c] = 0;
-
-		}
-	}
-}
-
-

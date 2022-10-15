@@ -77,21 +77,21 @@ void convolution(SDL_Surface *image, double ker[], int rows,
 			int valid = 1;
 			int roff = rows/2;
 			int coff = cols/2;
-			for (int k = -1 * roff; k < rows -1 && valid; k++){
-				for (int l = -1 * coff; l < cols - 1 && valid ; l++){
+			for (int k = -roff; k <= roff  && valid; k++){
+				for (int l = -coff; l <= coff && valid ; l++){
 					if (i+k >= 0 && j+l >= 0 && i+k <height && j+l < width){
-					    double res = 0;
+					    double res = 0.0;
 						Uint8 value = 0;
 						SDL_GetRGB(pixels[(i+k)*width+(j+l)], image->format,
 							   	&value, &value, &value);
 						
 						if (sym){
 							res =
-								ker[(k+roff) * cols + l+coff] * value;
+								ker[(k+roff) * cols + l+coff] * (double)value;
 						}
 						else{
 							res =
-								kert[(k+roff) * cols + l+coff] * value;
+								kert[(k+roff) * cols + l+coff] * (double)value;
 						}
 						
 						acc += res;

@@ -27,11 +27,10 @@ int main(int argc, char** argv){
 	//Convert surface to greyscale
 	greyscale(test);
 
-	//blur(test, 3);
+	//blur(test, 5);
 
     //thresholding
     otsu(test);
-
     //CANNY
 	canny(test); 
 
@@ -41,9 +40,7 @@ int main(int argc, char** argv){
 	//dilate(test, 5);
 	//erose(test, 5);
 	//closing(clo, 10);
-	
-	//double_thresholding(maxima, height, width, 0.50, 0.90);
-	
+/*    	
     int rows = sqrt(height * height + width * width);
 	 
 	int angle_precision = 360;
@@ -64,11 +61,13 @@ int main(int argc, char** argv){
 	Line* gridX = malloc(sizeof(Line) * len_li.x);
 	Line* gridY = malloc(sizeof(Line) * len_li.y);
 
-	int xtemp = get_grid(linesX, len_li.x, 16, gridX);
-	int ytemp = get_grid(linesY, len_li.y, 16, gridY);
+	int xtemp = get_grid(linesX, len_li.x, 10, gridX);
+	int ytemp = get_grid(linesY, len_li.y, 10, gridY);
 
     //SDL_FreeSurface(clo);
 	TupleInt pt = {0,0};
+*/
+
       
     SDL_Window *window = SDL_CreateWindow("Cookin'VR",SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,test->w,test->h,SDL_WINDOW_RESIZABLE);
     if (window == NULL)
@@ -95,6 +94,7 @@ int main(int argc, char** argv){
         SDL_RenderClear(renderer);
 		  
         SDL_RenderCopy(renderer, texture, NULL, &img_size);
+/*   	
  	
         for (int i = 0; i < xtemp; i++){
             int rho = gridX[i].rho;
@@ -131,11 +131,7 @@ int main(int argc, char** argv){
 
 
         	SDL_SetRenderDrawColor(renderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
-			//if (lines[i].theta < 70)
-           //variable 	SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
 			SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
-		 	//SDL_RenderDrawPoint(renderer, x1, y1);
-		 	//SDL_RenderDrawPoint(renderer, x1, y1);
 
         }
 		
@@ -151,7 +147,9 @@ int main(int argc, char** argv){
 				}
         	}
 		}
-    
+
+*/		
+   
         //copy texture to output device
 		SDL_SetRenderDrawColor(renderer, 0, 255, 255, SDL_ALPHA_OPAQUE);
 		//SDL_RenderDrawPoint(renderer, pt.x, pt.y);
@@ -168,9 +166,9 @@ int main(int argc, char** argv){
     IMG_SavePNG(test, "/Users/gustave/Documents/c/images/briacpassicursed3.png");
     SDL_FreeSurface(test);
 	//SDL_FreeSurface(clo);
-	free(linesX);
-	free(linesY);
-	free(gridX);
-	free(gridY);
+	//free(linesX);
+	//free(linesY);
+	//free(gridX);
+	//free(gridY);
 
 }

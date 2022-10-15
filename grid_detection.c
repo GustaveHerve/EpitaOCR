@@ -18,7 +18,6 @@ void hough_init(int res[], int rows, int cols){
 }
 
 void hough_lines(SDL_Surface* image, int angleNb, int step, int res[]){
-
 	unsigned int width = image->w;
 	unsigned int height = image->h;
 
