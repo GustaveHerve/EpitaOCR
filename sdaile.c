@@ -31,7 +31,7 @@ void open_img_window(char* path)
         SDL_WaitEvent(&event);
         
         if(event.type == SDL_QUIT)    
-            i = 0;
+            i = 0; 
 
         if(event.type == SDL_WINDOWEVENT)
         {

@@ -11,8 +11,10 @@ int main (int argc, char* argv[])
 {
 
     init_sdl();
-    SDL_Surface *img = load_image("/Users/gustave/Documents/c/images/cacatest.png");
-    rotate_img(img, M_PI); //atof converts a "string" to a double
+    SDL_Surface *img = load_image(argv[1]);
+    rotate_img(img, atof(argv[2])); //atof converts a "string" to a double
     open_img_window("image_rotated.png");
-
+    SDL_FreeSurface(img);
+    IMG_Quit();
+    SDL_Quit();
 }
