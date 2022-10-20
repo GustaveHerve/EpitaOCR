@@ -26,20 +26,60 @@ int main()
 	
 	double hBias[nHiddenNodes];
 	double oBias[nOutputs];
+    
+    int numberOfTimes = 10000;
+    int memo_val = 0;
+
+    double memory[numberOfTimes*trainSets];
+
+    int BrainExists = 0;
 
 	double hWeights[nInputs][nHiddenNodes];
 	double oWeights[nHiddenNodes][nOutputs];
-
-	double trainInput[trainSets][nInputs] = {{0.0f, 0.0f},{0.0f,1.0f}, //tests
-																					{1.0f,0.0f},{1.0f,1.0f}};
-	double trainOutputs[trainSets][nOutputs] = {{0.0f},{1.0f},{1.0f},{0.0f}}; //results
+	const double trainInput[trainSets][nInputs] = {{0.0f, 0.0f},{0.0f,1.0f}, 
+        {1.0f,0.0f},{1.0f,1.0f}};
+	double trainOutputs[trainSets][nOutputs] = {{0.0f},{1.0f},
+        {1.0f},{0.0f}}; //results
 
 
 /*
- * Here, I define all the weights with random values in order to start to backprop 
+ *
+ */
+
+	FILE * fp;
+	fp = fopen("Brain", "r");
+	if (fp){
+        BrainExists = 1;
+		double myvariable;
+		for (int i = 0; i < nInputs; i++)
+                for (int j = 0; j < nHiddenNodes; j++)
+                {	
+			fscanf(fp,"%lf",&myvariable);
+      			printf("%s,%f \n","In hWeights : \n",myvariable);
+                        hWeights[i][j] += myvariable;
+                }
+
+		for (int i = 0; i < nHiddenNodes; i++)
+		for (int j = 0; j < nOutputs; j++)
+                {
+			fscanf(fp,"%lf",&myvariable);
+      			printf("%s,%f \n","In oWeights : \n",myvariable);
+                        oWeights[i][j] += myvariable;
+                }
+		for (int j = 0; j < nOutputs; j++)
+        	{
+			fscanf(fp,"%lf",&myvariable);
+                        printf("%s, %f \n"," In oBias : \n",myvariable);
+                	oBias[j] += myvariable;
+        	}
+    }
+/*
+ * We enter this part if the file "Brain" doesn't exist, this emplies that it's the first time that the XOR NN is executed
+ * I define all the weights with random values in order to start to backprop 
  * For this reason : https://machinelearningmastery.com/why-initialize-a-neural-network-with-random-weights/ 
  */
 
+	else {
 
 	for (int i = 0; i < nInputs; i++)
 		for (int j = 0; j < nHiddenNodes; j++)
@@ -52,16 +92,14 @@ int main()
 		{
 			oWeights[i][j] = initWeights(); //Init Weights with random values
 		}
-
+	
 	for (int j = 0; j < nOutputs; j++)
 	{
 		oBias[j] = initWeights(); //Init Output Layer Bias with random values
 	}
-
-	int trainingSetOrder[] = {0,1,2,3}; // There are 4 Training sets :D (Amogus)
-
-	int numberOfTimes = 15000; // U dumb or you want a comment for that :/
-
+	}
+	int trainingSetOrder[] = {0,1,2,3}; // There are 4 Training sets
+		
 	//TRAINING TIME
 	
 	// From a bit of the super YT Video NN
@@ -75,13 +113,12 @@ int main()
 
 		for(int x = 0; x < trainSets; x++)
 		{
+            memo_val++;
 			int i = trainingSetOrder[x];
 
 			// "Forward Path"
 			// Compute the Input Layer Activation >>
 			// Here, Sigmoid is the activation function
-			// https://machinelearningmastery.com/a-gentle-introduction-to-sigmoid-function/
-			// Ce site est le fire OwO
 
 			for (int j = 0; j < nHiddenNodes; j++)
 			{
@@ -104,7 +141,9 @@ int main()
 				}
 				oLayer[j] = sigmoid(act); //Input mult with Bias
 			}
-			printf ("Input:(%g,%g)  Output:%g    Expected Output: %g\n",
+
+
+			printf("Input : (%g,%g)  Output:%g    Expected Output: %g\n",
                     trainInput[i][0], trainInput[i][1],
                     oLayer[0], trainOutputs[i][0]);
 			// Magic print to get the results :D
@@ -122,6 +161,7 @@ int main()
 			for(int j = 0; j < nOutputs; j++)
 			{
 				double err = (trainOutputs[i][j] - oLayer[j]);
+                memory[memo_val] = err;
 				dOutput[j] = err * dSigmoid(oLayer[j]);
 			}
 
@@ -137,6 +177,7 @@ int main()
 				}
 				dHidden[j] = err * dSigmoid(hLayer[j]);
 			}
+			
 
 			//Apply changes in outp Weights
 			for(int j = 0; j < nOutputs; j++)
@@ -161,6 +202,33 @@ int main()
 
 		}
 	}
+    double res = Precision(memo_val,memory) * 100;
+    printf("\n The Precision is : %f",res);
+    printf("%c \n\n", 37);
+    
+    PrintValues(nInputs,nHiddenNodes,hWeights,"Hidden Weights");
+
+	// In this part we will save our values in the brain file
+	
+	fp = fopen("Brain", "w+");
+
+	for(int j = 0; j < nInputs; j++)
+           for(int k = 0; k < nHiddenNodes; k++)
+              fprintf(fp, "%f\n", hWeights[k][j]);
+
+	    for(int j = 0; j < nHiddenNodes; j++)
+           for(int k = 0; k < nOutputs; k++)
+              fprintf(fp, "%f\n", oWeights[k][j]);
+
+	    for (int j = 0; j < nOutputs; j++)
+              fprintf(fp,"%f\n",oBias[j]);
+	
+
+	fclose(fp);
+	
+	return 0;
+
+
 }
 
 

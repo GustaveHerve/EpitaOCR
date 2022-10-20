@@ -15,10 +15,13 @@ double dSigmoid(double x) //Derivative of Sigmoid Func.
 
 double initWeights()
 {
-  return((double)rand()) / ((double)RAND_MAX); // Create random Weights between 0 and 1 to init.
+  return((double)rand()) / ((double)RAND_MAX); // Create random Weights between
+					       // 0 and 1 to init.
 }
 
-void shuffle(int *arr, size_t t) // Shuffling data serves the purpose of reducing variance and making sure that models remain general and overfit less.
+void shuffle(int *arr, size_t t) // Shuffling data serves the purpose of 
+				 // reducing variance and making sure that 
+				 // models remain general and overfit less.
 {
   if (t > 1)
   {
@@ -31,3 +34,34 @@ void shuffle(int *arr, size_t t) // Shuffling data serves the purpose of reducin
       }
   }
 }
+
+double Precision(int num, double memo[num]){
+    double res =0.0f;
+    for (int i = 0; i < num; i++){
+        double acc = memo[i];
+        if (acc < 0){
+            res += (1+acc);
+        }
+        else{
+            res += (1-acc);
+        }
+    }
+    return res/num;
+
+
+}
+
+
+void PrintValues(int rows, int cols, double mat[rows][cols], char * name){
+    printf("Values of %s : \n [",name);
+    for (int i= 0; i < rows; i++)
+        for (int j = 0; j < cols; j++){
+            if (i + 1 == rows && j+1 == cols)
+                printf(" %f ",mat[i][j]);
+            else    
+                printf(" %f, ",mat[i][j]);
+        }
+    printf("] \n\n");  
+
+}
+
