@@ -2,6 +2,7 @@
 #define EDGE_DETECTION_H
 
 #include <SDL2/SDL.h>
+#include "utils.h"
 
 void sobel_c(SDL_Surface* surf, Uint8* edges, Uint8* angles);
 void sobel(SDL_Surface* surf);
@@ -11,5 +12,7 @@ void non_maxima_suppr(Uint8 edges[], Uint8 angles[], size_t rows, size_t cols, U
 void non_maxima_suppr_place(Uint8* edges, Uint8* angles, size_t rows, size_t cols);
 void canny(SDL_Surface *image);
 void double_thresholding(Uint8 *edges, size_t rows, size_t cols, float lowRatio, float highRatio); 
+void hysteresis(Uint8 *edges, size_t rows, size_t cols, Stack_Tint* s);
+void __hysteresis(Uint8 *edges, size_t rows, size_t cols, int i, int j);
 
 #endif

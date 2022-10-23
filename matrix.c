@@ -85,14 +85,10 @@ void convolution(SDL_Surface *image, double ker[], int rows,
 						SDL_GetRGB(pixels[(i+k)*width+(j+l)], image->format,
 							   	&value, &value, &value);
 						
-						if (sym){
-							res =
-								ker[(k+roff) * cols + l+coff] * (double)value;
-						}
-						else{
-							res =
-								kert[(k+roff) * cols + l+coff] * (double)value;
-						}
+						if (sym)
+							res = ker[(k+roff) * cols + l+coff] * (double)value;	
+						else
+							res = kert[(k+roff) * cols + l+coff] * (double)value;
 						
 						acc += res;
 					}
@@ -102,11 +98,6 @@ void convolution(SDL_Surface *image, double ker[], int rows,
 			}
 			if (!valid)
 				acc = 0;
-			//else if (acc > 255)
-			//	acc = 255;
-			//else if (acc < 0)
-			//	acc = 0;
-			//r[i*width + j] = (Uint8)acc;
 			r[i*width + j] = acc;
 		}
 	}

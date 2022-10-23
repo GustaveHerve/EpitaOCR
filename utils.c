@@ -2,6 +2,7 @@
 #include <SDL2/SDL.h>
 #include "include/utils.h"
 #include "include/pixel.h"
+#include <err.h>
 
 int max2(int a, int b){
 
@@ -32,6 +33,8 @@ int min3(int a, int b, int c){
         return c;
     return temp;
 }
+
+//HIST
 
 void histo_init(Histo* hist){
 
@@ -80,4 +83,35 @@ int array_min_index(float arr[], size_t len){
 	return (int) min;
 }
 
+//STACK
 
+Stack_Tint* newStack_Tint(int size){
+	Stack_Tint* res = malloc(sizeof(Stack_Tint));	
+	res->maxsize = size;
+	res->arr = malloc(size * sizeof(TupleInt));
+	res->top = -1;
+	return res;
+
+}
+
+int stackTint_is_empty(Stack_Tint* s){
+	if (s->top == -1)
+		return 1;
+	return 0;
+}
+
+int stackTint_push(Stack_Tint* s, TupleInt e){
+	if (s->top == s->maxsize - 1)
+		return 0;
+
+	s->top++;
+	s->arr[s->top] = e;
+	return 1;
+}
+
+TupleInt stackTint_pop(Stack_Tint* s){
+	if (s->top == -1)
+		errx(1, "Tried to pop empty stack");
+	s->top--;
+	return s->arr[s->top+1];
+}

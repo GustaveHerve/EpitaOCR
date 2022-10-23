@@ -149,7 +149,7 @@ float otsu_threshold(SDL_Surface* image){
 		}
 
 	}
-	return thresh;
+	return thresh/max_intensity;
 
 }
 
@@ -157,7 +157,7 @@ float otsu_threshold(SDL_Surface* image){
 void otsu(SDL_Surface* image){
 
 	float thresh = otsu_threshold(image);
-	threshold_value(image, thresh);
+	threshold_value(image, thresh*255);
 
 }
 

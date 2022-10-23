@@ -27,11 +27,12 @@ int main(int argc, char** argv){
 	//Convert surface to greyscale
 	greyscale(test);
 
-	//blur(test, 5);
+	//blur(test, 3);
 
     //thresholding
-    otsu(test);
     //CANNY
+	//sobel(test);
+    otsu(test);
 	canny(test); 
 
 	//SDL_Surface* clo = SDL_CreateRGBSurface(0, width, height, 32, 0, 0, 0, 0);
@@ -40,7 +41,8 @@ int main(int argc, char** argv){
 	//dilate(test, 5);
 	//erose(test, 5);
 	//closing(clo, 10);
-/*    	
+
+    	
     int rows = sqrt(height * height + width * width);
 	 
 	int angle_precision = 360;
@@ -66,7 +68,7 @@ int main(int argc, char** argv){
 
     //SDL_FreeSurface(clo);
 	TupleInt pt = {0,0};
-*/
+
 
       
     SDL_Window *window = SDL_CreateWindow("Cookin'VR",SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,test->w,test->h,SDL_WINDOW_RESIZABLE);
@@ -94,7 +96,7 @@ int main(int argc, char** argv){
         SDL_RenderClear(renderer);
 		  
         SDL_RenderCopy(renderer, texture, NULL, &img_size);
-/*   	
+
  	
         for (int i = 0; i < xtemp; i++){
             int rho = gridX[i].rho;
@@ -148,7 +150,8 @@ int main(int argc, char** argv){
         	}
 		}
 
-*/		
+
+		
    
         //copy texture to output device
 		SDL_SetRenderDrawColor(renderer, 0, 255, 255, SDL_ALPHA_OPAQUE);
@@ -163,7 +166,7 @@ int main(int argc, char** argv){
     SDL_DestroyWindow(window);
     SDL_DestroyRenderer(renderer);
 	
-    IMG_SavePNG(test, "/Users/gustave/Documents/c/images/briacpassicursed3.png");
+    IMG_SavePNG(test, "/Users/gustave/Documents/c/images/pascaca.png");
     SDL_FreeSurface(test);
 	//SDL_FreeSurface(clo);
 	//free(linesX);

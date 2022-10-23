@@ -4,6 +4,10 @@
 #include "include/pixel.h"
 #include "include/matrix.h"
 #include "include/image_processing.h"
+#include "include/edge_detection.h"
+
+#define WEAK 100
+#define STRONG 255
 
 /* gradient: computes edge and angle gradient values from two matrices of same size
 *  stores the result in edges[] and angles[] (so it doesn't affect the image directly)
@@ -205,22 +209,98 @@ void double_thresholding(Uint8 *edges, size_t rows, size_t cols,
 
 	int highvalue = highratio * 255;
 	int lowvalue = highvalue * lowratio;
-	int weak = 100;
-	int strong = 255;
+
+	Stack_Tint* s = newStack_Tint(rows*cols);
 
 	for (size_t i = 0; i < rows; i++){
 		for (size_t j = 0; j < cols; j++){
 			int c = i * cols + j;
-
-			if (edges[c] >= highvalue)
-				edges[c] = strong;
+			if (edges[c] >= highvalue){
+				edges[c] = STRONG;
+				TupleInt e = {i,j}; 
+				stackTint_push(s, e);
+			}
 			else if (edges[c] > lowvalue)
-				edges[c] = weak;
+				edges[c] = WEAK;
+			
 			else
 				edges[c] = 0;
 
 		}
 	}
+
+	hysteresis(edges, rows, cols, s);
+
+}
+
+void hysteresis(Uint8 *edges, size_t rows, size_t cols, Stack_Tint* s){
+
+	while (!stackTint_is_empty(s)){
+		TupleInt e = stackTint_pop(s);
+		int i = e.x;
+		int j = e.y;
+
+		if (i-1 >= 0){
+			__hysteresis(edges, rows, cols, i-1, j); //N
+			if (j-1 >= 0)
+				__hysteresis(edges, rows, cols, i-1, j-1); //NW
+			if (j+1 >= 0)
+				__hysteresis(edges, rows, cols, i-1, j+1); //NE
+		}
+
+		if (j-1 >=0)
+			__hysteresis(edges, rows, cols, i, j-1); //W
+		if (j+1 < cols)
+			__hysteresis(edges, rows, cols, i, j+1); //E
+		
+		if (i+1 < rows){
+			__hysteresis(edges, rows, cols, i+1, j); //S
+			if (j-1 >= 0)
+				__hysteresis(edges, rows ,cols, i+1, j-1); //SW
+			if (j+1 >= 0)
+				__hysteresis(edges, rows, cols, i+1, j+1); //SE
+		}
+
+	}
+}
+
+void __hysteresis(Uint8 *edges, size_t rows, size_t cols, int i, int j){
+
+	if (edges[i*cols+j] != WEAK)
+		return;
+
+	edges[i * cols + j] = STRONG;
+
+	if (i-1 >= 0){
+			__hysteresis(edges, rows, cols, i-1, j); //N
+			if (j-1 >= 0)
+				__hysteresis(edges, rows, cols, i-1, j-1); //NW
+			if (j+1 >= 0)
+				__hysteresis(edges, rows, cols, i-1, j+1); //NE
+		}
+
+		if (j-1 >=0)
+			__hysteresis(edges, rows, cols, i, j-1); //W
+		if (j+1 < cols)
+			__hysteresis(edges, rows, cols, i, j+1); //E
+		
+		if (i+1 < rows){
+			__hysteresis(edges, rows, cols, i+1, j); //S
+			if (j-1 >= 0)
+				__hysteresis(edges, rows ,cols, i+1, j-1); //SW
+			if (j+1 >= 0)
+				__hysteresis(edges, rows, cols, i+1, j+1); //SE
+		}
+
+}
+
+void clean(Uint8 *edges, size_t size){
+
+	for (size_t i = 0; i < size; i++){
+		if (edges[i] == WEAK)
+			edges[i] = 0;
+	}
+
 }
 
 void canny(SDL_Surface *image){
@@ -231,10 +311,17 @@ void canny(SDL_Surface *image){
 
 	Uint8 *maxima = calloc(image->w * image->h, sizeof(Uint8));
     non_maxima_suppr(edges, angles, image->h, image->w, maxima);
-	apply_convolution(image, maxima, (size_t)image->h, (size_t)image->w);
-
 	free(edges);
 	free(angles);
+	/*
+
+	float threshold = otsu_threshold(image);
+	double_thresholding(maxima, image->w, image->h, 0.5, threshold);
+	clean(maxima,image->w*image->h);
+	*/
+
+	apply_convolution(image, maxima, (size_t)image->h, (size_t)image->w);
+
 	free(maxima);
 
 }
