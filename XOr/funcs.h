@@ -8,5 +8,6 @@ void shuffle(int *arr, size_t t);
 double initWeights();
 void PrintValues(int rows, int cols, double mat[rows][cols], char * name);
 double Precision(int num, double memo[num]);
+int transform(double val);
 
 #endif

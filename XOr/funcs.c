@@ -35,17 +35,25 @@ void shuffle(int *arr, size_t t) // Shuffling data serves the purpose of
   }
 }
 
+int transform(double val) {
+     if (val < 0.5f)
+          return 0;
+      return 1;
+ }
+
+
 double Precision(int num, double memo[num]){
-    double res =0.0f;
+    double res = 0;
     for (int i = 0; i < num; i++){
         double acc = memo[i];
         if (acc < 0){
-            res += (1+acc);
+            res += (double) transform((1+acc));
         }
         else{
-            res += (1-acc);
+            res += (double) transform((1-acc));
         }
     }
+
     return res/num;
 
 
