@@ -195,3 +195,21 @@ void apply_convolution_int(SDL_Surface *image, int r[], size_t rows, size_t cols
         }
     }
 }
+
+void invert(SDL_Surface *image){
+	int w = image->w;
+	int h = image->h;
+	Uint32 black = SDL_MapRGB(image->format, 0, 0, 0);
+	Uint32 white = SDL_MapRGB(image->format, 255, 255, 255);
+	for (size_t i = 0; i < h; i++){
+		for (size_t j = 0; j < w; j++){
+			Uint32 pixel = get_pixel(image, j, i);
+			Uint8 val = 0;
+			SDL_GetRGB(pixel, image->format, &val, &val, &val);
+			if (val == 255)
+				replace_pixel(image, j, i, black);
+			else if (val == 0)
+				replace_pixel(image, j, i, white);
+		}
+	}
+}

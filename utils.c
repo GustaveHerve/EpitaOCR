@@ -61,6 +61,19 @@ void histo_compute(SDL_Surface* image, Histo* hist){
 	}
 }
 
+int get_biggest_bin(int* hough, int maxr, int maxtheta){
+
+	int max = 0;
+	for (int i = 0; i < maxr; i++){
+		for (int j = 0; j < maxtheta; j++){
+			int c = i * maxtheta + j;
+			if (hough[c] > max)
+				max = hough[c];
+		}
+	}
+	return max;
+}
+
 float array_sum(float arr[], int begin, int end){
 
 	float res = 0;

@@ -7,6 +7,7 @@
 
 void hough_init(int res[], int rows, int cols);
 void hough_lines(SDL_Surface* image, int angleNb, int step, int res[]);
+void hough_lines_gradient(SDL_Surface* image, int angleNb, Uint8 *edges, Uint8 *angles, int res[]);
 int hough_filter(int input[], int rows, int cols, int threshold, Line res[]);
 TupleInt hough_filter_local(int input[], int rows, int cols, int threshold, int step, Line hor[], Line ver[]);
 int* line_distances(Line* lines, int len, int* res);

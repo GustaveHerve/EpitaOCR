@@ -60,20 +60,21 @@ void gradientv2(int r1[], int r2[], Uint8 edges[], Uint8 angles[], size_t rows, 
 			float tan = atan2(r2[current], r1[current]);
 			float dtan = 0;
 			dtan = tan * 180 / M_PI;
-			//dtan+=90;
 			if (dtan < 0)
 				dtan += 180; //get opposite point in triogo circle for easier comparisons
 							 //
+			   
 			Uint8 angle = 0;
-			if ((dtan >= 0 && dtan <= 22.5) || (dtan <= 180 && dtan > 157.5)) 
+			if ((dtan >= 0 && dtan < 22.5) || (dtan <= 180 && dtan >= 157.5)) 
 				angle = 0;
-			else if (dtan >= 22.5 && dtan <= 67.5)
+			else if (dtan >= 22.5 && dtan < 67.5)
 				angle = 45;
-			else if (dtan >= 67.5 && dtan <= 112.5)
+			else if (dtan >= 67.5 && dtan < 112.5)
 				angle = 90;
-			else
+			else if (dtan >= 112.5 && dtan < 157.5)
 				angle = 135;
 
+				
 			angles[current] = angle;
 		}	
 	}
@@ -117,7 +118,7 @@ void non_maxima_suppr(Uint8 edges[], Uint8 angles[], size_t rows, size_t cols,
 		for (int j = 0; j < (int)cols; j++){
 			unsigned int c = i * cols + j;
 			Uint8 angle = angles[c];
-			
+
 			switch (angle)
 			{
 
@@ -159,47 +160,47 @@ void non_maxima_suppr(Uint8 edges[], Uint8 angles[], size_t rows, size_t cols,
 
 					
 			}
-		}
-	}
-}
+			/*
 
-void non_maxima_suppr_place(Uint8* edges, Uint8* angles, size_t rows, size_t cols){
+			Uint8 q = 255;
+			Uint8 r = 255;
 
-	for (int i = 0; i < (int)rows; i++){
-		for (int j = 0; j < (int)cols; j++){
-			unsigned int c = i * cols + j;
-			Uint8 angle = angles[c];
-
-			switch (angle)
-			{
-			case 0:
+			if ((angle >= 0 && angle < 22.5) || (angle >= 180 && angle <= 157.5)){
 				if (j+1 < (int)cols && j-1 >= 0){
-					if (!(edges[c] >= edges[c-1] && edges[c] >= edges[c+1]))
-						edges[c] = 0;
+					q = edges[i*cols + j-1];
+					r = edges[i*cols + j+1];
 				}
-				break;
-
-			case 45:
-				if ((j+1 < (int)cols && i+1 < (int)rows) && (i-1 >= 0 && j-1 >= 0)){
-					if (!(edges[c] >= edges[(i-1)*cols+j+1] && edges[c] >= edges[(i+1)*cols+j-1]))
-						edges[c] = 0;
-				}
-				break;
-
-			case 90:
-				if (i+1 < (int)cols && i-1 >= 0){
-					if (!(edges[c] >= edges[(i-1)*cols+j] && edges[c] >= edges[(i+1)*cols+j]))
-						edges[c] = 0;
-				}
-				break;
-
-			case 135:
-				if ((j-1 >= 0 && i+1 < (int)rows ) && (j+1 < (int)cols && i-1 >= 0)){
-					if (!(edges[c] >= edges[(i-1)*cols+j-1] && edges[c] >= edges[(i+1)*cols+j+1]))
-						edges[c] = 0;
-				}
-				break;
 			}
+			
+			else if (angle >= 22.5 && angle < 67.5){
+				if ((j+1 < (int)cols && i+1 < (int)rows) && (i-1 >= 0 && j-1 >= 0)){
+					q = edges[(i+1)*cols + j-1];
+					r = edges[(i-1)*cols + j+1];
+				}
+
+			}
+
+			else if (angle >= 67.5 && angle < 112.5){
+				if (i+1 < (int)cols && i-1 >= 0){
+					q = edges[(i+1)*cols + j];
+					r = edges[(i-1)*cols +j];
+				}
+			}
+
+			else if (angle >= 112.5 && angle < 157.5){
+				if ((j-1 >= 0 && i+1 < (int)rows ) && (j+1 < (int)cols && i-1 >= 0)){
+					q = edges[(i-1)*cols + j-1];
+					r = edges[(i+1)*cols + j+1];
+				}
+
+			}
+
+			if (edges[c] >= q && edges[c] >= r)
+				res[c] = edges[c];
+			else
+				res[c] = 0;
+				*/
+
 		}
 	}
 }
@@ -207,20 +208,20 @@ void non_maxima_suppr_place(Uint8* edges, Uint8* angles, size_t rows, size_t col
 void double_thresholding(Uint8 *edges, size_t rows, size_t cols, 
 		float lowratio, float highratio){
 
-	int highvalue = highratio * 255;
-	int lowvalue = highvalue * lowratio;
+	Uint8 highvalue = highratio * 255;
+	Uint8 lowvalue = highvalue * lowratio;
 
 	Stack_Tint* s = newStack_Tint(rows*cols);
 
-	for (size_t i = 0; i < rows; i++){
-		for (size_t j = 0; j < cols; j++){
+	for (int i = 0; i < rows; i++){
+		for (int j = 0; j < cols; j++){
 			int c = i * cols + j;
 			if (edges[c] >= highvalue){
 				edges[c] = STRONG;
 				TupleInt e = {i,j}; 
 				stackTint_push(s, e);
 			}
-			else if (edges[c] > lowvalue)
+			else if (edges[c] >= lowvalue)
 				edges[c] = WEAK;
 			
 			else
@@ -244,7 +245,7 @@ void hysteresis(Uint8 *edges, size_t rows, size_t cols, Stack_Tint* s){
 			__hysteresis(edges, rows, cols, i-1, j); //N
 			if (j-1 >= 0)
 				__hysteresis(edges, rows, cols, i-1, j-1); //NW
-			if (j+1 >= 0)
+			if (j+1 < cols)
 				__hysteresis(edges, rows, cols, i-1, j+1); //NE
 		}
 
@@ -257,7 +258,7 @@ void hysteresis(Uint8 *edges, size_t rows, size_t cols, Stack_Tint* s){
 			__hysteresis(edges, rows, cols, i+1, j); //S
 			if (j-1 >= 0)
 				__hysteresis(edges, rows ,cols, i+1, j-1); //SW
-			if (j+1 >= 0)
+			if (j+1 < cols)
 				__hysteresis(edges, rows, cols, i+1, j+1); //SE
 		}
 
@@ -275,7 +276,7 @@ void __hysteresis(Uint8 *edges, size_t rows, size_t cols, int i, int j){
 			__hysteresis(edges, rows, cols, i-1, j); //N
 			if (j-1 >= 0)
 				__hysteresis(edges, rows, cols, i-1, j-1); //NW
-			if (j+1 >= 0)
+			if (j+1 < cols)
 				__hysteresis(edges, rows, cols, i-1, j+1); //NE
 		}
 
@@ -288,7 +289,7 @@ void __hysteresis(Uint8 *edges, size_t rows, size_t cols, int i, int j){
 			__hysteresis(edges, rows, cols, i+1, j); //S
 			if (j-1 >= 0)
 				__hysteresis(edges, rows ,cols, i+1, j-1); //SW
-			if (j+1 >= 0)
+			if (j+1 < cols)
 				__hysteresis(edges, rows, cols, i+1, j+1); //SE
 		}
 
@@ -303,7 +304,7 @@ void clean(Uint8 *edges, size_t size){
 
 }
 
-void canny(SDL_Surface *image){
+CannyRes canny(SDL_Surface *image){
 
 	Uint8 *edges = malloc(sizeof(Uint8) * image->w * image->h);
     Uint8 *angles = malloc(sizeof(Uint8) * image->w * image->h);
@@ -312,16 +313,13 @@ void canny(SDL_Surface *image){
 	Uint8 *maxima = calloc(image->w * image->h, sizeof(Uint8));
     non_maxima_suppr(edges, angles, image->h, image->w, maxima);
 	free(edges);
-	free(angles);
-	/*
-
+	free(angles);   
 	float threshold = otsu_threshold(image);
-	double_thresholding(maxima, image->w, image->h, 0.5, threshold);
+	double_thresholding(maxima, image->h, image->w, 0.5, threshold);
 	clean(maxima,image->w*image->h);
-	*/
-
 	apply_convolution(image, maxima, (size_t)image->h, (size_t)image->w);
-
-	free(maxima);
+	CannyRes res = {maxima, angles};
+	return res;
+	//free(maxima);
 
 }

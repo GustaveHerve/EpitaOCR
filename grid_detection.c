@@ -44,6 +44,57 @@ void hough_lines(SDL_Surface* image, int angleNb, int step, int res[]){
 	}
 }
 
+void hough_lines_gradient(SDL_Surface* image, int angleNb, Uint8 *edges, Uint8 *angles, int res[]){
+	unsigned int width = image->w;
+	unsigned int height = image->h;
+
+	for (unsigned int i = 0; i < height; i++){
+		for (unsigned int j = 0; j < width; j++){
+			int c = i*width + j;
+			if (edges[c] == 255){
+				float rad = angles[c] * M_PI / 180;
+				float rho = j*cos(rad) + i*sin(rad);
+				if (rho < 0)
+					continue;
+				unsigned int rhoi = roundf(rho);
+				res[rhoi * angleNb + angles[c]]++;
+
+			}
+		}
+	}
+}
+
+/*  
+void hough_lines_local(SDL_Surface* image, int angleNb, int ker, int res[]){
+	unsigned int width = image->w;
+	unsigned int height = image->h;
+
+	for (unsigned int i = 0; i < height; i++){
+		for (unsigned int j = 0; j < width; j++){
+
+			Uint32 pixel = get_pixel(image, j, i);
+			Uint8 r = 0, g = 0, b = 0;
+			SDL_GetRGB(pixel, image->format, &r, &g, &b);
+			int off = ker/2;
+			float maxrho;
+			float maxangle;
+			float rad = 
+
+			for (unsigned int k = -off; k <= off; k++){
+				for (unsigned int l = -off; l <= off; l++){
+					if (i+k < height && i+k >= 0 && j+l >= 0 && j+l < width){
+
+					}
+
+
+				}
+			}
+
+
+		}
+	}
+}
+*/
 int hough_filter(int input[], int rows, int cols, int threshold, Line res[]){
 
 	int acc = 0;
@@ -58,6 +109,23 @@ int hough_filter(int input[], int rows, int cols, int threshold, Line res[]){
 	}
 
 	return acc;
+}
+
+void neighbour_suppr(int *hough, int rows, int cols, int r, int theta){
+	int roff = rows/4;
+	int coff = cols/4;
+	if (roff % 2 == 0)
+		roff++;
+	if (coff % 2 == 0)
+		coff++;
+
+	for (int k = -roff; k <= roff; k++){
+		for (int l = -coff; l <= coff; l++){
+			if (r+k >= 0 && r+k < rows && l+theta >= 0 && l+theta < cols){
+				hough[(k+r)*cols + l+theta] = 0;
+			}
+		}
+	}
 }
 
 TupleInt hough_filter_local(int input[], int rows, int cols, int threshold, int step, Line hor[], Line ver[]){
@@ -95,6 +163,7 @@ TupleInt hough_filter_local(int input[], int rows, int cols, int threshold, int 
 					hor[horacc] = new;
 					horacc++;
 				}
+				//neighbour_suppr(input, rows, cols, i, j);
 			}
 		}
 	}
@@ -104,6 +173,8 @@ TupleInt hough_filter_local(int input[], int rows, int cols, int threshold, int 
 	res.y = veracc;
 	return res;
 }
+
+
 
 void line_distances(Line* lines, int len, int* res){
 
@@ -169,6 +240,8 @@ int get_grid_lines(Line* lines, int len, int* dis, int tolerance, Line* res){
 
 int get_grid(Line* lines, int len, int tolerance, Line* res){
 
+	if (len < 2)
+		return 0;
 	int* gX = malloc(sizeof(int) * (len-1));
 	line_distances(lines, len, gX);
 	int n = get_grid_lines(lines, len, gX, tolerance, res);

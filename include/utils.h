@@ -34,5 +34,14 @@ TupleInt stackTint_pop(Stack_Tint* s);
 float array_sum(float arr[], int begin, int end);
 int array_min_index(float arr[], size_t len);
 
+int get_biggest_bin(int* hough, int maxr, int maxtheta);
+
+
+typedef struct CannyRes{
+	Uint8* edges;
+	Uint8* angles;
+
+} CannyRes;
+
 
 #endif
