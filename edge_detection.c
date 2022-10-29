@@ -316,7 +316,7 @@ CannyRes canny(SDL_Surface *image){
 	free(angles);   
 	float threshold = otsu_threshold(image);
 	double_thresholding(maxima, image->h, image->w, 0.5, threshold);
-	clean(maxima,image->w*image->h);
+	//clean(maxima,image->w*image->h);
 	apply_convolution(image, maxima, (size_t)image->h, (size_t)image->w);
 	CannyRes res = {maxima, angles};
 	return res;

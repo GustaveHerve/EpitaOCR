@@ -13,5 +13,6 @@ TupleInt hough_filter_local(int input[], int rows, int cols, int threshold, int 
 int* line_distances(Line* lines, int len, int* res);
 int get_grid_lines(Line* lines, int len, int* dis, int tolerance, Line* res);
 int get_grid(Line* lines, int len, int tolerance, Line* res);
+int merge_lines(Line* lines, int len, int thresh, Line* res);
 
 #endif

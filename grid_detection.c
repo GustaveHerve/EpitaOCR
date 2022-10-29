@@ -185,6 +185,34 @@ void line_distances(Line* lines, int len, int* res){
 
 }
 
+int merge_lines(Line* lines, int len, int thresh, Line* res){
+	if (len <= 0)
+		return -1;
+	int curdist = 0;
+	int index = 0;
+	Line max = lines[0];
+
+	for (int i = 1; i < len; i++){
+		curdist += lines[i].rho - lines[i-1].rho;
+		if (curdist > thresh){
+			res[index] = max;
+			index++;
+			max = lines[i];
+			curdist = 0;
+			continue;
+		}
+
+		if (lines[i].rho > max.rho)
+			max = lines[i];
+	}
+
+	if (max.rho - res[index-1].rho > thresh)
+		res[index] = max;
+
+	return index+1; 
+	
+}
+
 int get_grid_lines(Line* lines, int len, int* dis, int tolerance, Line* res){
 
 	int res_dist = 0;

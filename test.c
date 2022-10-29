@@ -27,7 +27,8 @@ int main(int argc, char** argv){
 	//Convert surface to greyscale
 	greyscale(test);
 
-	//blur(test, 5);
+	//blur(test, 3);
+	//dilate(test, 5);
 	//erose(test, 5);
 
     //CANNY
@@ -44,31 +45,40 @@ int main(int argc, char** argv){
 
     int rows = sqrt(height * height + width * width);
 
-	int angle_precision = 360;
+	int angle_precision = 180;
     int *hough = calloc(angle_precision * rows, sizeof(int));
-	//hough_lines_gradient(test, angle_precision, can.edges, can.angles, hough);
+	hough_lines_gradient(test, angle_precision, can.edges, can.angles, hough);
 
-    hough_lines(test, angle_precision, 1, hough);
+	//hough_lines(test, angle_precision, 1, hough);
 
 	Line *linesX = calloc(angle_precision * rows, sizeof(Line));
 	Line *linesY = calloc(angle_precision * rows, sizeof(Line));
 
-	int hough_threshold = get_biggest_bin(hough, rows, angle_precision) * 0.5;
+	int hough_threshold = get_biggest_bin(hough, rows, angle_precision) * 0.23;
 
-    TupleInt len_li = hough_filter_local(hough, rows, angle_precision, hough_threshold, 60, linesX, linesY);
+    TupleInt len_li = hough_filter_local(hough, rows, angle_precision, hough_threshold, 10, linesX, linesY);
 
 	free(hough);
 
     linesX = (Line *)realloc(linesX, len_li.x * sizeof(Line));
     linesY = (Line *)realloc(linesY, len_li.y * sizeof(Line));
-	/*
+ 
+	Line *cacay = malloc(len_li.y * sizeof(Line));
+	Line *cacax = malloc(len_li.x * sizeof(Line));
+
+	len_li.y =  merge_lines(linesY, len_li.y, 10, cacay);
+	len_li.x =  merge_lines(linesX, len_li.x, 10, cacax);
+
+	linesX = cacax;
+	linesY = cacay;
+	
 
 	Line* gridX = calloc(len_li.x, sizeof(Line));
 	Line* gridY = calloc(len_li.y, sizeof(Line));
 
 	int xtemp = get_grid(linesX, len_li.x, 16, gridX);
 	int ytemp = get_grid(linesY, len_li.y, 16, gridY);
-	*/
+	
 
     //SDL_FreeSurface(clo);
       
@@ -99,9 +109,9 @@ int main(int argc, char** argv){
         SDL_RenderCopy(renderer, texture, NULL, &img_size);
 
  	
-        for (int i = 0; i < len_li.x; i++){
-            int rho = linesX[i].rho;
-            float theta = linesX[i].theta * M_PI / 180;
+        for (int i = 0; i < xtemp; i++){
+            int rho = gridX[i].rho;
+            float theta = gridX[i].theta * M_PI / 180;
             double sinA = sin(theta);
             double cosA = cos(theta);
             float x0 = cosA * rho;
@@ -120,9 +130,9 @@ int main(int argc, char** argv){
 		 	//SDL_RenderDrawPoint(renderer, x1, y1);
 
         }	
-		for (int i = 0; i < len_li.y; i++){
-            int rho = linesY[i].rho;
-            float theta = linesY[i].theta * M_PI / 180;
+		for (int i = 0; i < ytemp; i++){
+            int rho = gridY[i].rho;
+            float theta = gridY[i].theta * M_PI / 180;
             double sinA = sin(theta);
             double cosA = cos(theta);
             float x0 = cosA * rho;
