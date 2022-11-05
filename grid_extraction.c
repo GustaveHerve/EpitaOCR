@@ -15,6 +15,15 @@
 #include "include/thresholding.h"
 #include <string.h>
 
+int avg_size(Square *sq, int len){
+
+	double sum = 0;
+	for (int i = 0; i < len; i++)
+		sum += sq[i].NE.x - sq[i].NW.x;
+	return sum / len;
+	
+}
+
 int get_squares(Line *x, Line *y, Square *res){
 
 	int len = 0;
@@ -42,6 +51,8 @@ int get_squares(Line *x, Line *y, Square *res){
 
 void save_squares(Square *sq, int len, SDL_Surface *image){
 
+	int avg = avg_size(sq, len);
+
 	for (int i = 0; i < len; i++){
 
 		char *name = malloc(3 * sizeof(char));
@@ -57,17 +68,19 @@ void save_squares(Square *sq, int len, SDL_Surface *image){
 	    second[0] = (i % 10) + '0';
 		strcat(name, second);
 
-		int w = sq[i].NE.x - sq[i].NW.x;
-		int h = sq[i].SW.y - sq[i].NW.y;
+		//int w = sq[i].NE.x - sq[i].NW.x;
+		//int h = sq[i].SW.y - sq[i].NW.y;
+		int w = avg;
+		int h = avg;
 
-		SDL_Surface* crop = SDL_CreateRGBSurface(0, w, h, 32, 0, 0, 0, 0);
+		SDL_Surface* crop = SDL_CreateRGBSurface(0, 28, 28, 32, 0, 0, 0, 0);
 		SDL_Rect rect;
 		rect.x = sq[i].NW.x;
 		rect.y = sq[i].NW.y;
 		rect.w = w;
 		rect.h = h;
 
-		SDL_BlitSurface(image, &rect, crop, NULL);
+		SDL_BlitScaled(image, &rect, crop, NULL);
 		char *path1 = "/Users/gustave/Documents/c/grid/";
 		char *ext = ".png";
 		char *path = malloc(50 * sizeof(char));
