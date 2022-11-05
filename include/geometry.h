@@ -13,6 +13,14 @@ typedef struct Segment{
 	TupleInt pt2;
 } Segment;
 
+typedef struct Square{
+	TupleInt NW;
+	TupleInt SW;
+	TupleInt NE;
+	TupleInt SE;
+} Square;
+
+
 int polar_intersection(TupleInt *res, Line line1, Line line2);
 Segment get_segment(SDL_Surface *image, Line *line);
 

@@ -13,6 +13,7 @@
 #include "include/grid_detection.h"
 #include "include/morph.h"
 #include "include/thresholding.h"
+#include "include/grid_extraction.h"
 
 int main(int argc, char** argv){
 
@@ -41,7 +42,7 @@ int main(int argc, char** argv){
 	//erose(test, 3);
 	//dilate(test, 3);
 	CannyRes can = canny(test);
-	dilate(test, 3);
+	//dilate(test, 3);
 	//erose(test, 3);
 	//dilate(test, 3);
 
@@ -89,7 +90,10 @@ int main(int argc, char** argv){
 	int ytemp = get_grid(linesY, len_li.y, 16, gridY);
 
 	//SDL_UnlockSurface(test);
-	
+	Square *squares = calloc(81, sizeof(Square));
+	int len = get_squares(gridX, gridY, squares);
+	save_squares(squares, len, test);
+
 
     //SDL_FreeSurface(clo);
       
@@ -188,7 +192,6 @@ int main(int argc, char** argv){
     SDL_DestroyWindow(window);
     SDL_DestroyRenderer(renderer);
 	
-    IMG_SavePNG(test, "/Users/gustave/Documents/c/images/ALZD.png");
     SDL_FreeSurface(test);
 	//SDL_FreeSurface(clo);
 	free(linesX);

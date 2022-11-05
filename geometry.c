@@ -24,8 +24,8 @@ int polar_intersection(TupleInt *res, Line line1, Line line2){
     }
 	//Both lines never intersect
 	else
-		return 1;
-	return 0;
+		return 0;
+	return 1;
 }
 
 Segment get_segment(SDL_Surface *image, Line *line){
