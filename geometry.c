@@ -139,3 +139,4 @@ Segment get_segment(SDL_Surface *image, Line *line){
 	
 	return res;
 }
+

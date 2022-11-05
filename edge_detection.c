@@ -12,38 +12,6 @@
 /* gradient: computes edge and angle gradient values from two matrices of same size
 *  stores the result in edges[] and angles[] (so it doesn't affect the image directly)
 */
-void gradient(int r1[], int r2[], Uint8 edges[], Uint8 angles[], size_t rows, size_t cols){
-
-	for (size_t i = 0; i < rows; i++){
-		for (size_t j = 0; j < cols; j++){	
-			int current = i*cols + j;
-			double s1 = (double)r1[current] * (double)r1[current];
-			double s2 = (double)r2[current] * (double)r2[current];
-			double temp = sqrt(s1+s2);
-			//double temp = fabs(r1[current]) + fabs(r2[current]);
-			if (temp > 255)
-				temp = 255;
-			edges[current] = (Uint8)temp;
-
-			float tan = atan2(r2[current], r1[current]);
-			tan = fabs(tan);
-			tan = tan * 180 / M_PI;
-			Uint8 angle = 0;
-
-			if (tan >= 0 && tan <= 22.5)
-				angle = 0;
-			else if (tan <= 67.5)
-				angle = 45;
-			else if (tan <= 112.5)
-				angle = 90;
-			else
-				angle = 135;
-
-			angles[current] = angle;
-		}	
-	}
-}
-
 void gradientv2(int r1[], int r2[], Uint8 edges[], Uint8 angles[], size_t rows, size_t cols){
 
 	for (size_t i = 0; i < rows; i++){
@@ -160,46 +128,6 @@ void non_maxima_suppr(Uint8 edges[], Uint8 angles[], size_t rows, size_t cols,
 
 					
 			}
-			/*
-
-			Uint8 q = 255;
-			Uint8 r = 255;
-
-			if ((angle >= 0 && angle < 22.5) || (angle >= 180 && angle <= 157.5)){
-				if (j+1 < (int)cols && j-1 >= 0){
-					q = edges[i*cols + j-1];
-					r = edges[i*cols + j+1];
-				}
-			}
-			
-			else if (angle >= 22.5 && angle < 67.5){
-				if ((j+1 < (int)cols && i+1 < (int)rows) && (i-1 >= 0 && j-1 >= 0)){
-					q = edges[(i+1)*cols + j-1];
-					r = edges[(i-1)*cols + j+1];
-				}
-
-			}
-
-			else if (angle >= 67.5 && angle < 112.5){
-				if (i+1 < (int)cols && i-1 >= 0){
-					q = edges[(i+1)*cols + j];
-					r = edges[(i-1)*cols +j];
-				}
-			}
-
-			else if (angle >= 112.5 && angle < 157.5){
-				if ((j-1 >= 0 && i+1 < (int)rows ) && (j+1 < (int)cols && i-1 >= 0)){
-					q = edges[(i-1)*cols + j-1];
-					r = edges[(i+1)*cols + j+1];
-				}
-
-			}
-
-			if (edges[c] >= q && edges[c] >= r)
-				res[c] = edges[c];
-			else
-				res[c] = 0;
-				*/
 
 		}
 	}
@@ -313,10 +241,10 @@ CannyRes canny(SDL_Surface *image){
 	Uint8 *maxima = calloc(image->w * image->h, sizeof(Uint8));
     non_maxima_suppr(edges, angles, image->h, image->w, maxima);
 	free(edges);
-	free(angles);   
+	//free(angles);   
 	float threshold = otsu_threshold(image);
 	double_thresholding(maxima, image->h, image->w, 0.5, threshold);
-	//clean(maxima,image->w*image->h);
+	clean(maxima,image->w*image->h);
 	apply_convolution(image, maxima, (size_t)image->h, (size_t)image->w);
 	CannyRes res = {maxima, angles};
 	return res;

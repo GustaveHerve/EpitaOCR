@@ -9,19 +9,17 @@ void dilate_c(SDL_Surface *image, int kersize, int r[]){
 	int height = image->h;
 	int len = height * width;
 
-	Uint32 *pixels = malloc(sizeof(Uint32) * len);
-	get_pixel_array(image, pixels);
+	Uint32 *pixels = image->pixels; 
 
 	for (int i = 0; i < height; i++){
 		for (int j = 0; j < width; j++){
 
-			double acc = 0;
+			Uint8 acc = 0;
 			int roff = kersize/2;
-			int coff = kersize/2;
 
-			for (int k = -1 * roff; k <= roff; k++){
-				for (int l = -1 * coff; l <= roff; l++){
-					if (i+k >= 0 && j+l >= 0 && i+k <height && j+l < width){
+			for (int k = -roff; k <= roff; k++){
+				for (int l = -roff; l <= roff; l++){
+					if (i+k >= 0 && j+l >= 0 && i+k < height && j+l < width){
 						Uint8 value;
 						SDL_GetRGB(pixels[(i+k)*width+(j+l)], image->format,
 							   	&value, &value, &value);
@@ -33,7 +31,6 @@ void dilate_c(SDL_Surface *image, int kersize, int r[]){
 			r[i*width + j] = acc;
 		}
 	}
-	free(pixels);
 }
 
 void dilate(SDL_Surface *image, int kersize){

@@ -12,6 +12,7 @@
 #include "include/geometry.h"
 #include "include/grid_detection.h"
 #include "include/morph.h"
+#include "include/thresholding.h"
 
 int main(int argc, char** argv){
 
@@ -19,6 +20,7 @@ int main(int argc, char** argv){
 	if (argc != 2)
 		errx(2, "Wrong arguments\nUsage: ./binary filepath");
     SDL_Surface* test = load_image(argv[1]);
+	//SDL_LockSurface(test);
 	
 
     unsigned int width = test->w;
@@ -27,15 +29,21 @@ int main(int argc, char** argv){
 	//Convert surface to greyscale
 	greyscale(test);
 
+
 	//blur(test, 3);
 	//dilate(test, 5);
 	//erose(test, 5);
+	//adaptive_thresholding(test, 11, 11);
 
-    //CANNY
     //otsu(test);
 	//invert(test);
+	//dilate(test, 3);
+	//erose(test, 3);
+	//dilate(test, 3);
 	CannyRes can = canny(test);
-	//closing(test, 5);
+	dilate(test, 3);
+	//erose(test, 3);
+	//dilate(test, 3);
 
 	//SDL_Surface* clo = SDL_CreateRGBSurface(0, width, height, 32, 0, 0, 0, 0);
 	//SDL_BlitSurface(test, NULL, clo, NULL);
@@ -46,28 +54,29 @@ int main(int argc, char** argv){
     int rows = sqrt(height * height + width * width);
 
 	int angle_precision = 180;
-    int *hough = calloc(angle_precision * rows, sizeof(int));
-	hough_lines_gradient(test, angle_precision, can.edges, can.angles, hough);
 
-	//hough_lines(test, angle_precision, 1, hough);
+    int *hough = calloc(angle_precision * rows, sizeof(int));
+	//hough_lines_gradient(test, angle_precision, can.edges, can.angles, hough);
+
+	hough_lines(test, angle_precision, 1, hough);
 
 	Line *linesX = calloc(angle_precision * rows, sizeof(Line));
 	Line *linesY = calloc(angle_precision * rows, sizeof(Line));
 
-	int hough_threshold = get_biggest_bin(hough, rows, angle_precision) * 0.23;
+	int hough_threshold = get_biggest_bin(hough, rows, angle_precision) * 0.5;
 
-    TupleInt len_li = hough_filter_local(hough, rows, angle_precision, hough_threshold, 10, linesX, linesY);
+    TupleInt len_li = hough_filter_local(hough, rows, angle_precision, hough_threshold, 1, 3, linesX, linesY);
 
 	free(hough);
 
     linesX = (Line *)realloc(linesX, len_li.x * sizeof(Line));
     linesY = (Line *)realloc(linesY, len_li.y * sizeof(Line));
- 
+
 	Line *cacay = malloc(len_li.y * sizeof(Line));
 	Line *cacax = malloc(len_li.x * sizeof(Line));
 
-	len_li.y =  merge_lines(linesY, len_li.y, 10, cacay);
-	len_li.x =  merge_lines(linesX, len_li.x, 10, cacax);
+	len_li.y =  merge_lines(linesY, len_li.y, 30, cacay);
+	len_li.x =  merge_lines(linesX, len_li.x, 30, cacax);
 
 	linesX = cacax;
 	linesY = cacay;
@@ -78,6 +87,8 @@ int main(int argc, char** argv){
 
 	int xtemp = get_grid(linesX, len_li.x, 16, gridX);
 	int ytemp = get_grid(linesY, len_li.y, 16, gridY);
+
+	//SDL_UnlockSurface(test);
 	
 
     //SDL_FreeSurface(clo);
@@ -177,7 +188,7 @@ int main(int argc, char** argv){
     SDL_DestroyWindow(window);
     SDL_DestroyRenderer(renderer);
 	
-    IMG_SavePNG(test, "/Users/gustave/Documents/c/images/pascaca.png");
+    IMG_SavePNG(test, "/Users/gustave/Documents/c/images/ALZD.png");
     SDL_FreeSurface(test);
 	//SDL_FreeSurface(clo);
 	free(linesX);

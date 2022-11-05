@@ -128,7 +128,7 @@ void neighbour_suppr(int *hough, int rows, int cols, int r, int theta){
 	}
 }
 
-TupleInt hough_filter_local(int input[], int rows, int cols, int threshold, int step, Line hor[], Line ver[]){
+TupleInt hough_filter_local(int input[], int rows, int cols, int threshold, int step, int tol, Line hor[], Line ver[]){
 
 	int horacc = 0;
 	int veracc = 0;
@@ -155,11 +155,11 @@ TupleInt hough_filter_local(int input[], int rows, int cols, int threshold, int 
 				Line new;
 				new.theta = jmax;
 				new.rho = imax;
-				if (jmax <= 5 || jmax >= 355 ){
+				if (jmax <= 0 + tol || jmax >= 360 - tol){
 					ver[veracc] = new;
 					veracc++;
 				}
-				else if ( (jmax >= 85 && jmax <= 95 ) || (jmax >= 265 && jmax <= 275)){
+				else if ( (jmax >= 90 - tol && jmax <= 90 + tol ) || (jmax >=  270 - tol && jmax <= 270 + tol)){
 					hor[horacc] = new;
 					horacc++;
 				}
@@ -213,12 +213,24 @@ int merge_lines(Line* lines, int len, int thresh, Line* res){
 	
 }
 
+int average_dist(int* dists, int len){
+
+	int sum = 0;
+	for (int i = 0; i < len; i++){
+		sum += dists[i];
+	}
+	return sum / len;
+
+}
+
 int get_grid_lines(Line* lines, int len, int* dis, int tolerance, Line* res){
 
 	int res_dist = 0;
 	int cur_dist = dis[0];
 	int res_count = 0;
 	int cur_count = 1;
+
+	int avg = average_dist(dis, len-1);
 
 	for (int i = 1; i < len -1; i++){
 
@@ -265,6 +277,8 @@ int get_grid_lines(Line* lines, int len, int* dis, int tolerance, Line* res){
 	return j;
 
 }
+
+
 
 int get_grid(Line* lines, int len, int tolerance, Line* res){
 
