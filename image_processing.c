@@ -85,12 +85,12 @@ void apply_convolution_int(SDL_Surface *image, int r[], size_t rows, size_t cols
         for (size_t j= 0; j < cols; j++){
 
 			Uint8 value;
-			if (r[i*cols+j] > 255)
+			if (r[i*cols+j] >= 255)
 				value = 255;
 			else if (r[i*cols+j] < 0)
 				value = 0;
 			else
-				value = r[i*cols+j];
+				value = (Uint8)r[i*cols+j];
 
             Uint32 pixel = SDL_MapRGB(image->format, value, value,
 					value);

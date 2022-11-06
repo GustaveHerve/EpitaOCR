@@ -30,17 +30,18 @@ int main(int argc, char** argv){
 	greyscale(test);
 
 	//blur(test, 3);
+
 	//adaptive_thresholding(test, 11, 11);
 
     //otsu(test);
 	//invert(test);
 	canny(test);
-	//dilate(test, 3);
 	//erose(test, 3);
 	//dilate(test, 3);
 
-	//SDL_Surface* clo = SDL_CreateRGBSurface(0, width, height, 32, 0, 0, 0, 0);
-	//SDL_BlitSurface(test, NULL, clo, NULL);
+	SDL_Surface* dilsur = SDL_CreateRGBSurface(0, width, height, 32, 0, 0, 0, 0);
+	SDL_BlitSurface(test, NULL, dilsur, NULL);
+	dilate(dilsur, 5);
 
     int rows = sqrt(height * height + width * width);
 
@@ -49,14 +50,14 @@ int main(int argc, char** argv){
     int *hough = calloc(angle_precision * rows, sizeof(int));
 	//hough_lines_gradient(test, angle_precision, can.edges, can.angles, hough);
 
-	hough_lines(test, angle_precision, 1, hough);
+	hough_lines(dilsur, angle_precision, 1, hough);
 
 	Line *linesX = calloc(angle_precision * rows, sizeof(Line));
 	Line *linesY = calloc(angle_precision * rows, sizeof(Line));
 
 	int hough_threshold = get_biggest_bin(hough, rows, angle_precision) * 0.5;
 
-    TupleInt len_li = hough_filter_local(hough, rows, angle_precision, hough_threshold, 1, 3, linesX, linesY);
+    TupleInt len_li = hough_filter_local(hough, rows, angle_precision, hough_threshold, 1, 0, linesX, linesY);
 
 	free(hough);
 
@@ -79,13 +80,12 @@ int main(int argc, char** argv){
 	int xtemp = get_grid(linesX, len_li.x, 16, gridX);
 	int ytemp = get_grid(linesY, len_li.y, 16, gridY);
 
-	//SDL_UnlockSurface(test);
-	//Square *squares = calloc(81, sizeof(Square));
-	//int len = get_squares(gridX, gridY, squares);
-	//save_squares(squares, len, test);
+	Square *squares = calloc(81, sizeof(Square));
+	int len = get_squares(gridX, gridY, squares);
+	save_squares(squares, len, test);
 
 
-    //SDL_FreeSurface(clo);
+    SDL_FreeSurface(dilsur);
       
     SDL_Window *window = SDL_CreateWindow("Cookin'VR",SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,test->w,test->h,SDL_WINDOW_RESIZABLE);
     if (window == NULL)
@@ -181,6 +181,7 @@ int main(int argc, char** argv){
     SDL_DestroyTexture(texture);
     SDL_DestroyWindow(window);
     SDL_DestroyRenderer(renderer);
+   	IMG_SavePNG(test, "/Users/gustave/Documents/c/images/final.png");
 	
     SDL_FreeSurface(test);
 	//SDL_FreeSurface(clo);

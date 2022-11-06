@@ -13,7 +13,7 @@
 /* gradient: computes edge and angle gradient values from two matrices of same size
 *  stores the result in edges[] and angles[] (so it doesn't affect the image directly)
 */
-void gradientv2(int r1[], int r2[], Uint8 edges[], Uint8 angles[], size_t rows, size_t cols){
+void gradient(int r1[], int r2[], int edges[], Uint8 angles[], size_t rows, size_t cols){
 
 	for (size_t i = 0; i < rows; i++){
 		for (size_t j = 0; j < cols; j++){	
@@ -22,9 +22,9 @@ void gradientv2(int r1[], int r2[], Uint8 edges[], Uint8 angles[], size_t rows, 
 			double s2 = (double)r2[current] * (double)r2[current];
 			double temp = sqrt(s1+s2);
 			//double temp = fabs(r1[current]) + fabs(r2[current]); //faster compute but less precise
-			if (temp > 255)
-				temp = 255;
-			edges[current] = (Uint8)temp;
+			//if (temp > 255)
+			//	temp = 255;
+			edges[current] = temp;
 
 			float tan = atan2(r2[current], r1[current]);
 			float dtan = 0;
@@ -50,7 +50,7 @@ void gradientv2(int r1[], int r2[], Uint8 edges[], Uint8 angles[], size_t rows, 
 }
 //Compute sobel and returns result in place in edges and angles
 //useful for Canny
-void sobel_c(SDL_Surface* surf, Uint8* edges, Uint8* angles){
+void sobel_c(SDL_Surface* surf, int* edges, Uint8* angles){
 
 	int *r1 = malloc(sizeof(int) * surf->w * surf->h);
     int *r2 = malloc(sizeof(int) * surf->w * surf->h);
@@ -61,7 +61,7 @@ void sobel_c(SDL_Surface* surf, Uint8* edges, Uint8* angles){
 	convolution(surf, kerx, 3, 3, r1, 1);
     convolution(surf, kery, 3, 3, r2, 1);
 
-	gradientv2(r1, r2, edges, angles, surf->h, surf->w);
+	gradient(r1, r2, edges, angles, surf->h, surf->w);
 
 	free(r1);
     free(r2);
@@ -72,16 +72,16 @@ void sobel_c(SDL_Surface* surf, Uint8* edges, Uint8* angles){
 //useful for testing sobel alone
 void sobel(SDL_Surface* surf){
 
-	Uint8 *edges = malloc(sizeof(Uint8) * surf->w * surf->h);
+	int *edges = malloc(sizeof(int) * surf->w * surf->h);
 	Uint8 *angles = malloc(sizeof(Uint8) * surf->w * surf->h);
 	sobel_c (surf, edges, angles);
-    apply_convolution(surf, edges, (size_t)surf->h, (size_t)surf->w);
+    apply_convolution_int(surf, edges, (size_t)surf->h, (size_t)surf->w);
 
 }
 
 //Canny substep
-void non_maxima_suppr(Uint8 edges[], Uint8 angles[], size_t rows, size_t cols,
-		Uint8 res[]){
+void non_maxima_suppr(int edges[], Uint8 angles[], size_t rows, size_t cols,
+		int res[]){
 
 	for (int i = 0; i < (int)rows; i++){
 		for (int j = 0; j < (int)cols; j++){
@@ -134,11 +134,11 @@ void non_maxima_suppr(Uint8 edges[], Uint8 angles[], size_t rows, size_t cols,
 	}
 }
 
-void double_thresholding(Uint8 *edges, size_t rows, size_t cols, 
+void double_thresholding(int *edges, size_t rows, size_t cols, 
 		float lowratio, float highratio){
 
-	Uint8 highvalue = highratio * 255;
-	Uint8 lowvalue = highvalue * lowratio;
+	int highvalue = highratio * 255;
+	int lowvalue = highvalue * lowratio;
 
 	Stack_Tint* s = newStack_Tint(rows*cols);
 
@@ -163,7 +163,7 @@ void double_thresholding(Uint8 *edges, size_t rows, size_t cols,
 
 }
 
-void hysteresis(Uint8 *edges, size_t rows, size_t cols, Stack_Tint* s){
+void hysteresis(int *edges, size_t rows, size_t cols, Stack_Tint* s){
 
 	while (!stackTint_is_empty(s)){
 		TupleInt e = stackTint_pop(s);
@@ -194,7 +194,7 @@ void hysteresis(Uint8 *edges, size_t rows, size_t cols, Stack_Tint* s){
 	}
 }
 
-void __hysteresis(Uint8 *edges, size_t rows, size_t cols, size_t i, size_t j){
+void __hysteresis(int *edges, size_t rows, size_t cols, size_t i, size_t j){
 
 	if (edges[i*cols+j] != WEAK)
 		return;
@@ -224,7 +224,7 @@ void __hysteresis(Uint8 *edges, size_t rows, size_t cols, size_t i, size_t j){
 
 }
 
-void clean(Uint8 *edges, size_t size){
+void clean(int *edges, size_t size){
 
 	for (size_t i = 0; i < size; i++){
 		if (edges[i] == WEAK)
@@ -235,18 +235,26 @@ void clean(Uint8 *edges, size_t size){
 
 CannyRes canny(SDL_Surface *image){
 
-	Uint8 *edges = malloc(sizeof(Uint8) * image->w * image->h);
+	int *edges = malloc(sizeof(int) * image->w * image->h);
     Uint8 *angles = malloc(sizeof(Uint8) * image->w * image->h);
 	sobel_c(image, edges, angles);
+	apply_convolution_int(image, edges, (size_t)image->h, (size_t)image->w);
+   	IMG_SavePNG(image, "/Users/gustave/Documents/c/images/step1.png");
 
-	Uint8 *maxima = calloc(image->w * image->h, sizeof(Uint8));
+	int *maxima = calloc(image->w * image->h, sizeof(int));
     non_maxima_suppr(edges, angles, image->h, image->w, maxima);
+	apply_convolution_int(image, maxima, (size_t)image->h, (size_t)image->w);
+
+   	IMG_SavePNG(image, "/Users/gustave/Documents/c/images/step2.png");
 	free(edges);
 	//free(angles);   
 	float threshold = otsu_threshold(image);
 	double_thresholding(maxima, image->h, image->w, 0.5, threshold);
+
+	apply_convolution_int(image, maxima, (size_t)image->h, (size_t)image->w);
+   	IMG_SavePNG(image, "/Users/gustave/Documents/c/images/step3.png");
 	clean(maxima,image->w*image->h);
-	apply_convolution(image, maxima, (size_t)image->h, (size_t)image->w);
+	apply_convolution_int(image, maxima, (size_t)image->h, (size_t)image->w);
 	CannyRes res = {maxima, angles};
 	return res;
 	//free(maxima);

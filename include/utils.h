@@ -38,7 +38,7 @@ int get_biggest_bin(int* hough, int maxr, int maxtheta);
 
 
 typedef struct CannyRes{
-	Uint8* edges;
+	int* edges;
 	Uint8* angles;
 
 } CannyRes;

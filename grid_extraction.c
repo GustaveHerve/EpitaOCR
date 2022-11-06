@@ -74,13 +74,17 @@ void save_squares(Square *sq, int len, SDL_Surface *image){
 		int h = avg;
 
 		SDL_Surface* crop = SDL_CreateRGBSurface(0, 28, 28, 32, 0, 0, 0, 0);
+		SDL_Surface* temp = SDL_CreateRGBSurface(0, avg, avg, 32, 0, 0, 0, 0);
 		SDL_Rect rect;
 		rect.x = sq[i].NW.x;
 		rect.y = sq[i].NW.y;
 		rect.w = w;
 		rect.h = h;
 
-		SDL_BlitScaled(image, &rect, crop, NULL);
+		SDL_BlitSurface(image, &rect, temp, NULL);
+		dilate(temp, 3);
+
+		SDL_BlitScaled(temp, NULL, crop, NULL);
 		char *path1 = "/Users/gustave/Documents/c/grid/";
 		char *ext = ".png";
 		char *path = malloc(50 * sizeof(char));
