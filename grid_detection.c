@@ -230,7 +230,7 @@ int get_grid_lines(Line* lines, int len, int* dis, int tolerance, Line* res){
 	int res_count = 0;
 	int cur_count = 1;
 
-	int avg = average_dist(dis, len-1);
+	//int avg = average_dist(dis, len-1);
 
 	for (int i = 1; i < len -1; i++){
 

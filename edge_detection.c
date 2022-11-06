@@ -141,8 +141,8 @@ void double_thresholding(Uint8 *edges, size_t rows, size_t cols,
 
 	Stack_Tint* s = newStack_Tint(rows*cols);
 
-	for (int i = 0; i < rows; i++){
-		for (int j = 0; j < cols; j++){
+	for (size_t i = 0; i < rows; i++){
+		for (size_t j = 0; j < cols; j++){
 			int c = i * cols + j;
 			if (edges[c] >= highvalue){
 				edges[c] = STRONG;
@@ -166,8 +166,8 @@ void hysteresis(Uint8 *edges, size_t rows, size_t cols, Stack_Tint* s){
 
 	while (!stackTint_is_empty(s)){
 		TupleInt e = stackTint_pop(s);
-		int i = e.x;
-		int j = e.y;
+		size_t i = e.x;
+		size_t j = e.y;
 
 		if (i-1 >= 0){
 			__hysteresis(edges, rows, cols, i-1, j); //N
@@ -193,7 +193,7 @@ void hysteresis(Uint8 *edges, size_t rows, size_t cols, Stack_Tint* s){
 	}
 }
 
-void __hysteresis(Uint8 *edges, size_t rows, size_t cols, int i, int j){
+void __hysteresis(Uint8 *edges, size_t rows, size_t cols, size_t i, size_t j){
 
 	if (edges[i*cols+j] != WEAK)
 		return;

@@ -12,6 +12,6 @@ void non_maxima_suppr(Uint8 edges[], Uint8 angles[], size_t rows, size_t cols, U
 CannyRes canny(SDL_Surface *image);
 void double_thresholding(Uint8 *edges, size_t rows, size_t cols, float lowRatio, float highRatio); 
 void hysteresis(Uint8 *edges, size_t rows, size_t cols, Stack_Tint* s);
-void __hysteresis(Uint8 *edges, size_t rows, size_t cols, int i, int j);
+void __hysteresis(Uint8 *edges, size_t rows, size_t cols, size_t i, size_t j);
 
 #endif

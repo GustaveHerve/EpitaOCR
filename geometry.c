@@ -31,7 +31,6 @@ int polar_intersection(TupleInt *res, Line line1, Line line2){
 Segment get_segment(SDL_Surface *image, Line *line){
 
 	unsigned int width = image->w;
-	unsigned int height = image->h;
 	size_t max = 0;
 	size_t acc = 0;
 

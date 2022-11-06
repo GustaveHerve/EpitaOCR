@@ -7,7 +7,6 @@ void dilate_c(SDL_Surface *image, int kersize, int r[]){
 
 	int width = image->w;
 	int height = image->h;
-	int len = height * width;
 
 	Uint32 *pixels = image->pixels; 
 

@@ -21,7 +21,7 @@ typedef struct TupleInt{
 } TupleInt;
 
 typedef struct Stack_Tint{
-	size_t maxsize;
+	int maxsize;
 	TupleInt* arr;
 	int top;
 } Stack_Tint;

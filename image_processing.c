@@ -201,8 +201,8 @@ void invert(SDL_Surface *image){
 	int h = image->h;
 	Uint32 black = SDL_MapRGB(image->format, 0, 0, 0);
 	Uint32 white = SDL_MapRGB(image->format, 255, 255, 255);
-	for (size_t i = 0; i < h; i++){
-		for (size_t j = 0; j < w; j++){
+	for (int i = 0; i < h; i++){
+		for (int j = 0; j < w; j++){
 			Uint32 pixel = get_pixel(image, j, i);
 			Uint8 val = 0;
 			SDL_GetRGB(pixel, image->format, &val, &val, &val);

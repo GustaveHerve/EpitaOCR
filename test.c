@@ -41,7 +41,7 @@ int main(int argc, char** argv){
 	//dilate(test, 3);
 	//erose(test, 3);
 	//dilate(test, 3);
-	CannyRes can = canny(test);
+	canny(test);
 	//dilate(test, 3);
 	//erose(test, 3);
 	//dilate(test, 3);
