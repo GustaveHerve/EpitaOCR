@@ -9,6 +9,102 @@
 #include "include/matrix.h"
 #include "include/image_processing.h"
 
+//threshold: applies a fixed threshold treatment to a SDL_Surface
+void threshold(SDL_Surface* image, float threshold){
+
+	unsigned int width = image->w;
+	unsigned int height = image->h;
+	Uint8 t = threshold * 255;
+
+	for (unsigned int i = 0; i < height; i++){
+		for (unsigned int j = 0; j < width; j++){
+			
+			Uint32 pixel = get_pixel(image, j, i);
+			Uint8 r = 0, g = 0, b = 0;
+
+			SDL_GetRGB(pixel, image->format, &r, &g, &b);
+			Uint8 res = 0;
+			if (r >= t){
+				res = 255;
+			}
+
+			Uint32 newpixel = SDL_MapRGB(image->format, res, res, res);
+			replace_pixel(image, j, i, newpixel);
+				
+
+		}
+	}
+}
+
+void threshold_value(SDL_Surface* image, int threshold){
+
+	unsigned int width = image->w;
+	unsigned int height = image->h;
+
+	for (unsigned int i = 0; i < height; i++){
+		for (unsigned int j = 0; j < width; j++){
+			Uint32 pixel = get_pixel(image, j, i);
+			Uint8 r = 0, g = 0, b = 0;
+
+			SDL_GetRGB(pixel, image->format, &r, &g, &b);
+			Uint8 res = 0;
+			if (r > threshold){
+				res = 255;
+			}
+
+			Uint32 newpixel = SDL_MapRGB(image->format, res, res, res);
+			replace_pixel(image, j, i, newpixel);
+		}
+	}
+}
+
+//Compute otsu global threshold and returnx it without applying it
+float otsu_threshold(SDL_Surface* image){
+
+	int n = image->w * image->h;
+	float thresh = 0, var_max = 0, sum = 0, sumB = 0;
+	float q1 = 0, q2 = 0, u1 = 0, u2 = 0;
+	int max_intensity = 255;
+
+	Histo hist;
+	histo_init(&hist);
+	histo_compute(image, &hist);
+
+
+	for (int i = 0; i <= max_intensity; i++){
+		sum += (float)i * (float)hist.values[i];
+	}
+
+	for (int t = 0; t <= max_intensity; t++){
+		q1 += (float)hist.values[t];
+		if (q1 == 0){
+			continue;
+		}
+		q2 = (float)n - q1;
+
+		sumB += t * hist.values[t];
+		u1 = sumB / q1;
+		u2 = (sum - sumB) / q2;
+
+		float var = q1 * q2 * ((u1 - u2) * (u1 - u2));
+
+		if (var > var_max){
+			thresh = t;
+			var_max = var;
+		}
+
+	}
+	return thresh/max_intensity;
+
+}
+
+//Computes otsu threshold and apply it
+void otsu(SDL_Surface* image){
+
+	float thresh = otsu_threshold(image);
+	threshold_value(image, thresh*255);
+
+}
 void adaptive_thresholding_c(SDL_Surface *image, int size, int *r, int c){
 
 	SDL_LockSurface(image);
@@ -60,4 +156,3 @@ void adaptive_thresholding(SDL_Surface *image, int size, int c){
 	apply_convolution_int(image, r, image->h, image->w);
 }
 
-//void local_otsu(SDL_Surface *image

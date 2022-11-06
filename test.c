@@ -22,7 +22,6 @@ int main(int argc, char** argv){
 		errx(2, "Wrong arguments\nUsage: ./binary filepath");
     SDL_Surface* test = load_image(argv[1]);
 	//SDL_LockSurface(test);
-	
 
     unsigned int width = test->w;
 	unsigned int height = test->h;
@@ -30,17 +29,11 @@ int main(int argc, char** argv){
 	//Convert surface to greyscale
 	greyscale(test);
 
-
 	//blur(test, 3);
-	//dilate(test, 5);
-	//erose(test, 5);
 	//adaptive_thresholding(test, 11, 11);
 
     //otsu(test);
 	//invert(test);
-	//dilate(test, 3);
-	//erose(test, 3);
-	//dilate(test, 3);
 	canny(test);
 	//dilate(test, 3);
 	//erose(test, 3);
@@ -48,9 +41,6 @@ int main(int argc, char** argv){
 
 	//SDL_Surface* clo = SDL_CreateRGBSurface(0, width, height, 32, 0, 0, 0, 0);
 	//SDL_BlitSurface(test, NULL, clo, NULL);
-
-	//erose(test, 3);
-	//closing(test, 5);
 
     int rows = sqrt(height * height + width * width);
 
@@ -90,9 +80,9 @@ int main(int argc, char** argv){
 	int ytemp = get_grid(linesY, len_li.y, 16, gridY);
 
 	//SDL_UnlockSurface(test);
-	Square *squares = calloc(81, sizeof(Square));
-	int len = get_squares(gridX, gridY, squares);
-	save_squares(squares, len, test);
+	//Square *squares = calloc(81, sizeof(Square));
+	//int len = get_squares(gridX, gridY, squares);
+	//save_squares(squares, len, test);
 
 
     //SDL_FreeSurface(clo);
@@ -199,4 +189,64 @@ int main(int argc, char** argv){
 	//free(gridX);
 	//free(gridY);
 
+}
+
+void test3(char *path){
+
+    SDL_Surface* test = load_image(path);
+	SDL_LockSurface(test);
+
+    unsigned int width = test->w;
+	unsigned int height = test->h;
+
+	greyscale(test);
+
+	canny(test);
+
+    int rows = sqrt(height * height + width * width);
+
+	int angle_precision = 180;
+
+    int *hough = calloc(angle_precision * rows, sizeof(int));
+
+	hough_lines(test, angle_precision, 1, hough);
+
+	Line *linesX = calloc(angle_precision * rows, sizeof(Line));
+	Line *linesY = calloc(angle_precision * rows, sizeof(Line));
+
+	int hough_threshold = get_biggest_bin(hough, rows, angle_precision) * 0.5;
+
+    TupleInt len_li = hough_filter_local(hough, rows, angle_precision, hough_threshold, 1, 3, linesX, linesY);
+
+	free(hough);
+
+    linesX = (Line *)realloc(linesX, len_li.x * sizeof(Line));
+    linesY = (Line *)realloc(linesY, len_li.y * sizeof(Line));
+
+	Line *tempy = malloc(len_li.y * sizeof(Line));
+	Line *tempx = malloc(len_li.x * sizeof(Line));
+
+	len_li.y =  merge_lines(linesY, len_li.y, 30, tempy);
+	len_li.x =  merge_lines(linesX, len_li.x, 30, tempx);
+
+	linesX = tempx;
+	linesY = tempy;
+	
+
+	Line* gridX = calloc(len_li.x, sizeof(Line));
+	Line* gridY = calloc(len_li.y, sizeof(Line));
+
+	int xtemp = get_grid(linesX, len_li.x, 16, gridX);
+	int ytemp = get_grid(linesY, len_li.y, 16, gridY);
+
+	Square *squares = calloc(81, sizeof(Square));
+	int len = get_squares(gridX, gridY, squares);
+	save_squares(squares, len, test);
+
+	SDL_UnlockSurface(test);
+	free(linesX);
+	free(linesY);
+
+	free(gridX);
+	free(gridY);
 }

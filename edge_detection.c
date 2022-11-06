@@ -5,6 +5,7 @@
 #include "include/matrix.h"
 #include "include/image_processing.h"
 #include "include/edge_detection.h"
+#include "include/thresholding.h"
 
 #define WEAK 100
 #define STRONG 255
