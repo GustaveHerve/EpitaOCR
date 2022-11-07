@@ -12,7 +12,19 @@ int main (int argc, char* argv[])
 
     init_sdl();
     SDL_Surface *img = load_image(argv[1]);
-    rotate_img(img, atof(argv[2])); //atof converts a "string" to a double
+    double angle = atof(argv[2]);
+    if(angle >= 147 && angle <= 209)
+    {
+        rotate_img90(img, angle);
+    }
+    else if(angle == 360)
+    {
+        open_img_window(argv[1]);
+    }
+    else
+    {
+        rotate_img(img, angle); //atof converts a "string" to a double
+    }
     open_img_window("image_rotated.png");
     SDL_FreeSurface(img);
     IMG_Quit();
