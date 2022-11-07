@@ -10,6 +10,12 @@ double deg_to_rad(double angle)
 {
     return angle*(M_PI/180.0);
 }
+
+long Abs(long numbir)
+{
+    return numbir<0 ? -numbir:numbir;
+}
+
 void rotate_img(SDL_Surface *img, double angle)
 {
     double width = img ->w;
@@ -17,18 +23,18 @@ void rotate_img(SDL_Surface *img, double angle)
     
     angle = deg_to_rad(angle);
 
-    double y0 = ((height+1)/2)-1;
+    double y0 = ((height+1)/2)-1; //coordinates of the center of the initial img
     double x0 = ((width+1)/2)-1;    //remettre en double
    
     double cosinus = cos(angle);   //remettre en double
     double sinus = sin(angle);
     double tangent = tan(angle/2);
 
-    double nwidth = fabs(width*cos(angle)) +fabs(height*sin(angle))+1;
-    double nheight =fabs(height*cos(angle)) +fabs(width*sin(angle))+1;
+    double nwidth = Abs(width*cos(angle)) +Abs(height*sin(angle))+1;  //new dimensions of the image
+    double nheight = Abs(height*cos(angle)) + Abs(width*sin(angle))+1;  //remettre en double
 
-    long ncenterx = ((nwidth+1)/2)-1;
-    long ncentery = ((nheight+1)/2)-1;
+    long ncenterx = ((nwidth+1)/2)-1;  //remettre en long
+    long ncentery = ((nheight+1)/2)-1; //coordinates of the center of the resulting image
 
     SDL_Surface *new_img= SDL_CreateRGBSurface(0,nwidth,nheight,32,0,0,0,0);
     
@@ -42,10 +48,10 @@ void rotate_img(SDL_Surface *img, double angle)
             //long y2 = sinus * ((double)i - x0) + cosinus * ((double)j - y0) + y0;
 
             
-            long y2 = height-1-i-y0;
+            long y2 = height-1-i-y0;  //remettre en long
             long x2 = width-1-j-x0;
 
-            x2 = x2-(y2*tangent);       //Shear 1 
+            x2 = x2-(y2*tangent);       //Shear 1
             y2 = x2*sin(angle)+y2;     //Shear 2
             x2 = x2-(y2*tangent);      //Shear 3
 
