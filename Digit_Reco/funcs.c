@@ -2,6 +2,11 @@
 #include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+#include "include/image_loading.h"
+#include "include/pixel.h"
+
 
 double sigmoid(double x) // Sigmoid function used for the improvement bt part.
 {
@@ -17,6 +22,39 @@ double initWeights()
 {
   return((double)rand()) / ((double)RAND_MAX); // Create random Weights between
 					       // 0 and 1 to init.
+}
+
+int NumberOfPixels(SDL_Surface* image){
+    unsigned int width = image->w;
+    unsigned int height = image->h;
+    return width * height;
+}
+
+void parcours_pixel(SDL_Surface* image, double trainInput[])
+{
+    unsigned int width = image->w;
+    unsigned int height = image->h;
+    Uint32 *pixels = image->pixels;
+    int acc = 0;
+    for (unsigned int i = 0; i < height; i++)
+        for (unsigned int j = 0; j < width; j++)
+        {
+            //Pixel intensity
+            Uint8 val = 0;
+            //Get pixel intensity and store it in val
+            SDL_GetRGB(pixels[i*width + j], image->format, &val, &val, &val);
+            //New val from a 0-255 int to a 0-1 int
+            if (val == 255)
+                val = 0;
+            else
+                val = 1;
+
+            trainInput[acc] = val;
+            acc++;
+
+        }
+    
+
 }
 
 void shuffle(int *arr, size_t t) // Shuffling data serves the purpose of 
@@ -40,10 +78,23 @@ int transform(double val)  //Transforms an double to an int
     if (val < 0.5f) // serves the purpose of printing "0" instead of 0.0032....
           return 0;
 
-     if (val < 1.0f) // serves the purpose of printing "1" instead of 0.99....
+     if (val < 1.5f) // serves the purpose of printing "1" instead of 0.99....
          return 1;
-
-     return (int) val;
+     if (val < 2.5f)
+         return 2;
+     if (val < 3.5f)
+         return 3;
+     if (val < 4.5f)
+         return 4;
+     if (val < 5.5f)
+         return 5;
+     if (val < 6.5f)
+         return 6;
+     if (val < 7.5f)
+         return 7;
+     if (val < 8.5f)
+         return 8;
+     return 9;
  }
 
 
@@ -89,4 +140,19 @@ void PrintValues(int rows, int cols, double mat[rows][cols], char * name)
     printf("] \n\n");  
 
 }
+
+int GetMax(int size, double arr[size]) 
+{
+    int max = 0;
+
+    for (int i = 0; i < 10; i++)
+    {
+        printf("%g \n", arr[i]);
+        if (arr[i] > arr[max])
+           max = i;
+    }
+
+    return max;
+}
+
 
