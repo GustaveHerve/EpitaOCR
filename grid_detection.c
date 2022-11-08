@@ -64,37 +64,6 @@ void hough_lines_gradient(SDL_Surface* image, int angleNb, Uint8 *edges, Uint8 *
 	}
 }
 
-/*  
-void hough_lines_local(SDL_Surface* image, int angleNb, int ker, int res[]){
-	unsigned int width = image->w;
-	unsigned int height = image->h;
-
-	for (unsigned int i = 0; i < height; i++){
-		for (unsigned int j = 0; j < width; j++){
-
-			Uint32 pixel = get_pixel(image, j, i);
-			Uint8 r = 0, g = 0, b = 0;
-			SDL_GetRGB(pixel, image->format, &r, &g, &b);
-			int off = ker/2;
-			float maxrho;
-			float maxangle;
-			float rad = 
-
-			for (unsigned int k = -off; k <= off; k++){
-				for (unsigned int l = -off; l <= off; l++){
-					if (i+k < height && i+k >= 0 && j+l >= 0 && j+l < width){
-
-					}
-
-
-				}
-			}
-
-
-		}
-	}
-}
-*/
 int hough_filter(int input[], int rows, int cols, int threshold, Line res[]){
 
 	int acc = 0;
@@ -223,71 +192,160 @@ int average_dist(int* dists, int len){
 
 }
 
-int get_grid_lines(Line* lines, int len, int* dis, int tolerance, Line* res){
+int average_segdist(Line* lines, int len, SDL_Surface *surf){
 
-	int res_dist = 0;
-	int cur_dist = dis[0];
-	int res_count = 0;
-	int cur_count = 1;
+	Segment temp;
+	int sum = 0;
+	for (int i = 0; i < len; i++){
+		temp = get_segment(surf, &lines[i]);
+		int hor = temp.pt2.x - temp.pt1.x;
+		int ver = temp.pt2.y - temp.pt1.y;
+		sum += sqrt(hor * hor + ver*ver);
+	}
 
-	//int avg = average_dist(dis, len-1);
+	return sum / len;
+}
 
-	for (int i = 1; i < len -1; i++){
+int average_weight(Line* lines, int len, int *hough){
 
-		if (dis[i] <= cur_dist + tolerance && dis[i] >= cur_dist - tolerance){
-			cur_count++;
+	int sum = 0;
+	for (int i = 0; i < len; i++){
+		int c = 180*lines[i].rho + lines[i].theta;
+		sum += hough[c];
+	}
 
-			if (i == len - 2){
-				res_count = cur_count;
-				res_dist = cur_dist;
-			}
+	return sum / len;
+}
+
+int get_grid_linesold(Line* lines, int len, int* dis, int tolerance, Line* res, int *hough){
+
+	int begin = 0;
+	int end = 0;
+
+	for (int i = 1; i < len -1 && end - begin+1 < 10; i++){
+		int delta = dis[i] - dis[i-1];
+		if (delta < 0)
+			delta = -delta;
+		if (delta <= tolerance){
+			end++;
 		}
 
 		else{
-
-			if (cur_count > res_count){
-				res_count = cur_count;
-				res_dist = cur_dist;
-			}
-
-			cur_count = 1;
-			cur_dist = dis[i];
-
+			begin = i;
+			i++;
+			end = i;
 		}
 
 	}
 
 	if (res == NULL)
 		errx(2, "get_grid_lines: failed allocating memory");
-	int j = 0;
-	for (int i = 0; i < len-1; i++){
-
-		if (dis[i] <= res_dist + tolerance && dis[i] >= res_dist - tolerance){
-			if (j == 0){
-				res[j] = lines[i];
-				res[j+1] = lines[i+1];
-				j+= 2;
-			}
-			else{
-				res[j] = lines[i+1];
-				j++;
-			}
-		}
+	int index = 0;
+	for (int i = begin; i <= end; i++){
+		res[index] = lines[i];
+		index++;
 	}
-	return j;
+	res[index] = lines[end+1];
+	index++;
+
+	return index;
 
 }
 
+int get_grid_lines(Line* lines, int len, int* dis, Line* res, int *hough){
+
+	int begin = 0;
+	int end = 1;
+
+	for (int i = 1; i < len -1 && end - begin + 1 < 10; i++){
+		float dis_dev = 0;
+		if (dis[i-1] > dis[i])
+			dis_dev = 1 - (float)dis[i] / (float)dis[i-1];
+		else
+			dis_dev = 1 - (float)dis[i-1] / (float)dis[i];
+		if (dis_dev < 0.3){
+			float line_dev = 0;
+			int c1 = 360 * lines[i].rho + (int)lines[i].theta;
+			int c2 = 360 * lines[i-1].rho + (int)lines[i-1].theta;
+			int val1 = hough[c1];
+			int val2 = hough[c2];
+			if (val1 > val2)
+				line_dev = 1 - (float)val2/(float)val1;
+			else
+				line_dev = 1 - (float)val1/(float)val2;
+			if (line_dev < 0.3){
+				end++;
+			}
+			else{
+				begin = i;
+				end = i;
+			}
+
+		}
+		else{
+			begin = i;
+			end = i;
+		}
 
 
-int get_grid(Line* lines, int len, int tolerance, Line* res){
+	}
+
+	if (res == NULL)
+		errx(2, "get_grid_lines: failed allocating memory");
+	int index = 0;
+	while (end - begin + 1 > 10)
+		end--;
+	for (int i = begin; i <= end; i++){
+		res[index] = lines[i];
+		index++;
+	}
+	
+	return index;
+
+}
+
+int get_grid(Line* lines, int len, Line* res, int *hough){
 
 	if (len < 2)
 		return 0;
 	int* gX = malloc(sizeof(int) * (len-1));
 	line_distances(lines, len, gX);
-	int n = get_grid_lines(lines, len, gX, tolerance, res);
+	int n = get_grid_linesold(lines, len, gX, 13, res, hough);
 	free(gX);
 	return n;
 
+}
+
+int get_intersection_count(Segment s, Segment* segments, int len){
+	int res = 0;
+	for (int i = 0; i < len; i++){
+		if (intersect(s, segments[i]))
+				res++;
+	}
+
+	return res;
+}
+
+Segment *get_grid_seg(Segment* xseg, Segment* yseg, TupleInt lens){
+
+	Segment *grid = calloc(20, sizeof(Segment));
+
+	int count = 0;
+	for (int i = 0; i < lens.x && count < 10; i++){
+		int inter = get_intersection_count(xseg[i], yseg, lens.y);
+		if (inter == 10){
+			grid[count] = xseg[i];
+			count++;
+		}
+	}
+
+	for (int i = 0; i < lens.y && count < 20; i++){
+		int inter = get_intersection_count(yseg[i], xseg, lens.x);
+		if (inter == 10){
+			grid[count] = yseg[i];
+			count++;
+		}
+	}
+
+	return grid;
 }
