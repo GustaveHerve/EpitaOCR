@@ -10,7 +10,7 @@
 // define the number of each type of nodes
 #define nInputs 784
 #define nOutputs 10
-#define nHiddenNodes 784 
+#define nHiddenNodes 20
 #define filename "Brain"
 
 void InputValues(char* file, double hWeights[nInputs][nHiddenNodes], 
@@ -114,7 +114,7 @@ int main(int argc, char **argv)
 	double hBias[nHiddenNodes];
 	double oBias[nOutputs];
     
-    int numberOfTimes = 10;
+    int numberOfTimes = 10000;
     int memo_val = 0;
 
 
@@ -166,25 +166,25 @@ int main(int argc, char **argv)
     
      init_sdl();
 
-     SDL_Surface* image = load_image("cells/00.png");
+     SDL_Surface* image = load_image("Train/SET3/00.png");
      parcours_pixel(image,trainInput[0]);
-     image = load_image("cells/01.png");
+     image = load_image("Train/SET3/01.png");
      parcours_pixel(image,trainInput[1]);
-     image = load_image("cells/02.png");
+     image = load_image("Train/SET3/02.png");
      parcours_pixel(image,trainInput[2]);
-     image = load_image("cells/03.png");             
+     image = load_image("Train/SET3/03.png");             
      parcours_pixel(image,trainInput[3]);
-     image = load_image("cells/04.png");
+     image = load_image("Train/SET3/04.png");
      parcours_pixel(image,trainInput[4]);
-     image = load_image("cells/05.png");
+     image = load_image("Train/SET3/05.png");
      parcours_pixel(image,trainInput[5]);
-     image = load_image("cells/06.png");
+     image = load_image("Train/SET3/06.png");
      parcours_pixel(image,trainInput[6]);
-     image = load_image("cells/07.png");
+     image = load_image("Train/SET3/07.png");
      parcours_pixel(image,trainInput[7]);
-     image = load_image("cells/08.png");
+     image = load_image("Train/SET3/08.png");
      parcours_pixel(image,trainInput[8]);     
-     image = load_image("cells/09.png");
+     image = load_image("Train/SET3/09.png");
      parcours_pixel(image,trainInput[9]);
 
 
@@ -214,8 +214,10 @@ int main(int argc, char **argv)
 			{
 				double act = hBias[j];
 				for (int k = 0; k < nInputs; k++)
-					act += trainInput[i][k] * hWeights[k][j];    
-				hLayer[j] = (sigmoid(act)); //Input mult with Bias
+					act += trainInput[i][k] * hWeights[k][j];
+                //printf("act of %d = %g \n",j, act);    
+				hLayer[j] = sigmoid(act); //Input mult with Bias
+                //printf("hLayer of %d = %g \n",j, hLayer[j]);
 			}
 
 			// Compute the Output Layer Activation >>
@@ -226,18 +228,20 @@ int main(int argc, char **argv)
 
 				for (int k = 0; k < nHiddenNodes; k++)
 					act += hLayer[k] * oWeights[k][j];
+
+                //printf("act of output : %d is %g \n", j, act);
+                //printf("his sigmoid is %g \n", sigmoid(act));
    
-                /*if (j == i)
-				    oLayer[j] = (sigmoid(act));
-                else 
-                    oLayer[j] = 1 - sigmoid(act);*/
+                
                 oLayer[j] = sigmoid(act);
 
 			}
 
-            int number = GetMax(nOutputs, oLayer);
-			printf("Input : %d  Output: %d  Expected Output: %d\n",
-                    i,number, GetMax(nOutputs,trainOutputs[i]));
+            int Result = GetMax(nOutputs, oLayer);
+            memory[memo_val] = (Result == i);
+
+			printf("Input : %d  Output: %d \n",
+                    i,Result);
 
 
 			// Backprop => Update the weights in function of the errors
@@ -246,9 +250,7 @@ int main(int argc, char **argv)
 
 			for(int j = 0; j < nOutputs; j++)
 			{
-                double err = 0.5*((trainOutputs[i][j] - oLayer[j])*(trainOutputs[i][j] - oLayer[j]));
-
-                memory[memo_val] = err;
+                double err = (trainOutputs[i][j] - oLayer[j]);
 				dOutput[j] = err * (dSigmoid(oLayer[j]));
 			}
 

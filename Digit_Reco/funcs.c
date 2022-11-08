@@ -20,8 +20,11 @@ double dSigmoid(double x) //Derivative of Sigmoid Func.
 
 double initWeights()
 {
-  return((double)rand()) / ((double)RAND_MAX); // Create random Weights between
-					       // 0 and 1 to init.
+    int rm = rand();
+    if (rm % 2)
+        return -((double)rand()) / ((double)RAND_MAX);
+    return ((double)rand() / (double)RAND_MAX); //aa Create random Weights between
+                                                        //       // 0 and 1 to init.
 }
 
 int NumberOfPixels(SDL_Surface* image){
@@ -103,20 +106,7 @@ double Precision(int num, double memo[num])
     double res = 0;
 
     for (int i = 0; i < num; i++)
-    {
-
-        double acc = memo[i];
-
-        if (acc < 0)
-        {
-            res += (double) transform((1+acc));
-        }
-        
-        else
-        {
-            res += (double) transform((1-acc));
-        }
-    }
+        res += memo[i];
 
     return res/num;
 
@@ -147,7 +137,7 @@ int GetMax(int size, double arr[size])
 
     for (int i = 0; i < 10; i++)
     {
-        printf("%g \n", arr[i]);
+        //printf("%g \n", arr[i]);
         if (arr[i] > arr[max])
            max = i;
     }
