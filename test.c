@@ -37,20 +37,20 @@ int main(int argc, char** argv){
 	//invert(test);
 	canny(test);
 	//erose(test, 3);
-	//dilate(test, 3);
+	//sobel(test);
 
 	SDL_Surface* dilsur = SDL_CreateRGBSurface(0, width, height, 32, 0, 0, 0, 0);
 	SDL_BlitSurface(test, NULL, dilsur, NULL);
 	dilate(dilsur, 5);
+	closing(dilsur, 5);
 
     int rows = sqrt(height * height + width * width);
 
-	int angle_precision = 180;
+	int angle_precision = 360;
 
     int *hough = calloc(angle_precision * rows, sizeof(int));
-	//hough_lines_gradient(test, angle_precision, can.edges, can.angles, hough);
 
-	hough_lines(dilsur, angle_precision, 1, hough);
+	hough_lines(test, angle_precision, 1, hough);
 
 	Line *linesX = calloc(angle_precision * rows, sizeof(Line));
 	Line *linesY = calloc(angle_precision * rows, sizeof(Line));
@@ -59,31 +59,26 @@ int main(int argc, char** argv){
 
     TupleInt len_li = hough_filter_local(hough, rows, angle_precision, hough_threshold, 1, 0, linesX, linesY);
 
-	free(hough);
-
     linesX = (Line *)realloc(linesX, len_li.x * sizeof(Line));
     linesY = (Line *)realloc(linesY, len_li.y * sizeof(Line));
 
-	Line *cacay = malloc(len_li.y * sizeof(Line));
-	Line *cacax = malloc(len_li.x * sizeof(Line));
+	Line *mergey = malloc(len_li.y * sizeof(Line));
+	Line *mergex = malloc(len_li.x * sizeof(Line));
 
-	len_li.y =  merge_lines(linesY, len_li.y, 30, cacay);
-	len_li.x =  merge_lines(linesX, len_li.x, 30, cacax);
+	len_li.y =  merge_lines(linesY, len_li.y, 40, mergey);
+	len_li.x =  merge_lines(linesX, len_li.x, 40, mergex);
 
-	linesX = cacax;
-	linesY = cacay;
+	linesX = mergex;
+	linesY = mergey;
 	
+	Segment *xseg = get_segments(dilsur, linesX, len_li.x);
+	Segment *yseg = get_segments(dilsur, linesY, len_li.y);
 
-	Line* gridX = calloc(len_li.x, sizeof(Line));
-	Line* gridY = calloc(len_li.y, sizeof(Line));
+	Segment *grid = get_grid_seg(xseg, yseg, len_li);
 
-	int xtemp = get_grid(linesX, len_li.x, 16, gridX);
-	int ytemp = get_grid(linesY, len_li.y, 16, gridY);
+	Square *sq = get_squares_seg(grid);
 
-	Square *squares = calloc(81, sizeof(Square));
-	int len = get_squares(gridX, gridY, squares);
-	save_squares(squares, len, test);
-
+	save_squares_seg(sq, test, "/Users/gustave/Documents/c/grid/");
 
     SDL_FreeSurface(dilsur);
       
@@ -114,9 +109,9 @@ int main(int argc, char** argv){
         SDL_RenderCopy(renderer, texture, NULL, &img_size);
 
  	
-        for (int i = 0; i < xtemp; i++){
-            int rho = gridX[i].rho;
-            float theta = gridX[i].theta * M_PI / 180;
+        for (int i = 0; i < len_li.x; i++){
+            int rho = linesX[i].rho;
+            float theta = linesX[i].theta * M_PI / 180;
             double sinA = sin(theta);
             double cosA = cos(theta);
             float x0 = cosA * rho;
@@ -128,16 +123,13 @@ int main(int argc, char** argv){
 
 
         	SDL_SetRenderDrawColor(renderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
-			//if (lines[i].theta < 70)
-           //variable 	SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
 			SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
 			SDL_RenderDrawPoint(renderer, x1, y1);
-		 	//SDL_RenderDrawPoint(renderer, x1, y1);
 
         }	
-		for (int i = 0; i < ytemp; i++){
-            int rho = gridY[i].rho;
-            float theta = gridY[i].theta * M_PI / 180;
+		for (int i = 0; i < len_li.y; i++){
+            int rho = linesY[i].rho;
+            float theta = linesY[i].theta * M_PI / 180;
             double sinA = sin(theta);
             double cosA = cos(theta);
             float x0 = cosA * rho;
@@ -181,73 +173,10 @@ int main(int argc, char** argv){
     SDL_DestroyTexture(texture);
     SDL_DestroyWindow(window);
     SDL_DestroyRenderer(renderer);
-   	IMG_SavePNG(test, "/Users/gustave/Documents/c/images/final.png");
 	
     SDL_FreeSurface(test);
-	//SDL_FreeSurface(clo);
-	free(linesX);
-	free(linesY);
-	//free(gridX);
-	//free(gridY);
-
-}
-
-void test3(char *path){
-
-    SDL_Surface* test = load_image(path);
-	SDL_LockSurface(test);
-
-    unsigned int width = test->w;
-	unsigned int height = test->h;
-
-	greyscale(test);
-
-	canny(test);
-
-    int rows = sqrt(height * height + width * width);
-
-	int angle_precision = 180;
-
-    int *hough = calloc(angle_precision * rows, sizeof(int));
-
-	hough_lines(test, angle_precision, 1, hough);
-
-	Line *linesX = calloc(angle_precision * rows, sizeof(Line));
-	Line *linesY = calloc(angle_precision * rows, sizeof(Line));
-
-	int hough_threshold = get_biggest_bin(hough, rows, angle_precision) * 0.5;
-
-    TupleInt len_li = hough_filter_local(hough, rows, angle_precision, hough_threshold, 1, 3, linesX, linesY);
-
-	free(hough);
-
-    linesX = (Line *)realloc(linesX, len_li.x * sizeof(Line));
-    linesY = (Line *)realloc(linesY, len_li.y * sizeof(Line));
-
-	Line *tempy = malloc(len_li.y * sizeof(Line));
-	Line *tempx = malloc(len_li.x * sizeof(Line));
-
-	len_li.y =  merge_lines(linesY, len_li.y, 30, tempy);
-	len_li.x =  merge_lines(linesX, len_li.x, 30, tempx);
-
-	linesX = tempx;
-	linesY = tempy;
-	
-
-	Line* gridX = calloc(len_li.x, sizeof(Line));
-	Line* gridY = calloc(len_li.y, sizeof(Line));
-
-	int xtemp = get_grid(linesX, len_li.x, 16, gridX);
-	int ytemp = get_grid(linesY, len_li.y, 16, gridY);
-
-	Square *squares = calloc(81, sizeof(Square));
-	int len = get_squares(gridX, gridY, squares);
-	save_squares(squares, len, test);
-
-	SDL_UnlockSurface(test);
 	free(linesX);
 	free(linesY);
 
-	free(gridX);
-	free(gridY);
 }
+

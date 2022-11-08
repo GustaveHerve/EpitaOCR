@@ -49,6 +49,88 @@ int get_squares(Line *x, Line *y, Square *res){
 	return len;
 }
 
+Square *get_squares_seg(Segment *grid){
+
+	Square *res = calloc(81, sizeof(Square));
+	int index = 0;
+	int xdis = grid[0].pt2.x - grid[0].pt1.x;
+	int ydis = grid[10].pt2.y - grid[10].pt1.y;
+	int xoffset = xdis / 9;
+	int yoffset = ydis / 9;
+
+	int start_x = grid[0].pt1.x;
+	int start_y = grid[10].pt1.y;
+
+	int posx = start_x;
+	int posy = start_y;
+
+	for (int i = 0; i < 9; i++){
+
+		posx = start_x;
+		for (int j = 0; j < 9; j++){
+
+			TupleInt NW = {posx, posy};
+			TupleInt SW = {posx, posy + yoffset};
+			TupleInt NE = {posx + xoffset, posy};
+			TupleInt SE = {posx + xoffset, posy + yoffset};
+
+			Square s = { NW, SW, NE, SE };
+			res[index] = s;
+			index++;
+
+			posx += xoffset;
+		}
+		posy += yoffset;
+	}
+
+	return res;
+
+}
+
+void save_squares_seg(Square *sq, SDL_Surface *image, char* path){
+
+	int avg = avg_size(sq, 81);
+
+	for (int i = 0; i < 81; i++){
+
+		char *name = malloc(3 * sizeof(char));
+		if (i < 10)
+			name[0] = '0';
+		else
+		{
+			int temp = i / 10;
+			name[0] = temp + '0'; 
+		}
+
+		char *second = malloc(2 * sizeof(char));
+	    second[0] = (i % 10) + '0';
+		strcat(name, second);
+
+		//int w = sq[i].NE.x - sq[i].NW.x;
+		//int h = sq[i].SW.y - sq[i].NW.y;
+		int w = avg;
+		int h = avg;
+
+		SDL_Surface* crop = SDL_CreateRGBSurface(0, 28, 28, 32, 0, 0, 0, 0);
+		SDL_Surface* temp = SDL_CreateRGBSurface(0, avg, avg, 32, 0, 0, 0, 0);
+		SDL_Rect rect;
+		rect.x = sq[i].NW.x;
+		rect.y = sq[i].NW.y;
+		rect.w = w;
+		rect.h = h;
+
+		SDL_BlitSurface(image, &rect, temp, NULL);
+
+		SDL_BlitScaled(temp, NULL, crop, NULL);
+		char *ext = ".png";
+		char *pathres = malloc(50 * sizeof(char));
+		strcat(pathres, path);
+		strcat(pathres, name);
+		strcat(pathres, ext);
+    	IMG_SavePNG(crop, pathres);
+	}
+}
+
 void save_squares(Square *sq, int len, SDL_Surface *image){
 
 	int avg = avg_size(sq, len);

@@ -233,30 +233,22 @@ void clean(int *edges, size_t size){
 
 }
 
-CannyRes canny(SDL_Surface *image){
+void canny(SDL_Surface *image){
 
 	int *edges = malloc(sizeof(int) * image->w * image->h);
     Uint8 *angles = malloc(sizeof(Uint8) * image->w * image->h);
 	sobel_c(image, edges, angles);
-	apply_convolution_int(image, edges, (size_t)image->h, (size_t)image->w);
-   	IMG_SavePNG(image, "/Users/gustave/Documents/c/images/step1.png");
+	
+	//int *maxima = calloc(image->w * image->h, sizeof(int));
+    //non_maxima_suppr(edges, angles, image->h, image->w, maxima);
+	//apply_convolution_int(image, maxima, (size_t)image->h, (size_t)image->w);
 
-	int *maxima = calloc(image->w * image->h, sizeof(int));
-    non_maxima_suppr(edges, angles, image->h, image->w, maxima);
-	apply_convolution_int(image, maxima, (size_t)image->h, (size_t)image->w);
-
-   	IMG_SavePNG(image, "/Users/gustave/Documents/c/images/step2.png");
-	free(edges);
-	//free(angles);   
 	float threshold = otsu_threshold(image);
-	double_thresholding(maxima, image->h, image->w, 0.5, threshold);
+	double_thresholding(edges, image->h, image->w, 0.5, threshold);
 
-	apply_convolution_int(image, maxima, (size_t)image->h, (size_t)image->w);
-   	IMG_SavePNG(image, "/Users/gustave/Documents/c/images/step3.png");
-	clean(maxima,image->w*image->h);
-	apply_convolution_int(image, maxima, (size_t)image->h, (size_t)image->w);
-	CannyRes res = {maxima, angles};
-	return res;
-	//free(maxima);
+	clean(edges,image->w*image->h);
+	apply_convolution_int(image, edges, (size_t)image->h, (size_t)image->w);
+	free(edges);
+	free(angles);
 
 }

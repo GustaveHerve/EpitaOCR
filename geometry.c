@@ -139,3 +139,19 @@ Segment get_segment(SDL_Surface *image, Line *line){
 	return res;
 }
 
+Segment *get_segments(SDL_Surface *image, Line *lines, int len){
+	Segment *res = malloc(sizeof(Segment) * len);
+	for (int i = 0; i < len; i++){
+		Segment temp = get_segment(image, &lines[i]);
+		res[i] = temp;
+	}
+	return res;
+}
+
+int intersect(Segment s1, Segment s2){
+	if (s2.pt1.x > s1.pt2.x || s2.pt2.x < s1.pt1.x)
+		return 0;
+	if (s2.pt2.y < s1.pt1.y || s2.pt1.y > s1.pt2.y)
+		return 0;
+	return 1;
+}
