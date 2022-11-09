@@ -21,7 +21,6 @@ int avg_size(Square *sq, int len){
 	for (int i = 0; i < len; i++)
 		sum += sq[i].NE.x - sq[i].NW.x;
 	return sum / len;
-	
 }
 
 int get_squares(Line *x, Line *y, Square *res){
@@ -86,7 +85,6 @@ Square *get_squares_seg(Segment *grid){
 	return res;
 
 }
-
 void save_squares_seg(Square *sq, SDL_Surface *image, char* path){
 
 	int avg = avg_size(sq, 81);
@@ -94,18 +92,16 @@ void save_squares_seg(Square *sq, SDL_Surface *image, char* path){
 	for (int i = 0; i < 81; i++){
 
 		char *name = malloc(3 * sizeof(char));
+        name[2] = 0;
 		if (i < 10)
 			name[0] = '0';
 		else
 		{
 			int temp = i / 10;
-			name[0] = temp + '0'; 
+			name[0] = temp + '0';
 		}
-
 		char *second = malloc(2 * sizeof(char));
-	    second[0] = (i % 10) + '0';
-		strcat(name, second);
-
+	    name[1] = (i % 10) + '0';
 		//int w = sq[i].NE.x - sq[i].NW.x;
 		//int h = sq[i].SW.y - sq[i].NW.y;
 		int w = avg;
@@ -123,7 +119,7 @@ void save_squares_seg(Square *sq, SDL_Surface *image, char* path){
 
 		SDL_BlitScaled(temp, NULL, crop, NULL);
 		char *ext = ".png";
-		char *pathres = malloc(50 * sizeof(char));
+		char *pathres = calloc(50 ,sizeof(char));
 		strcat(pathres, path);
 		strcat(pathres, name);
 		strcat(pathres, ext);
@@ -143,7 +139,7 @@ void save_squares(Square *sq, int len, SDL_Surface *image){
 		else
 		{
 			int temp = i / 10;
-			name[0] = temp + '0'; 
+			name[0] = temp + '0';
 		}
 
 		char *second = malloc(2 * sizeof(char));
@@ -169,13 +165,10 @@ void save_squares(Square *sq, int len, SDL_Surface *image){
 		SDL_BlitScaled(temp, NULL, crop, NULL);
 		char *path1 = "/Users/gustave/Documents/c/grid/";
 		char *ext = ".png";
-		char *path = malloc(50 * sizeof(char));
+		char *path = calloc(50, sizeof(char));
 		strcat(path, path1);
 		strcat(path, name);
 		strcat(path, ext);
     	IMG_SavePNG(crop, path);
 	}
 }
-
-
-
