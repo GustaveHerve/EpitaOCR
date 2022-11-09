@@ -77,11 +77,11 @@ void OutputValues(char* file, double hWeights[nInputs][nHiddenNodes],
 
      for(int j = 0; j < nInputs; j++)
         for(int k = 0; k < nHiddenNodes; k++)
-            fprintf(fp, "%f\n", hWeights[k][j]);
+            fprintf(fp, "%f\n", hWeights[j][k]);
 
      for(int j = 0; j < nHiddenNodes; j++)
         for(int k = 0; k < nOutputs; k++)
-            fprintf(fp, "%f\n", oWeights[k][j]);
+            fprintf(fp, "%f\n", oWeights[j][k]);
 
      for (int j = 0; j < nOutputs; j++)
           fprintf(fp,"%f\n",oBias[j]);
@@ -164,25 +164,25 @@ int main(int argc, char **argv)
 
      // Training sets
 
-     SDL_Surface* image = load_image("Train/SET3/00.png");
+     SDL_Surface* image = load_image("Train/SET2/00.png");
      parcours_pixel(image,trainInput[0]);
-     image = load_image("Train/SET3/01.png");
+     image = load_image("Train/SET2/01.png");
      parcours_pixel(image,trainInput[1]);
-     image = load_image("Train/SET3/02.png");
+     image = load_image("Train/SET2/02.png");
      parcours_pixel(image,trainInput[2]);
-     image = load_image("Train/SET3/03.png");
+     image = load_image("Train/SET2/03.png");
      parcours_pixel(image,trainInput[3]);
-     image = load_image("Train/SET3/04.png");
+     image = load_image("Train/SET2/04.png");
      parcours_pixel(image,trainInput[4]);
-     image = load_image("Train/SET3/05.png");
+     image = load_image("Train/SET2/05.png");
      parcours_pixel(image,trainInput[5]);
-     image = load_image("Train/SET3/06.png");
+     image = load_image("Train/SET2/06.png");
      parcours_pixel(image,trainInput[6]);
-     image = load_image("Train/SET3/07.png");
+     image = load_image("Train/SET2/07.png");
      parcours_pixel(image,trainInput[7]);
-     image = load_image("Train/SET3/08.png");
+     image = load_image("Train/SET2/08.png");
      parcours_pixel(image,trainInput[8]);
-     image = load_image("Train/SET3/09.png");
+     image = load_image("Train/SET2/09.png");
      parcours_pixel(image,trainInput[9]);
 
 
@@ -292,13 +292,16 @@ int main(int argc, char **argv)
     // Here we print the values of the weights
 
     //PrintValues(nInputs,nHiddenNodes,hWeights,"Hidden Weights");
-    //PrintValues(nHiddenNodes, nOutputs,oWeights, "Output Weights");
+    PrintValues(nHiddenNodes, nOutputs,oWeights, "Output Weights");
 
     // Finally we save the values of Weights and output bias in a file.
 
     OutputValues(filename, hWeights, oWeights, oBias);
 
     free(hWeights);
+    free(trainInput);
+    free(oLayer);
+    free(oWeights);
 
 	return 0;
 
