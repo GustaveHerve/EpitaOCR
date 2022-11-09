@@ -1,4 +1,4 @@
 #EpitaOCR
 
-The Greatest Sudouko Solver of All Time !
-sUwUdoku
+OCR project of 4D Generates.
+
