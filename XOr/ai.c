@@ -238,7 +238,7 @@ int main(int argc, char **argv)
     // Finally we save the values of Weights and output bias in a file.
 
     OutputValues(filename, hWeights, oWeights, oBias);
-
+    
     free(hWeights);
 
 	return 0;
