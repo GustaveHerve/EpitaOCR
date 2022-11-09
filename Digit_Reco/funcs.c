@@ -18,13 +18,12 @@ double dSigmoid(double x) //Derivative of Sigmoid Func.
   return x * (1 - x);
 }
 
-double initWeights()
+double initWeights() // Random weights between -1 and 1.
 {
     int rm = rand();
     if (rm % 2)
         return -((double)rand()) / ((double)RAND_MAX);
-    return ((double)rand() / (double)RAND_MAX); //aa Create random Weights between
-                                                        //       // 0 and 1 to init.
+    return ((double)rand() / (double)RAND_MAX);
 }
 
 int NumberOfPixels(SDL_Surface* image){
@@ -56,12 +55,12 @@ void parcours_pixel(SDL_Surface* image, double trainInput[])
             acc++;
 
         }
-    
+
 
 }
 
-void shuffle(int *arr, size_t t) // Shuffling data serves the purpose of 
-				 // reducing variance and making sure that 
+void shuffle(int *arr, size_t t) // Shuffling data serves the purpose of
+				 // reducing variance and making sure that
 				 // models remain general and overfit less.
 {
   if (t > 1)
@@ -76,8 +75,9 @@ void shuffle(int *arr, size_t t) // Shuffling data serves the purpose of
   }
 }
 
-int transform(double val)  //Transforms an double to an int
-{     
+int transform(double val)  //Transforms an double to an int, mostly usefull for
+                           //XOR NN
+{
     if (val < 0.5f) // serves the purpose of printing "0" instead of 0.0032....
           return 0;
 
@@ -123,15 +123,15 @@ void PrintValues(int rows, int cols, double mat[rows][cols], char * name)
             if (i + 1 == rows && j+1 == cols)
                 printf(" %f ",mat[i][j]);
 
-            else    
+            else
                 printf(" %f, ",mat[i][j]);
         }
 
-    printf("] \n\n");  
+    printf("] \n\n");
 
 }
 
-int GetMax(int size, double arr[size]) 
+int GetMax(int size, double arr[size])
 {
     int max = 0;
 

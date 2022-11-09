@@ -19,8 +19,8 @@ double initWeights()
 					       // 0 and 1 to init.
 }
 
-void shuffle(int *arr, size_t t) // Shuffling data serves the purpose of 
-				 // reducing variance and making sure that 
+void shuffle(int *arr, size_t t) // Shuffling data serves the purpose of
+				 // reducing variance and making sure that
 				 // models remain general and overfit less.
 {
   if (t > 1)
@@ -36,7 +36,7 @@ void shuffle(int *arr, size_t t) // Shuffling data serves the purpose of
 }
 
 int transform(double val)  //Transforms an double to an int
-{     
+{
     if (val < 0.5f) // serves the purpose of printing "0" instead of 0.0032....
           return 0;
 
@@ -60,7 +60,7 @@ double Precision(int num, double memo[num])
         {
             res += (double) transform((1+acc));
         }
-        
+
         else
         {
             res += (double) transform((1-acc));
@@ -82,11 +82,11 @@ void PrintValues(int rows, int cols, double mat[rows][cols], char * name)
             if (i + 1 == rows && j+1 == cols)
                 printf(" %f ",mat[i][j]);
 
-            else    
+            else
                 printf(" %f, ",mat[i][j]);
         }
 
-    printf("] \n\n");  
+    printf("] \n\n");
 
 }
 

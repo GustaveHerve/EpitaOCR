@@ -13,8 +13,8 @@
 #define nHiddenNodes 20
 #define filename "Brain"
 
-void InputValues(char* file, double hWeights[nInputs][nHiddenNodes], 
-    double oWeights[nHiddenNodes][nOutputs], double oBias[nOutputs]) 
+void InputValues(char* file, double hWeights[nInputs][nHiddenNodes],
+    double oWeights[nHiddenNodes][nOutputs], double oBias[nOutputs])
 {
     // this function is the beggining of the NN, it intputs the starting values
     // to the weights and output bias
@@ -31,7 +31,7 @@ void InputValues(char* file, double hWeights[nInputs][nHiddenNodes],
             fscanf(fp,"%lf",&myvariable);
             hWeights[i][j] += myvariable;
          }
- 
+
      for (int i = 0; i < nHiddenNodes; i++)
          for (int j = 0; j < nOutputs; j++)
          {
@@ -46,25 +46,25 @@ void InputValues(char* file, double hWeights[nInputs][nHiddenNodes],
 
      fclose(fp);
  }
- else 
+ else
  { // If there is no "Brain" file that means that it's the first time that
-        // the NN if being launched, therefore we input random values.                                                                     
-                                                                                 
-     for (int i = 0; i < nInputs; i++)                                           
-         for (int j = 0; j < nHiddenNodes; j++)                                                                                                         
-             hWeights[i][j] = initWeights(); //Init Weights with random values                                                                          
-                                                                                 
-     for (int i = 0; i < nHiddenNodes; i++)                                      
-         for (int j = 0; j < nOutputs; j++)                                                                                                           
-             oWeights[i][j] = initWeights(); //Init Weights with random values                                                                          
-                                                                                 
-     for (int j = 0; j < nOutputs; j++)                                                                                                                          
-         oBias[j] = initWeights(); //Init Output Layer Bias with random values   
-                               
- }     
+        // the NN if being launched, therefore we input random values.
+
+     for (int i = 0; i < nInputs; i++)
+         for (int j = 0; j < nHiddenNodes; j++)
+             hWeights[i][j] = initWeights(); //Init Weights with random values
+
+     for (int i = 0; i < nHiddenNodes; i++)
+         for (int j = 0; j < nOutputs; j++)
+             oWeights[i][j] = initWeights(); //Init Weights with random values
+                                             //
+     for (int j = 0; j < nOutputs; j++)
+         oBias[j] = initWeights(); //Init Output Layer Bias with random values
+
+ }
 }
 
-void OutputValues(char* file, double hWeights[nInputs][nHiddenNodes],            
+void OutputValues(char* file, double hWeights[nInputs][nHiddenNodes],
       double oWeights[nHiddenNodes][nOutputs], double oBias[nOutputs])
 {
     // This function "saves" the values of weights and bias in a file so that
@@ -73,21 +73,20 @@ void OutputValues(char* file, double hWeights[nInputs][nHiddenNodes],
 
      FILE * fp;
 
-     fp = fopen(filename, "w+");                                                  
-                                                                                 
-     for(int j = 0; j < nInputs; j++)                                            
-        for(int k = 0; k < nHiddenNodes; k++)                                
-            fprintf(fp, "%f\n", hWeights[k][j]);                              
-                                                                                 
-     for(int j = 0; j < nHiddenNodes; j++)                                   
-        for(int k = 0; k < nOutputs; k++)                                    
-            fprintf(fp, "%f\n", oWeights[k][j]);                              
-                                                                                 
-     for (int j = 0; j < nOutputs; j++)                                      
-          fprintf(fp,"%f\n",oBias[j]);                                      
-                                                                                 
-                                                                                 
-     fclose(fp);              
+     fp = fopen(filename, "w+");
+
+     for(int j = 0; j < nInputs; j++)
+        for(int k = 0; k < nHiddenNodes; k++)
+            fprintf(fp, "%f\n", hWeights[k][j]);
+
+     for(int j = 0; j < nHiddenNodes; j++)
+        for(int k = 0; k < nOutputs; k++)
+            fprintf(fp, "%f\n", oWeights[k][j]);
+
+     for (int j = 0; j < nOutputs; j++)
+          fprintf(fp,"%f\n",oBias[j]);
+
+     fclose(fp);
 
 }
 
@@ -97,9 +96,6 @@ void OutputValues(char* file, double hWeights[nInputs][nHiddenNodes],
 int main(int argc, char **argv)
 {
 
-    //if (argc == 2) 
-        //multiplier = argv[1][0] - '0';
-
     if (argc > 2)
     {
         fprintf(stderr, "To many arguments \n");
@@ -107,29 +103,29 @@ int main(int argc, char **argv)
     }
 
 	double lr = 0.1f; //Learning Rate
-	
+
 	double hLayer[nHiddenNodes];
 	double (*oLayer) = malloc(sizeof(double[nOutputs]));;
-	
+
 	double hBias[nHiddenNodes];
 	double oBias[nOutputs];
-    
+
     int numberOfTimes = 10000;
     int memo_val = 0;
 
 
     double memory[numberOfTimes*trainSets];
 
-	double (*hWeights)[nHiddenNodes] = 
+	double (*hWeights)[nHiddenNodes] =
         malloc(sizeof(double[nInputs][nHiddenNodes]));
 
-	double (*oWeights)[nOutputs] = 
+	double (*oWeights)[nOutputs] =
         malloc(sizeof(double[nHiddenNodes][nOutputs]));
 
 	double (*trainInput)[nInputs] =
         malloc(sizeof(double[trainSets][nInputs]));
 
-	double trainOutputs[trainSets][nOutputs] = 
+	double trainOutputs[trainSets][nOutputs] =
     {
         {1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
        0.0f, 0.0f, 0.0f, 0.0f, 0.0f},
@@ -137,10 +133,10 @@ int main(int argc, char **argv)
         {0.0f, 1.0f, 0.0f, 0.0f, 0.0f,
         0.0f, 0.0f, 0.0f, 0.0f, 0.0f},
 
-        {0.0f, 0.0f, 1.0f, 0.0f, 0.0f,                                          
+        {0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
         0.0f, 0.0f, 0.0f, 0.0f, 0.0f},
 
-         {0.0f, 0.0f, 0.0f, 1.0f, 0.0f,                                          
+         {0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
          0.0f, 0.0f, 0.0f, 0.0f, 0.0f},
 
         {0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
@@ -153,7 +149,7 @@ int main(int argc, char **argv)
          0.0f, 1.0f, 0.0f, 0.0f, 0.0f},
 
          {0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-          0.0f, 0.0f, 1.0f, 0.0f, 0.0f}, 
+          0.0f, 0.0f, 1.0f, 0.0f, 0.0f},
 
         {0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
         0.0f, 0.0f, 0.0f, 1.0f, 0.0f},
@@ -161,10 +157,12 @@ int main(int argc, char **argv)
          {0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
          0.0f, 0.0f, 0.0f, 0.0f, 1.0f},
 
-    
-    }; //results
-    
+
+    }; // Excpected results
+
      init_sdl();
+
+     // Training sets
 
      SDL_Surface* image = load_image("Train/SET3/00.png");
      parcours_pixel(image,trainInput[0]);
@@ -172,7 +170,7 @@ int main(int argc, char **argv)
      parcours_pixel(image,trainInput[1]);
      image = load_image("Train/SET3/02.png");
      parcours_pixel(image,trainInput[2]);
-     image = load_image("Train/SET3/03.png");             
+     image = load_image("Train/SET3/03.png");
      parcours_pixel(image,trainInput[3]);
      image = load_image("Train/SET3/04.png");
      parcours_pixel(image,trainInput[4]);
@@ -183,19 +181,18 @@ int main(int argc, char **argv)
      image = load_image("Train/SET3/07.png");
      parcours_pixel(image,trainInput[7]);
      image = load_image("Train/SET3/08.png");
-     parcours_pixel(image,trainInput[8]);     
+     parcours_pixel(image,trainInput[8]);
      image = load_image("Train/SET3/09.png");
      parcours_pixel(image,trainInput[9]);
 
 
 
     InputValues(filename, hWeights, oWeights, oBias);
-	
 	int trainingSetOrder[] = {0,1,2,3,4,5,6,7,8,9}; //There are 4 Training sets
-		
+
 	//TRAINING TIME
-	
-	
+
+
 	// Num of Epoch is the num of times it goes through the dataset
 	for (int epoch = 0; epoch < numberOfTimes; epoch++)
 	{
@@ -215,9 +212,9 @@ int main(int argc, char **argv)
 				double act = hBias[j];
 				for (int k = 0; k < nInputs; k++)
 					act += trainInput[i][k] * hWeights[k][j];
-                //printf("act of %d = %g \n",j, act);    
+
 				hLayer[j] = sigmoid(act); //Input mult with Bias
-                //printf("hLayer of %d = %g \n",j, hLayer[j]);
+
 			}
 
 			// Compute the Output Layer Activation >>
@@ -229,10 +226,6 @@ int main(int argc, char **argv)
 				for (int k = 0; k < nHiddenNodes; k++)
 					act += hLayer[k] * oWeights[k][j];
 
-                //printf("act of output : %d is %g \n", j, act);
-                //printf("his sigmoid is %g \n", sigmoid(act));
-   
-                
                 oLayer[j] = sigmoid(act);
 
 			}
@@ -245,7 +238,7 @@ int main(int argc, char **argv)
 
 
 			// Backprop => Update the weights in function of the errors
-			
+
 			double dOutput[nOutputs]; // Delta Outputs
 
 			for(int j = 0; j < nOutputs; j++)
@@ -255,7 +248,7 @@ int main(int argc, char **argv)
 			}
 
 			double dHidden[nHiddenNodes]; // Detla of Hidden layer here
-			
+
 
 			for(int j = 0; j < nHiddenNodes; j++)
 			{
@@ -266,7 +259,7 @@ int main(int argc, char **argv)
 
 				dHidden[j] = (dSigmoid(hLayer[j])) * err ;
 			}
-			
+
 
 			//Apply changes in outp Weights
 			for(int j = 0; j < nOutputs; j++)
@@ -276,12 +269,11 @@ int main(int argc, char **argv)
 				for(int k = 0; k < nHiddenNodes; k++)
 					oWeights[k][j] += hLayer[k] * dOutput[j] * lr;
 			}
-			
 			// For input weights
 			for(int j = 0; j < nHiddenNodes; j++)
 			{
 				hBias[j] += dHidden[j] * lr;
-                
+
 				for(int k = 0; k < nHiddenNodes; k++)
 					hWeights[k][j] += trainInput[i][k] * dHidden[j] * lr;
 			}
@@ -296,16 +288,16 @@ int main(int argc, char **argv)
 
     printf("\n The Precision is : %d",res);
     printf("%c \n\n", 37);
-    
+
     // Here we print the values of the weights
 
     //PrintValues(nInputs,nHiddenNodes,hWeights,"Hidden Weights");
     //PrintValues(nHiddenNodes, nOutputs,oWeights, "Output Weights");
-    
+
     // Finally we save the values of Weights and output bias in a file.
 
     OutputValues(filename, hWeights, oWeights, oBias);
-	
+
     free(hWeights);
 
 	return 0;

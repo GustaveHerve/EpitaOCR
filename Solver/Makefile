@@ -3,3 +3,4 @@ all :
 
 clean :
 	-rm -f solver
+	-rm	-f grid.result
