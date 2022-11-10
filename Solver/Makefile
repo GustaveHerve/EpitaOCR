@@ -1,5 +1,5 @@
 all :
-	gcc solver.c -Werror -g -o solver
+	gcc tools.c solver.c -Werror -Wall -g -o solver
 
 clean :
 	-rm -f solver
