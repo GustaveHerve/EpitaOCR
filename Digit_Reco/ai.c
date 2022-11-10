@@ -292,7 +292,7 @@ int main(int argc, char **argv)
     // Here we print the values of the weights
 
     //PrintValues(nInputs,nHiddenNodes,hWeights,"Hidden Weights");
-    PrintValues(nHiddenNodes, nOutputs,oWeights, "Output Weights");
+    //PrintValues(nHiddenNodes, nOutputs,oWeights, "Output Weights");
 
     // Finally we save the values of Weights and output bias in a file.
 
