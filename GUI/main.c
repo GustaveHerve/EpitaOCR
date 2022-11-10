@@ -18,19 +18,16 @@ GError *error = NULL;
 int main(int argc, char *argv [])
 {
   gchar *filename = NULL;
-  /* Initialisation de la librairie Gtk. */
+  /* Initialising GTK */
   gtk_init(&argc, &argv);
 
   /* Ouverture du fichier Glade de la fenêtre principale */
 
-  /* Création du chemin complet pour accéder au fichier test.glade. */
-  /* g_build_filename(); construit le chemin complet en fonction du système */
-  /* d'exploitation. ( / pour Linux et \ pour Windows) */
 
-      /* Chargement du fichier test.glade. */
+      /* Loading the Glade config */
   builder = gtk_builder_new_from_file ("config.glade");
 
-    /* Récupération du pointeur de la fenêtre principale */
+    /* Getting Widgets pointers */
   window = GTK_WIDGET(gtk_builder_get_object (builder, "mainwindow"));
   impButton = GTK_WIDGET(gtk_builder_get_object(builder,"impButton"));
   image = GTK_WIDGET(gtk_builder_get_object(builder,"image"));
@@ -39,12 +36,11 @@ int main(int argc, char *argv [])
   infoLabel = GTK_LABEL(gtk_builder_get_object(builder,"infoLabel"));
   delButton = GTK_WIDGET(gtk_builder_get_object(builder, "delButton"));
 
-  /* Affectation du signal "destroy" à la fonction gtk_main_quit(); pour la */
-  /* fermeture de la fenêtre. */
+  /* Destroy signal to close the Window */
   g_signal_connect (G_OBJECT (window), "destroy", (GCallback)gtk_main_quit, NULL);
   gtk_builder_connect_signals(builder,NULL);
 
-  /* Affichage de la fenêtre principale. */
+  /* Display the Main Window. */
   gtk_widget_show(window);
   image2 = NULL;
 
@@ -56,6 +52,7 @@ int main(int argc, char *argv [])
   return 0;
 }
 
+// Check if buttons clicked
 
 void on_impButton_clicked()
 {
@@ -77,7 +74,7 @@ void on_impButton_clicked()
 
 void on_delButton_clicked()
 {
-  printf("UwU\n");
+  printf("Delete Button Clicked\n");
   gtk_label_set_text(infoLabel,"Image Deleted.");
   gtk_widget_hide(image2);
   image2 = NULL;
