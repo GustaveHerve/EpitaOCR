@@ -100,7 +100,6 @@ void save_squares_seg(Square *sq, SDL_Surface *image, char* path){
 			int temp = i / 10;
 			name[0] = temp + '0';
 		}
-		char *second = malloc(2 * sizeof(char));
 	    name[1] = (i % 10) + '0';
 		//int w = sq[i].NE.x - sq[i].NW.x;
 		//int h = sq[i].SW.y - sq[i].NW.y;
@@ -124,6 +123,10 @@ void save_squares_seg(Square *sq, SDL_Surface *image, char* path){
 		strcat(pathres, name);
 		strcat(pathres, ext);
     	IMG_SavePNG(crop, pathres);
+
+        SDL_FreeSurface(crop);
+        SDL_FreeSurface(temp);
+        free(name);
 	}
 }
 

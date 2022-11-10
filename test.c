@@ -75,12 +75,14 @@ int main(int argc, char** argv){
 	len_li.y =  merge_lines(linesY, len_li.y, 40, mergey);
 	len_li.x =  merge_lines(linesX, len_li.x, 40, mergex);
 
-	linesX = mergex;
-	linesY = mergey;
+	free(linesX);
+	free(linesY);
+	//linesX = mergex;
+	//linesY = mergey;
     printf("Detecting grid...\n");
 
-	Segment *xseg = get_segments(dilsur, linesX, len_li.x);
-	Segment *yseg = get_segments(dilsur, linesY, len_li.y);
+	Segment *xseg = get_segments(dilsur, mergex, len_li.x);
+	Segment *yseg = get_segments(dilsur, mergey, len_li.y);
 
     printf("Extracting grid squares...\n");
 	Segment *grid = get_grid_seg(xseg, yseg, len_li);
@@ -90,6 +92,8 @@ int main(int argc, char** argv){
 	save_squares_seg(sq, test, "temp/");
 
     SDL_FreeSurface(dilsur);
+    free(sq);
+    free(grid);
 
     SDL_Window *window = SDL_CreateWindow("Cookin'VR",SDL_WINDOWPOS_UNDEFINED
 			,SDL_WINDOWPOS_UNDEFINED,test->w,test->h,SDL_WINDOW_RESIZABLE);
@@ -117,8 +121,8 @@ int main(int argc, char** argv){
         SDL_RenderCopy(renderer, texture, NULL, &img_size);
 
         for (int i = 0; i < len_li.x; i++){
-            int rho = linesX[i].rho;
-            float theta = linesX[i].theta * M_PI / 180;
+            int rho = mergex[i].rho;
+            float theta = mergex[i].theta * M_PI / 180;
             double sinA = sin(theta);
             double cosA = cos(theta);
             float x0 = cosA * rho;
@@ -135,8 +139,8 @@ int main(int argc, char** argv){
 
         }
 		for (int i = 0; i < len_li.y; i++){
-            int rho = linesY[i].rho;
-            float theta = linesY[i].theta * M_PI / 180;
+            int rho = mergey[i].rho;
+            float theta = mergey[i].theta * M_PI / 180;
             double sinA = sin(theta);
             double cosA = cos(theta);
             float x0 = cosA * rho;
@@ -180,9 +184,9 @@ int main(int argc, char** argv){
     SDL_DestroyWindow(window);
     SDL_DestroyRenderer(renderer);
     SDL_FreeSurface(test);
+    SDL_Quit();
 
-	free(linesX);
-	free(linesY);
+
     free(yseg);
     free(xseg);
 
