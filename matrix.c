@@ -86,9 +86,11 @@ void convolution(SDL_Surface *image, double ker[], int rows,
 							   	&value, &value, &value);
 						
 						if (sym)
-							res = ker[(k+roff) * cols + l+coff] * (double)value;	
+							res = 
+								ker[(k+roff) * cols + l+coff] * (double)value;	
 						else
-							res = kert[(k+roff) * cols + l+coff] * (double)value;
+							res = 
+								kert[(k+roff) * cols + l+coff] * (double)value;
 						
 						acc += res;
 					}

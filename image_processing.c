@@ -41,16 +41,20 @@ void blur(SDL_Surface* image, int kersize){
 
         case 3:
 			{
-    		double blur[] = {0.0625, 0.125, 0.0625, 0.125, 0.25, 0.125, 0.0625, 0.125, 0.0625};
+    		double blur[] = {0.0625, 0.125, 0.0625, 0.125, 0.25, 0.125, 
+				0.0625, 0.125, 0.0625};
             convolution(image, blur, 3, 3, b, 1);
             break;}
 				
 
         case 5:
 			{
-            double blur[] = {1.0/256, 4.0/256, 6.0/256, 4.0/256, 1.0/256, 4.0/256, 16.0/256,
-    		24.0/256, 16.0/256, 4.0/256, 6.0/256, 24.0/256, 36.0/256, 24.0/256, 6.0/256, 4.0/256,
-    		16.0/256, 24.0/256, 16.0/256, 4.0/256, 1.0/256, 4.0/256, 6.0/256, 4.0/256, 1.0/256};
+            double blur[] = {
+				1.0/256, 4.0/256, 6.0/256, 4.0/256, 1.0/256, 
+				4.0/256, 16.0/256, 24.0/256, 16.0/256, 4.0/256,
+			   	6.0/256, 24.0/256, 36.0/256, 24.0/256, 6.0/256, 
+				4.0/256, 16.0/256, 24.0/256, 16.0/256, 4.0/256, 
+				1.0/256, 4.0/256, 6.0/256, 4.0/256, 1.0/256};
 			convolution(image, blur, 5, 5, b, 1);
 			break;}
 
@@ -64,22 +68,27 @@ void blur(SDL_Surface* image, int kersize){
 
 }
 
-//apply_convolution: applies the result of a convolution (stored in r[]) to an SDL_Surface image 
+//apply_convolution: applies the result of a convolution (stored in r[]) to 
+//an SDL_Surface image 
 //rows and cols determines r[]'s size
-void apply_convolution(SDL_Surface *image, Uint8 r[], size_t rows, size_t cols){
+void apply_convolution(SDL_Surface *image, Uint8 r[], size_t rows, 
+		size_t cols){
    
     for (size_t i = 0; i < rows; i++){
         for (size_t j= 0; j < cols; j++){
-            Uint32 pixel = SDL_MapRGB(image->format, r[i*cols + j], r[i*cols + j],
+            Uint32 pixel = 
+				SDL_MapRGB(image->format, r[i*cols + j], r[i*cols + j],
 					r[i*cols + j]);
             replace_pixel(image, j, i, pixel);
         }
     }
 }
 
-//apply_convolution_int: same as previous but accepts int array and clamp between 0 and 255 to avoid
+//apply_convolution_int: same as previous but accepts int array and clamp 
+//between 0 and 255 to avoid
 //overflow
-void apply_convolution_int(SDL_Surface *image, int r[], size_t rows, size_t cols){
+void apply_convolution_int(SDL_Surface *image, int r[], size_t rows, 
+		size_t cols){
    
     for (size_t i = 0; i < rows; i++){
         for (size_t j= 0; j < cols; j++){

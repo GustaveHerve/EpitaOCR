@@ -8,7 +8,8 @@
 int main(int argc, char** argv){
 	if (argc != 3){
 		printf("Wrong number of arguments\n");
-		printf("Usage: ./test_greyscale imagePath.(any format) newgreyimagePath.png\n");
+		printf("Usage: ./test_greyscale imagePath.(any format) 
+				newgreyimagePath.png\n");
 		exit(2);
 	}
 

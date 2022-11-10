@@ -44,7 +44,8 @@ void hough_lines(SDL_Surface* image, int angleNb, int step, int res[]){
 	}
 }
 
-void hough_lines_gradient(SDL_Surface* image, int angleNb, Uint8 *edges, Uint8 *angles, int res[]){
+void hough_lines_gradient(SDL_Surface* image, int angleNb, Uint8 *edges, 
+		Uint8 *angles, int res[]){
 	unsigned int width = image->w;
 	unsigned int height = image->h;
 
@@ -97,7 +98,8 @@ void neighbour_suppr(int *hough, int rows, int cols, int r, int theta){
 	}
 }
 
-TupleInt hough_filter_local(int input[], int rows, int cols, int threshold, int step, int tol, Line hor[], Line ver[]){
+TupleInt hough_filter_local(int input[], int rows, int cols, int threshold, 
+		int step, int tol, Line hor[], Line ver[]){
 
 	int horacc = 0;
 	int veracc = 0;
@@ -128,7 +130,8 @@ TupleInt hough_filter_local(int input[], int rows, int cols, int threshold, int 
 					ver[veracc] = new;
 					veracc++;
 				}
-				else if ( (jmax >= 90 - tol && jmax <= 90 + tol ) || (jmax >=  270 - tol && jmax <= 270 + tol)){
+				else if ( (jmax >= 90 - tol && jmax <= 90 + tol ) 
+						|| (jmax >=  270 - tol && jmax <= 270 + tol)){
 					hor[horacc] = new;
 					horacc++;
 				}
@@ -217,7 +220,8 @@ int average_weight(Line* lines, int len, int *hough){
 	return sum / len;
 }
 
-int get_grid_linesold(Line* lines, int len, int* dis, int tolerance, Line* res, int *hough){
+int get_grid_linesold(Line* lines, int len, int* dis, int tolerance, 
+		Line* res, int *hough){
 
 	int begin = 0;
 	int end = 0;

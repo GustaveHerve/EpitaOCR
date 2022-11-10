@@ -10,10 +10,13 @@
 #define WEAK 100
 #define STRONG 255
 
-/* gradient: computes edge and angle gradient values from two matrices of same size
-*  stores the result in edges[] and angles[] (so it doesn't affect the image directly)
+/* gradient: computes edge and angle gradient values from two matrices of 
+ * same size
+*  stores the result in edges[] and angles[] (so it doesn't affect the 
+*  image directly)
 */
-void gradient(int r1[], int r2[], int edges[], Uint8 angles[], size_t rows, size_t cols){
+void gradient(int r1[], int r2[], int edges[], Uint8 angles[], size_t rows, 
+		size_t cols){
 
 	for (size_t i = 0; i < rows; i++){
 		for (size_t j = 0; j < cols; j++){	
@@ -21,17 +24,17 @@ void gradient(int r1[], int r2[], int edges[], Uint8 angles[], size_t rows, size
 			double s1 = (double)r1[current] * (double)r1[current];
 			double s2 = (double)r2[current] * (double)r2[current];
 			double temp = sqrt(s1+s2);
-			//double temp = fabs(r1[current]) + fabs(r2[current]); //faster compute but less precise
-			//if (temp > 255)
-			//	temp = 255;
+			//faster compute but less precise
+			//double temp = fabs(r1[current]) + fabs(r2[current]); 
 			edges[current] = temp;
 
 			float tan = atan2(r2[current], r1[current]);
 			float dtan = 0;
 			dtan = tan * 180 / M_PI;
 			if (dtan < 0)
-				dtan += 180; //get opposite point in triogo circle for easier comparisons
-							 //
+				dtan += 180; //get opposite point in triogo circle for 
+							 //easier comparisons
+							 
 			   
 			Uint8 angle = 0;
 			if ((dtan >= 0 && dtan < 22.5) || (dtan <= 180 && dtan >= 157.5)) 
@@ -101,8 +104,10 @@ void non_maxima_suppr(int edges[], Uint8 angles[], size_t rows, size_t cols,
 				break;
 
 			case 45:
-				if ((j+1 < (int)cols && i+1 < (int)rows) && (i-1 >= 0 && j-1 >= 0)){
-					if (!(edges[c] >= edges[(i-1)*cols+j+1] && edges[c] >= edges[(i+1)*cols+j-1]))
+				if ((j+1 < (int)cols && i+1 < (int)rows) && (i-1 >= 0 
+							&& j-1 >= 0)){
+					if (!(edges[c] >= edges[(i-1)*cols+j+1] 
+								&& edges[c] >= edges[(i+1)*cols+j-1]))
 						res[c] = 0;
 					else
 						res[c] = edges[c];
@@ -111,7 +116,8 @@ void non_maxima_suppr(int edges[], Uint8 angles[], size_t rows, size_t cols,
 
 			case 90:
 				if (i+1 < (int)cols && i-1 >= 0){
-					if (!(edges[c] >= edges[(i-1)*cols+j] && edges[c] >= edges[(i+1)*cols+j]))
+					if (!(edges[c] >= edges[(i-1)*cols+j] 
+								&& edges[c] >= edges[(i+1)*cols+j]))
 						res[c] = 0;
 					else
 						res[c] = edges[c];
@@ -119,8 +125,10 @@ void non_maxima_suppr(int edges[], Uint8 angles[], size_t rows, size_t cols,
 				break;
 
 			case 135:
-				if ((j-1 >= 0 && i+1 < (int)rows ) && (j+1 < (int)cols && i-1 >= 0)){
-					if (!(edges[c] >= edges[(i-1)*cols+j-1] && edges[c] >= edges[(i+1)*cols+j+1]))
+				if ((j-1 >= 0 && i+1 < (int)rows ) 
+						&& (j+1 < (int)cols && i-1 >= 0)){
+					if (!(edges[c] >= edges[(i-1)*cols+j-1] 
+								&& edges[c] >= edges[(i+1)*cols+j+1]))
 						res[c] = 0;
 					else
 						res[c] = edges[c];

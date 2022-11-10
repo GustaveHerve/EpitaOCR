@@ -1,8 +1,9 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 
-//get_pixel_ref: Get adress of the first byte composing the pixel at (x,y) coordinates
-//				Not useful on its own but needed for get_pixel
+//get_pixel_ref: Get adress of the first byte composing the pixel at (x,y) 
+//coordinates
+//	Not useful on its own but needed for get_pixel
 Uint8* get_pixel_ref(SDL_Surface* image, unsigned x, unsigned y){
 	return (Uint8*)image->pixels + y * image->pitch + 
 		x * image->format->BytesPerPixel;
@@ -15,15 +16,20 @@ Uint32 get_pixel(SDL_Surface *image, unsigned x, unsigned y){
 	switch (image->format->BytesPerPixel){
 
 		case 1:	
-			return *p;		//The pixel is composed of one byte so nothing to do here
+			return *p; //The pixel is composed of one byte so nothing to do here
 
 		case 2:
 			return *(Uint16*)p;		
 			
-		case 3:			//There is no Uint24 type, we need to return it on a Uint32 instead (1 byte won't be used)
-			if (SDL_BYTEORDER == SDL_BIG_ENDIAN)	//BIG ENDIAN = Left byte is the most significant one
+		case 3:			//There is no Uint24 type, we need to return it on a 
+						//Uint32 instead (1 byte won't be used)
+			if (SDL_BYTEORDER == SDL_BIG_ENDIAN)	//BIG ENDIAN = 
+													//Left byte is the most 
+													//significant one
 				return p[0] << 16 | p[1] << 8 | p[2];	
-			else									//LITTLE ENDIAN = Left byte is the least signficant one
+			else									//LITTLE ENDIAN = 
+													//Left byte is the 
+													//least signficant one
 				return p[0] | p[1] << 8 | p[2] << 16;
 
 		case 4:

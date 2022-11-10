@@ -42,7 +42,8 @@ int main(int argc, char** argv){
 	//erose(test, 3);
 	//sobel(test);
 
-	SDL_Surface* dilsur = SDL_CreateRGBSurface(0, width, height, 32, 0, 0, 0, 0);
+	SDL_Surface* dilsur = 
+		SDL_CreateRGBSurface(0, width, height, 32, 0, 0, 0, 0);
 	SDL_BlitSurface(test, NULL, dilsur, NULL);
     printf("Dilating and closing...\n");
 	dilate(dilsur, 5);
@@ -62,7 +63,8 @@ int main(int argc, char** argv){
 
 	int hough_threshold = get_biggest_bin(hough, rows, angle_precision) * 0.5;
 
-    TupleInt len_li = hough_filter_local(hough, rows, angle_precision, hough_threshold, 1, 0, linesX, linesY);
+    TupleInt len_li = hough_filter_local(hough, rows, angle_precision,
+			hough_threshold, 1, 0, linesX, linesY);
 
     linesX = (Line *)realloc(linesX, len_li.x * sizeof(Line));
     linesY = (Line *)realloc(linesY, len_li.y * sizeof(Line));
@@ -89,7 +91,8 @@ int main(int argc, char** argv){
 
     SDL_FreeSurface(dilsur);
 
-    SDL_Window *window = SDL_CreateWindow("Cookin'VR",SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,test->w,test->h,SDL_WINDOW_RESIZABLE);
+    SDL_Window *window = SDL_CreateWindow("Cookin'VR",SDL_WINDOWPOS_UNDEFINED
+			,SDL_WINDOWPOS_UNDEFINED,test->w,test->h,SDL_WINDOW_RESIZABLE);
     if (window == NULL)
         errx(2, "couldn't create window");
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, 0);
@@ -154,8 +157,10 @@ int main(int argc, char** argv){
 				TupleInt pt;
 				if (!polar_intersection(&pt, gridX[i], gridY[j])){
 
-					SDL_SetRenderDrawColor(renderer, 0, 255, 255, SDL_ALPHA_OPAQUE);
-					SDL_RenderDrawLine(renderer, pt.x, pt.y-10, pt.x, pt.y + 10);
+					SDL_SetRenderDrawColor(renderer, 0, 255
+					, 255, SDL_ALPHA_OPAQUE);
+					SDL_RenderDrawLine(renderer, pt.x
+					, pt.y-10, pt.x, pt.y + 10);
 					SDL_RenderDrawLine(renderer, pt.x-10, pt.y, pt.x+10, pt.y);
 
 				}
