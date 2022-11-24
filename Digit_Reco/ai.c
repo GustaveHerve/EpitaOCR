@@ -10,11 +10,12 @@
 // define the number of each type of nodes
 #define nInputs 784
 #define nOutputs 10
-#define nHiddenNodes 20
+#define nHiddenNodes 40
 #define filename "Brain"
 
 void InputValues(char* file, double hWeights[nInputs][nHiddenNodes],
-    double oWeights[nHiddenNodes][nOutputs], double oBias[nOutputs])
+    double oWeights[nHiddenNodes][nOutputs], double oBias[nOutputs], 
+    double hBias[], double hLayer[], double oLayer[])
 {
     // this function is the beggining of the NN, it intputs the starting values
     // to the weights and output bias
@@ -23,8 +24,11 @@ void InputValues(char* file, double hWeights[nInputs][nHiddenNodes],
  fp = fopen(filename, "r");
  if (fp)
  {   // Input the previous values of weights and bias if they exist
-
+        
      double myvariable;
+
+    // Weights first
+
      for (int i = 0; i < nInputs; i++)
          for (int j = 0; j < nHiddenNodes; j++)
          {
@@ -38,11 +42,37 @@ void InputValues(char* file, double hWeights[nInputs][nHiddenNodes],
             fscanf(fp,"%lf",&myvariable);
             oWeights[i][j] += myvariable;
          }
+
+    // Bias second
+
      for (int j = 0; j < nOutputs; j++)
-         {
-            fscanf(fp,"%lf",&myvariable);
-            oBias[j] += myvariable;
-         }
+     {
+        fscanf(fp,"%lf",&myvariable);
+        oBias[j] += myvariable;
+     }
+        
+     // This part i'm not sure !
+     for (int j = 0; j < nHiddenNodes; j++)
+     {
+        fscanf(fp,"%lf",&myvariable);                                           
+        hBias[j] += myvariable;
+     }
+
+     // Layers
+        
+     for (int j = 0; j < nHiddenNodes; j++)
+     {
+        fscanf(fp,"%lf",&myvariable);                                           
+        hLayer[j] += myvariable;  
+     }
+
+     for (int j = 0; j < nOutputs; j++)
+     {
+        fscanf(fp,"%lf",&myvariable);
+        oLayer[j] += myvariable;
+     }          
+
+     // end
 
      fclose(fp);
  }
@@ -65,7 +95,8 @@ void InputValues(char* file, double hWeights[nInputs][nHiddenNodes],
 }
 
 void OutputValues(char* file, double hWeights[nInputs][nHiddenNodes],
-      double oWeights[nHiddenNodes][nOutputs], double oBias[nOutputs])
+      double oWeights[nHiddenNodes][nOutputs], double oBias[nOutputs],
+      double hBias[], double hLayer[], double oLayer[])
 {
     // This function "saves" the values of weights and bias in a file so that
     // the NN will keep his "knowledge" or "memory"
@@ -86,12 +117,19 @@ void OutputValues(char* file, double hWeights[nInputs][nHiddenNodes],
      for (int j = 0; j < nOutputs; j++)
           fprintf(fp,"%f\n",oBias[j]);
 
+     for (int j = 0; j < nHiddenNodes; j++)
+          fprintf(fp,"%lf",hBias[j]);
+ 
+     for (int j = 0; j < nHiddenNodes; j++)
+          fprintf(fp,"%lf",hLayer[j]);
+ 
+     for (int j = 0; j < nOutputs; j++)
+          fprintf(fp,"%lf",oLayer[j]);
+
      fclose(fp);
 
 }
 
-
-#define trainSets 10
 
 int main(int argc, char **argv)
 {
@@ -101,7 +139,7 @@ int main(int argc, char **argv)
         fprintf(stderr, "To many arguments \n");
         return 1;
     }
-
+    argc--;
 	double lr = 0.1f; //Learning Rate
 
 	double hLayer[nHiddenNodes];
@@ -111,8 +149,15 @@ int main(int argc, char **argv)
 	double oBias[nOutputs];
 
     int numberOfTimes = 10000;
-    int memo_val = 0;
+    if (argc)
+        numberOfTimes = 1;
 
+    int memo_val = 0;
+    int Result;
+    
+    int trainSets = 10;
+    if (argc)
+        trainSets = 1;
 
     double memory[numberOfTimes*trainSets];
 
@@ -124,8 +169,10 @@ int main(int argc, char **argv)
 
 	double (*trainInput)[nInputs] =
         malloc(sizeof(double[trainSets][nInputs]));
+    
+    
 
-	double trainOutputs[trainSets][nOutputs] =
+	double trainOutputs[10][nOutputs] =
     {
         {1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
        0.0f, 0.0f, 0.0f, 0.0f, 0.0f},
@@ -161,34 +208,63 @@ int main(int argc, char **argv)
     }; // Excpected results
 
      init_sdl();
-
+     SDL_Surface* image;
      // Training sets
+     if (argc) 
+     {
+        image = load_image(argv[1]);
+        parcours_pixel(image,trainInput[0]);
+     }
 
-     SDL_Surface* image = load_image("Train/SET2/00.png");
+     else 
+     {
+     
+     image = load_image("Train/SET5/00.png");
      parcours_pixel(image,trainInput[0]);
-     image = load_image("Train/SET2/01.png");
+     image = load_image("Train/SET5/01.png");
      parcours_pixel(image,trainInput[1]);
-     image = load_image("Train/SET2/02.png");
+     image = load_image("Train/SET5/02.png");
      parcours_pixel(image,trainInput[2]);
-     image = load_image("Train/SET2/03.png");
+     image = load_image("Train/SET5/03.png");
      parcours_pixel(image,trainInput[3]);
-     image = load_image("Train/SET2/04.png");
+     image = load_image("Train/SET5/04.png");
      parcours_pixel(image,trainInput[4]);
-     image = load_image("Train/SET2/05.png");
+     image = load_image("Train/SET5/05.png");
      parcours_pixel(image,trainInput[5]);
-     image = load_image("Train/SET2/06.png");
+     image = load_image("Train/SET5/06.png");
      parcours_pixel(image,trainInput[6]);
-     image = load_image("Train/SET2/07.png");
+     image = load_image("Train/SET5/07.png");
      parcours_pixel(image,trainInput[7]);
-     image = load_image("Train/SET2/08.png");
+     image = load_image("Train/SET5/08.png");
      parcours_pixel(image,trainInput[8]);
-     image = load_image("Train/SET2/09.png");
+     image = load_image("Train/SET5/09.png");
      parcours_pixel(image,trainInput[9]);
+     /*
+     image = load_image("Train/SET5/00.png");
+     parcours_pixel(image,trainInput[0]);
+     image = load_image("Train/SET5/01.png");
+     parcours_pixel(image,trainInput[1]);
+     image = load_image("Train/SET5/02.png");
+     parcours_pixel(image,trainInput[2]);
+     image = load_image("Train/SET5/03.png");
+     parcours_pixel(image,trainInput[3]);
+     image = load_image("Train/SET5/04.png");
+     parcours_pixel(image,trainInput[4]);
+     image = load_image("Train/SET4/05.png");
+     parcours_pixel(image,trainInput[5]);
+     image = load_image("Train/SET5/06.png");
+     parcours_pixel(image,trainInput[6]);
+     image = load_image("Train/SET5/07.png");
+     parcours_pixel(image,trainInput[7]);
+     image = load_image("Train/SET5/08.png");
+     parcours_pixel(image,trainInput[8]);
+     image = load_image("Train/SET5/09.png");
+     parcours_pixel(image,trainInput[9]);
+     */
+    }
 
-
-
-    InputValues(filename, hWeights, oWeights, oBias);
-	int trainingSetOrder[] = {0,1,2,3,4,5,6,7,8,9}; //There are 4 Training sets
+    InputValues(filename, hWeights, oWeights, oBias, hBias, hLayer, oLayer);
+	int trainingSetOrder[] = {0,1,2,3,4,5,6,7,8,9}; 
 
 	//TRAINING TIME
 
@@ -196,11 +272,11 @@ int main(int argc, char **argv)
 	// Num of Epoch is the num of times it goes through the dataset
 	for (int epoch = 0; epoch < numberOfTimes; epoch++)
 	{
-		shuffle(trainingSetOrder, trainSets);
+        if (!argc)
+		    shuffle(trainingSetOrder, trainSets);
 
 		for(int x = 0; x < trainSets; x++)
 		{
-            memo_val++;
 			int i = trainingSetOrder[x];
 
 			// "Forward Path"
@@ -230,64 +306,72 @@ int main(int argc, char **argv)
 
 			}
 
-            int Result = GetMax(nOutputs, oLayer);
-            memory[memo_val] = (Result == i);
-
-			printf("Input : %d  Output: %d \n",
-                    i,Result);
+            Result = GetMax(nOutputs, oLayer);
+            memory[memo_val] = (Result == i%10); //modify
+            memo_val++;
+            if (!argc)
+			    printf("Input : %d  Output: %d \n",
+                    (i%10),Result);
+            else 
+                printf("Image is a %d \n", Result);
 
 
 			// Backprop => Update the weights in function of the errors
+            if (!argc)
+            {
+			    double dOutput[nOutputs]; // Delta Outputs
 
-			double dOutput[nOutputs]; // Delta Outputs
+			    for(int j = 0; j < nOutputs; j++)
+			    {
+                    double err = (trainOutputs[i][j] - oLayer[j]);
+				    dOutput[j] = err * (dSigmoid(oLayer[j]));
+			    }
 
-			for(int j = 0; j < nOutputs; j++)
-			{
-                double err = (trainOutputs[i][j] - oLayer[j]);
-				dOutput[j] = err * (dSigmoid(oLayer[j]));
-			}
-
-			double dHidden[nHiddenNodes]; // Detla of Hidden layer here
-
-
-			for(int j = 0; j < nHiddenNodes; j++)
-			{
-				double err = 0.0f;
-
-				for(int k = 0; k < nOutputs; k++)
-					err += dOutput[k] * oWeights[j][k];
-
-				dHidden[j] = (dSigmoid(hLayer[j])) * err ;
-			}
+			    double dHidden[nHiddenNodes]; // Detla of Hidden layer here
 
 
-			//Apply changes in outp Weights
-			for(int j = 0; j < nOutputs; j++)
-			{
-				oBias[j] += (dOutput[j] * lr);
+			    for(int j = 0; j < nHiddenNodes; j++)
+			    {
+				    double err = 0.0f;
 
-				for(int k = 0; k < nHiddenNodes; k++)
-					oWeights[k][j] += hLayer[k] * dOutput[j] * lr;
-			}
-			// For input weights
-			for(int j = 0; j < nHiddenNodes; j++)
-			{
-				hBias[j] += dHidden[j] * lr;
+				    for(int k = 0; k < nOutputs; k++)
+					    err += dOutput[k] * oWeights[j][k];
 
-				for(int k = 0; k < nHiddenNodes; k++)
-					hWeights[k][j] += trainInput[i][k] * dHidden[j] * lr;
-			}
+				    dHidden[j] = (dSigmoid(hLayer[j])) * err ;
+			    }
 
 
-		}
-	}
+			    //Apply changes in outp Weights
+			    for(int j = 0; j < nOutputs; j++)
+			    {
+				    oBias[j] += (dOutput[j] * lr);
+
+				    for(int k = 0; k < nHiddenNodes; k++)
+					    oWeights[k][j] += hLayer[k] * dOutput[j] * lr;
+			    }
+			    // For input weights
+			    for(int j = 0; j < nHiddenNodes; j++)
+			    {
+				    hBias[j] += dHidden[j] * lr;
+
+				    for(int k = 0; k < nHiddenNodes; k++)
+					    hWeights[k][j] += trainInput[i][k] * dHidden[j] * lr;
+			    }
+
+
+		     }
+          }
+	   }
 
     // In this part we print the precision of the NN and his weights
 
     int res = (int) (Precision(memo_val,memory) * 100);
-
-    printf("\n The Precision is : %d",res);
-    printf("%c \n\n", 37);
+    
+    if (!argc)
+    {
+        printf("\n The Precision is : %d",res);
+        printf("%c \n\n", 37);
+    }
 
     // Here we print the values of the weights
 
@@ -296,7 +380,7 @@ int main(int argc, char **argv)
 
     // Finally we save the values of Weights and output bias in a file.
 
-    OutputValues(filename, hWeights, oWeights, oBias);
+    OutputValues(filename, hWeights, oWeights, oBias, hBias, hLayer, oLayer);
 
     free(hWeights);
     free(trainInput);
