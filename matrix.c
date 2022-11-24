@@ -105,3 +105,49 @@ void convolution(SDL_Surface *image, double ker[], int rows,
 	}
 	free(pixels);
 }
+
+
+
+double* get_cofactor(double* mat, double* res, int p, int q, int dim)
+{
+	int i = 0;
+	int j = 0;
+
+	for(int row = 0; row < dim; row++)
+	{
+		for(int col = 0; col < dim; col++)
+		{
+			if(row != p && col != q)
+			{
+				res[i*n+j] = mat[row*n+col];
+				j++;
+
+				if(j == dim-1)
+				{
+					j = 0;
+					i++;
+				}
+			}
+		}
+	}
+	return res;
+}
+
+//https://www.geeksforgeeks.org/adjoint-inverse-matrix/
+
+double get_determinant(double* mat, int dim)
+{
+	double det = 0;
+	if(n == 1)
+	{
+		return mat[0];
+	}
+	int sign = 1;
+
+	double* cofactor = malloc(sizeof(double)*(dim*dim+1));
+	for(int i = 0; i<dim; i++)
+	{
+		double *cofactor = get_cofactor(mat, cofactor, 1, 1, dim);
+	}
+}
+

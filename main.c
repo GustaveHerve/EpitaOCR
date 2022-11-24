@@ -6,10 +6,23 @@
 #include <SDL2/SDL_image.h>
 #include "include/sdaile.h"
 #include "include/image_loading.h"
+#include "include/matrix.h"
 
 int main (int argc, char* argv[])
 {
-
+    double *mat = malloc(sizeof(double)*10);
+    for(int i = 0; i <= 3; i++)
+    {
+	double j = i;
+        *(mat+i) = j+1;
+    }
+    invertMat(mat, 2);
+    for(int j = 0; j <= 3; j++)
+    {
+	double numbir = *(mat+j);
+    	printf("mat = %lf", numbir);
+    }
+    /*
     init_sdl();
     SDL_Surface *img = load_image(argv[1]);
     double angle = atof(argv[2]);
@@ -31,5 +44,8 @@ int main (int argc, char* argv[])
     SDL_FreeSurface(img);
     IMG_Quit();
     SDL_Quit();
+
+    */
+
     return 0;
 }
