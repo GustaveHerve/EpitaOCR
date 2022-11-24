@@ -11,11 +11,18 @@
 int main (int argc, char* argv[])
 {
     double *mat = malloc(sizeof(double)*10);
-    for(int i = 0; i <= 8; i++)
+    for(int i = 0; i <= 3; i++)
     {
-        *(mat+i) = i+1; 
+	double j = i;
+        *(mat+i) = j+1;
     }
-    invertMat(mat, 8);
+    invertMat(mat, 2);
+    for(int j = 0; j <= 3; j++)
+    {
+	double numbir = *(mat+j);
+    	printf("mat = %lf", numbir);
+    }
+    /*
     init_sdl();
     SDL_Surface *img = load_image(argv[1]);
     double angle = atof(argv[2]);
@@ -37,5 +44,8 @@ int main (int argc, char* argv[])
     SDL_FreeSurface(img);
     IMG_Quit();
     SDL_Quit();
+
+    */
+
     return 0;
 }
