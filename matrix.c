@@ -119,7 +119,7 @@ double* get_cofactor(double* mat, double* res, int p, int q, int dim)
 		{
 			if(row != p && col != q)
 			{
-				res[i*n+j] = mat[row*n+col];
+				res[i*dim+j] = mat[row*dim+col];
 				j++;
 
 				if(j == dim-1)
@@ -133,12 +133,11 @@ double* get_cofactor(double* mat, double* res, int p, int q, int dim)
 	return res;
 }
 
-//https://www.geeksforgeeks.org/adjoint-inverse-matrix/
 
 double get_determinant(double* mat, int dim)
 {
 	double det = 0;
-	if(n == 1)
+	if(dim == 1)
 	{
 		return mat[0];
 	}
@@ -147,7 +146,54 @@ double get_determinant(double* mat, int dim)
 	double* cofactor = malloc(sizeof(double)*(dim*dim+1));
 	for(int i = 0; i<dim; i++)
 	{
-		double *cofactor = get_cofactor(mat, cofactor, 1, 1, dim);
+		cofactor = get_cofactor(mat, cofactor, 0, i, dim);
+                det += sign * mat[i] * get_determinant(cofactor, dim-1);
+                sign = -sign;
 	}
+        return det;
 }
 
+
+double* get_adjoint(double* mat, double* adjoint, int dim)
+{
+    if(dim == 1)
+    {
+        adjoint[0] = 1;
+    }
+    int sign = 1;
+    double* cofactor = malloc(sizeof(double)*(dim*dim+1));
+    for(int i = 0; i < dim; i++)
+    {
+        for(int j = 0; j < dim; j++)
+        {
+            cofactor = get_cofactor(mat, cofactor, i, j, dim);
+            sign = (i+j)%2 == 0 ? 1:-1;
+            adjoint[j*dim+i] = sign*get_determinant(cofactor, dim-1);
+        }    
+    }
+    return adjoint;
+}
+
+
+double* inverseMat(double* mat, double* inverse, int dim)
+{
+    double det = get_determinant(mat, dim);
+    
+    if(det == 0)
+    {
+        printf("Can't inverse singular matrix..");
+    }
+
+    double* adjoint = malloc(sizeof(double)*(dim*dim+1));
+    
+    for(int i = 0; i < dim; i++)
+    {
+        for(int j = 0; j < dim; j++)
+        {
+            adjoint = get_adjoint(mat, adjoint, dim);
+            inverse[i*dim+j] = adjoint[i*dim+j] / det;
+            //inverse(mat) = adj(mat)/det(mat)
+        }
+    }
+    return inverse;
+}

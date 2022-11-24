@@ -16,12 +16,11 @@ int main (int argc, char* argv[])
 	double j = i;
         *(mat+i) = j+1;
     }
-    invertMat(mat, 2);
-    for(int j = 0; j <= 3; j++)
-    {
-	double numbir = *(mat+j);
-    	printf("mat = %lf", numbir);
-    }
+    double *inverted = malloc(sizeof(double)*10);
+    inverted = inverseMat(mat, inverted, 2);
+    print_matrix("mat", mat, 2, 2);
+    print_matrix("inverted", inverted, 2, 2);
+    
     /*
     init_sdl();
     SDL_Surface *img = load_image(argv[1]);

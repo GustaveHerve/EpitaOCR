@@ -10,4 +10,8 @@ void mul(double m1[], double m2[], size_t r1, size_t c1, size_t c2, double r[]);
 void convolution(SDL_Surface *image, double ker[], size_t rows, 
 		size_t cols, int r[], int sym);
 
+double* get_cofactor(double* mat, double*res, int p, int q, int dim);
+double get_determinant(double* mat, int dim);
+double* get_adjoint(double* mat, double* adjoint, int dim);
+double* inverseMat(double* mat, double* inverse, int dim);
 #endif
