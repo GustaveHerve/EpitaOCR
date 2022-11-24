@@ -5,6 +5,8 @@
 #include <math.h>
 #include "include/pixel.h"
 #include "include/matrix.h"
+#include "include/geometry.h"
+
 
 double deg_to_rad(double angle)
 {
@@ -101,4 +103,64 @@ void rotate_img90(SDL_Surface *img, double angle)
         }
     }
     IMG_SavePNG(new_img, "image_rotated.png");
+}
+
+
+double* invertMat(double* mat, int dim)
+{
+    double pivot;
+    int i, j;
+    for(int p = 1; p<=dim; p++)
+    {
+        pivot = mat[p*dim+p];
+        if (pivot == 0)
+            return 0;
+        for(i = 1; i <= dim; i++)
+            mat[i*dim+p] = -mat[i*dim+p] / pivot;
+        for(i = 1; i <= dim; i++)
+        {
+            if(i != p)
+            {
+                for(j = 1; j <= dim; j++)
+                {
+                    if(j != p)
+                        mat[i*dim+j]+= mat[p*dim+j]*mat[i*dim+p];
+                }
+            }
+        }
+        for(j = 1; j <= dim; j++)
+            mat[p*dim+j] /= pivot;
+        mat[p*dim+p] = 1/pivot;
+    }
+    for(int acc = 0; acc <= 8; acc++)
+    {
+        double numbir = *(mat+acc);
+        printf("mat = %lf", numbir);
+    }
+    return mat;
+}
+
+
+void homographicT(SDL_Surface *img, Square corners)
+{
+    //constants that 
+    int a1,a2,a3,b1,b2,b3,c1,c2;
+    
+    int new_x, new_y;
+    
+    int x1 = corners.NW.x;
+    int y1 = corners.NW.y;
+
+    int x2 = corners.NE.x;
+    int y2 = corners.NE.y;
+
+    int x3 = corners.SW.x;
+    int y3 = corners.SW.y;
+
+    int x4 = corners.SE.x;
+    int y4 = corners.SE.y;
+
+
+
+
 }

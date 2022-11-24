@@ -6,10 +6,16 @@
 #include <SDL2/SDL_image.h>
 #include "include/sdaile.h"
 #include "include/image_loading.h"
+#include "include/matrix.h"
 
 int main (int argc, char* argv[])
 {
-
+    double *mat = malloc(sizeof(double)*10);
+    for(int i = 0; i <= 8; i++)
+    {
+        *(mat+i) = i+1; 
+    }
+    invertMat(mat, 8);
     init_sdl();
     SDL_Surface *img = load_image(argv[1]);
     double angle = atof(argv[2]);
