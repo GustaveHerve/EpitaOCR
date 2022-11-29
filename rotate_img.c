@@ -40,8 +40,9 @@ void rotate_img(SDL_Surface *img, double angle)
     long ncenterx = ((nwidth+1)/2)-1;  
     long ncentery = ((nheight+1)/2)-1; 
     //coordinates of the center of the resulting image
-
+    
     SDL_Surface *new_img= SDL_CreateRGBSurface(0,nwidth,nheight,32,0,0,0,0);
+
     Uint32* pixels = new_img->pixels;
 
     for(unsigned int i = 0; i < height; i++)
@@ -62,8 +63,8 @@ void rotate_img(SDL_Surface *img, double angle)
             {
                 Uint32 old_pixel = get_pixel(img, j, i);
                 //replace_pixel(new_img, x2, y2, old_pixel);
-				int c = x2 * width + y2;
-				pixels[c] = old_pixel;
+		int c = x2 * width + y2;
+		pixels[c] = old_pixel;
             }
 
         }
@@ -105,27 +106,110 @@ void rotate_img90(SDL_Surface *img, double angle)
     IMG_SavePNG(new_img, "image_rotated.png");
 }
 
-
 void homographicT(SDL_Surface *img, Square corners)
 {
-    //constants that 
-    int a1,a2,a3,b1,b2,b3,c1,c2;
+    //below are the coordinates of the grid given in arguments
+    double x1 = corners.NW.x;
+    double y1 = corners.NW.y;
 
-    int new_x, new_y;
+    double x2 = corners.NE.x;
+    double y2 = corners.NE.y;
 
-    int x1 = corners.NW.x;
-    int y1 = corners.NW.y;
+    double x3 = corners.SW.x;
+    double y3 = corners.SW.y;
 
-    int x2 = corners.NE.x;
-    int y2 = corners.NE.y;
+    double x4 = corners.SE.x;
+    double y4 = corners.SE.y;
+    
+//let's find the size of the image we will get after homographic transform
 
-    int x3 = corners.SW.x;
-    int y3 = corners.SW.y;
+    double a = sqrt((x2-x1) * (x2-x1) + (y1-y2) * (y1-y2));
+    double b = sqrt((x2-x4) * (x2-x4) + (y2-y4) * (y2-y4));
+    double c = sqrt((x4-x3) * (x4-x3) + (y3-y4) * (y3-y4));
+    double d = sqrt((x1-x3) * (x1-x3) + (y1-y3) * (y1-y3));
+    
+    printf("a = %lf\n b = %lf\n c = %lf\n d = %lf\n", a, b, c, d);
+    int size = fmax(fmax(a,b), fmax(c,d));
+    
 
-    int x4 = corners.SE.x;
-    int y4 = corners.SE.y;
+//here are the coordinates of the points above ((x1,y1), (x2,y2), ...) in the new image
+
+    double x1bis = 0;
+    double y1bis = 0;
+
+    double x2bis = size;
+    double y2bis = 0;
+
+    double x3bis = 0;
+    double y3bis = size;
+
+    double x4bis = size;
+    double y4bis = size;
+
+//initializing the matrix that will allow us to compute the coordinates of each pixel
+
+    double mat[64] = {x1, y1, 1, 0, 0, 0, -x1*x1bis, -y1*x1bis,
+                      0, 0, 0, x1, y1, 1, -x1*y1bis, -y1*y1bis,
+                      x2, y2, 1, 0, 0, 0, -x2*x2bis, -y2*x2bis,
+                      0, 0, 0, x2, y2, 1, -x2*y2bis, -y2*y2bis,
+                      x3, y3, 1, 0, 0, 0, -x3*x3bis, -y3*x3bis,
+                      0, 0, 0, x3, y3, 1, -x3*y3bis, -y3*y3bis,
+                      x4, y4, 1, 0, 0, 0, -x4*x4bis, -y4*x4bis, 
+                      0, 0, 0, x4, y4, 1, -x4*y4bis, -y4*y4bis};
+    
+    double (*matp)[64] = &mat;
+
+    print_matrix("matp", *matp, 8, 8);
+    
+    double ncos[8]= {x1bis, y1bis, x2bis, y2bis, x3bis, y3bis,x4bis,y3bis};
+
+    double (*pncos)[8] = &ncos;
 
 
+//Now let's resolve the system to find the values of the constants above
 
+    double* invertedMat = malloc(sizeof(double)*64);
+    invertedMat = inverseMat(*matp, invertedMat, 8);
 
+    double* r = malloc(sizeof(double)*8);
+    mul(invertedMat, *pncos, 8, 8, 1, r);
+
+    double a1 = r[0];
+    double a2 = r[1];
+    double a3 = r[2];
+    double b1 = r[3];
+    double b2 = r[4];
+    double b3 = r[5];
+    double c1 = r[6];
+    double c2 = r[7];
+
+    print_matrix("constantsMat", r, 8, 1);
+    
+    double cons[8] = {a1, a2, a3, b1, b2, b3, c1, c2};
+    double (*kmat)[8] = &cons;
+
+    //we can now use these constants to resolve a system
+    
+    double width = img -> w;
+    double height = img -> h;
+
+    SDL_Surface *new_img= SDL_CreateRGBSurface(0,size,size,32,0,0,0,0);
+    Uint32* pixels = new_img->pixels;    
+
+    for(int i = 0; i < height; i++)
+    {
+        for(int j = 0; i < width; j++)
+        {
+            double new_x = (a1*i+a2*j+a3) / (c1*i+c2*j+1);
+            double new_y = (b1*i+b2*j+b3) / (c1*i+c2*j+1);
+
+            if(new_x >= 0 && new_y >= 0 && new_x<size && new_y<size)
+            {
+                Uint32 old_pixel = get_pixel(img, new_x, new_y);
+                pixels[i*(int)width+j] = old_pixel;
+            }
+
+        }
+    }
+    IMG_SavePNG(new_img, "homographic_image.png");
 }
