@@ -6,6 +6,7 @@
 #include <SDL2/SDL_image.h>
 #include "include/image_loading.h"
 #include "include/pixel.h"
+#include <dirent.h>
 
 // define the number of each type of nodes
 #define nInputs 784
@@ -50,27 +51,27 @@ void InputValues(char* file, double hWeights[nInputs][nHiddenNodes],
         fscanf(fp,"%lf",&myvariable);
         oBias[j] += myvariable;
      }
-        
+
      // This part i'm not sure !
      for (int j = 0; j < nHiddenNodes; j++)
      {
-        fscanf(fp,"%lf",&myvariable);                                           
+        fscanf(fp,"%lf",&myvariable);
         hBias[j] += myvariable;
      }
 
      // Layers
-        
+
      for (int j = 0; j < nHiddenNodes; j++)
      {
-        fscanf(fp,"%lf",&myvariable);                                           
-        hLayer[j] += myvariable;  
+        fscanf(fp,"%lf",&myvariable);
+        hLayer[j] += myvariable;
      }
 
      for (int j = 0; j < nOutputs; j++)
      {
         fscanf(fp,"%lf",&myvariable);
         oLayer[j] += myvariable;
-     }          
+     }
 
      // end
 
@@ -119,10 +120,10 @@ void OutputValues(char* file, double hWeights[nInputs][nHiddenNodes],
 
      for (int j = 0; j < nHiddenNodes; j++)
           fprintf(fp,"%lf",hBias[j]);
- 
+
      for (int j = 0; j < nHiddenNodes; j++)
           fprintf(fp,"%lf",hLayer[j]);
- 
+
      for (int j = 0; j < nOutputs; j++)
           fprintf(fp,"%lf",oLayer[j]);
 
@@ -131,9 +132,9 @@ void OutputValues(char* file, double hWeights[nInputs][nHiddenNodes],
 }
 
 
-int main(int argc, char **argv)
+int Train(int argc, char *argv)
 {
-
+    printf("here \n");
     if (argc > 2)
     {
         fprintf(stderr, "To many arguments \n");
@@ -148,13 +149,13 @@ int main(int argc, char **argv)
 	double hBias[nHiddenNodes];
 	double oBias[nOutputs];
 
-    int numberOfTimes = 10000;
+    int numberOfTimes = 2000;
     if (argc)
         numberOfTimes = 1;
 
     int memo_val = 0;
     int Result;
-    
+
     int trainSets = 10;
     if (argc)
         trainSets = 1;
@@ -169,8 +170,7 @@ int main(int argc, char **argv)
 
 	double (*trainInput)[nInputs] =
         malloc(sizeof(double[trainSets][nInputs]));
-    
-    
+
 
 	double trainOutputs[10][nOutputs] =
     {
@@ -210,13 +210,14 @@ int main(int argc, char **argv)
      init_sdl();
      SDL_Surface* image;
      // Training sets
-     if (argc) 
+     if (argc)
      {
-        image = load_image(argv[1]);
+        printf("Couscous");
+        image = load_image(argv);
         parcours_pixel(image,trainInput[0]);
      }
 
-     else 
+     else
      {
 
      image = load_image("Train/SET5/00.png");
@@ -264,7 +265,7 @@ int main(int argc, char **argv)
     }
 
     InputValues(filename, hWeights, oWeights, oBias, hBias, hLayer, oLayer);
-	int trainingSetOrder[] = {0,1,2,3,4,5,6,7,8,9}; 
+	int trainingSetOrder[] = {0,1,2,3,4,5,6,7,8,9};
 
 	//TRAINING TIME
 
@@ -309,12 +310,13 @@ int main(int argc, char **argv)
             Result = GetMax(nOutputs, oLayer);
             memory[memo_val] = (Result == i); //modify
             memo_val++;
+            /*
             if (!argc)
 			    printf("Input : %d  Output: %d \n",
                     i,Result);
-            else 
+            else
                 printf("Image is a %d \n", Result);
-
+            */
 
 			// Backprop => Update the weights in function of the errors
             if (!argc)
@@ -366,12 +368,13 @@ int main(int argc, char **argv)
     // In this part we print the precision of the NN and his weights
 
     int res = (int) (Precision(memo_val,memory) * 100);
-    
+    /*
     if (!argc)
     {
         printf("\n The Precision is : %d",res);
         printf("%c \n\n", 37);
     }
+    */
 
     // Here we print the values of the weights
 
@@ -387,10 +390,33 @@ int main(int argc, char **argv)
     free(oLayer);
     free(oWeights);
 
+
 	return 0;
 
 
 }
+
+int main(int argc, char **argv)
+{
+
+    Train(1,NULL);
+    DIR *d;
+    struct dirent *dir;
+    d = opendir(argv[1]);
+    if (d)
+    {
+        while ((dir = readdir(d)) != NULL)
+        {
+            printf("%s \n", dir->d_name);
+            printf("%d\n", Train(2,dir->d_name));
+        }
+        closedir(d);
+    }
+
+  return 0;
+
+}
+
 
 
 
