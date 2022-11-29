@@ -105,3 +105,102 @@ void convolution(SDL_Surface *image, double ker[], int rows,
 	}
 	free(pixels);
 }
+
+
+
+int* get_cofactor(int* mat, int* res, int p, int q, int dim)
+{
+	int i = 0;
+	int j = 0;
+
+	for(int row = 0; row < dim; row++)
+	{
+		for(int col = 0; col < dim; col++)
+		{
+			if(row != p && col != q)
+			{
+				res[i*dim+j] =(int)mat[row*dim+col];
+				j++;
+
+				if(j == dim-1)
+				{
+					j = 0;
+					i++;
+				}
+			}
+		}
+	}
+	return res;
+}
+
+
+int get_determinant(int* mat, int dim)
+{
+	int det = 0;
+	if(dim == 1)
+	{
+		return mat[0];
+	}
+	int sign = 1;
+
+	int* cofactor = malloc(sizeof(int)*(dim*dim+1));
+	for(int i = 0; i<dim; i++)
+	{
+		cofactor = get_cofactor(mat, cofactor, 0, i, dim);
+                det += sign * (int)mat[i] * get_determinant(cofactor, dim-1);
+                sign = -sign;
+	}
+        return det;
+}
+
+
+int* get_adjoint(int* mat, int* adjoint, int dim)
+{
+    if(dim == 1)
+    {
+        adjoint[0] = 1;
+    }
+    int sign = 1;
+    int* cofactor = malloc(sizeof(int)*(dim*dim+1));
+    for(int i = 0; i < dim; i++)
+    {
+        for(int j = 0; j < dim; j++)
+        {
+            cofactor = get_cofactor(mat, cofactor, i, j, dim);
+            sign = (i + j) % 2 == 0 ? 1:-1;
+            adjoint[j*dim+i] = sign*get_determinant(cofactor, dim-1);
+        }    
+    }
+    return adjoint;
+}
+
+
+int* inverseMat(int* mat, int* inverse, int dim)
+{
+    int det = get_determinant(mat, dim);
+   
+    printf("det = %d\n", det);
+
+    if(det == 0)
+    {
+        printf("Can't inverse singular matrix..");
+        goto no_inverse;
+        
+    }
+
+    int* adjoint = malloc(sizeof(int)*(dim*dim+1));
+    adjoint = get_adjoint(mat, adjoint, dim);
+    
+    for(int i = 0; i < dim; i++)
+    {
+        for(int j = 0; j < dim; j++)
+        {
+            inverse[i*dim+j] = adjoint[i*dim+j] / det;
+            //formula: inverse(mat)[i][j] = adj(mat)[i][j] / det(mat)
+        }
+    }
+    return inverse;
+
+no_inverse:
+    return inverse;
+}

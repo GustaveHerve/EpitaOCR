@@ -6,7 +6,7 @@ SRC= matrix.c test.c image_processing.c geometry.c utils.c image_loading.c pixel
 OBJ= ${SRC:.c=.o}
 EXEC = debug
 
-ROTSRC= sdaile.c image_loading.c rotate_img.c pixel.c main.c
+ROTSRC= sdaile.c image_loading.c rotate_img.c pixel.c main.c matrix.c
 ROTATE = rotation
 
 ${EXEC}: ${OBJ}
