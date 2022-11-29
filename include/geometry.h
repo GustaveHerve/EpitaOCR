@@ -3,17 +3,20 @@
 
 #include "utils.h"
 
-typedef struct Line{
+typedef struct Line
+{
 	int rho;
 	float theta;
 } Line;
 
-typedef struct Segment{
+typedef struct Segment
+{
 	TupleInt pt1;
 	TupleInt pt2;
 } Segment;
 
-typedef struct Square{
+typedef struct Square
+{
 	TupleInt NW;
 	TupleInt SW;
 	TupleInt NE;
@@ -22,6 +25,7 @@ typedef struct Square{
 
 
 int polar_intersection(TupleInt *res, Line line1, Line line2);
+void draw_line(SDL_Surface *surf, Line *line);
 Segment get_segment(SDL_Surface *image, Line *line);
 Segment *get_segments(SDL_Surface *image, Line *lines, int len);
 int intersect(Segment s1, Segment s2);

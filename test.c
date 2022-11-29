@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <err.h>
+#include <string.h>
 #include "include/pixel.h"
 #include "include/edge_detection.h"
 #include "include/image_processing.h"
@@ -14,40 +15,62 @@
 #include "include/morph.h"
 #include "include/thresholding.h"
 #include "include/grid_extraction.h"
+#include "include/display.h"
 
-int main(int argc, char** argv){
-
+int main(int argc, char** argv)
+{
     init_sdl();
-	if (argc != 2)
-		errx(2, "Wrong arguments\nUsage: ./binary filepath");
-    SDL_Surface* test = load_image(argv[1]);
-	//SDL_LockSurface(test);
+	if (argc < 2 || argc > 3)
+		errx(2, "Wrong arguments\nUsage: ./binary filepath -option");
+
+	int verbose = 0;
+
+	if (argc == 3)
+	{
+		if (strcmp(argv[2], "-v") == 0)
+			verbose = 1;
+		else
+			errx(2, "Wrong arguments\nUsage: ./binary filepath -option");
+	}
+
+	SDL_Surface* test = load_image(argv[1]);
+    SDL_Surface* original = load_image(argv[1]);
 
     unsigned int width = test->w;
 	unsigned int height = test->h;
 
-	//Convert surface to greyscale
-    printf("Converting to greyscale..\n");
 	greyscale(test);
 
-    printf("Applying blur...\n");
-	blur(test, 3);
+	blur(test, 5);
+	blur(test, 5);
+	blur(test, 5);
+	blur(test, 5);
+	blur(test, 5);
+    IMG_SavePNG(test, "temp/blur.png");
+	dilate(test, 5);
 
-	//adaptive_thresholding(test, 11, 11);
+    IMG_SavePNG(test, "temp/dilate.png");
+	//Convert surface to greyscale
+	if (verbose)
+    	printf("Converting to greyscale..\n");
 
-    //otsu(test);
-	//invert(test);
-    printf("Thresholding...\n");
+	if (verbose)
+    	printf("Applying blur...\n");
+
+	if (verbose)
+    	printf("Thresholding...\n");
+
 	canny(test);
-	//erose(test, 3);
-	//sobel(test);
+    IMG_SavePNG(test, "temp/canny.png");
 
-	SDL_Surface* dilsur = 
-		SDL_CreateRGBSurface(0, width, height, 32, 0, 0, 0, 0);
+
+	SDL_Surface* dilsur = SDL_CreateRGBSurface(0, width, 
+												height, 32, 0, 0, 0, 0);
 	SDL_BlitSurface(test, NULL, dilsur, NULL);
-    printf("Dilating and closing...\n");
-	dilate(dilsur, 5);
-	closing(dilsur, 5);
+	if (verbose)
+    	printf("Dilating and closing...\n");
+
+	//dilate(dilsur, 5);
 
     int rows = sqrt(height * height + width * width);
 
@@ -55,13 +78,24 @@ int main(int argc, char** argv){
 
     int *hough = calloc(angle_precision * rows, sizeof(int));
 
-    printf("Detecting lines with Hough Transform...\n");
+	if (verbose)
+    	printf("Detecting lines with Hough Transform...\n");
+
 	hough_lines(test, angle_precision, 1, hough);
+	int hough_threshold = get_biggest_bin(hough, rows, angle_precision) * 0.5;
+	Line *lines = calloc(angle_precision * rows, sizeof(Line));
+	int line_nb = hough_filter(hough, rows, angle_precision, hough_threshold, lines);
+
+	for (int i = 0; i < line_nb; i++)
+		draw_line(test, &lines[i]);
+    IMG_SavePNG(test, "temp/lines.png");
+
+	/*
+
 
 	Line *linesX = calloc(angle_precision * rows, sizeof(Line));
 	Line *linesY = calloc(angle_precision * rows, sizeof(Line));
 
-	int hough_threshold = get_biggest_bin(hough, rows, angle_precision) * 0.5;
 
     TupleInt len_li = hough_filter_local(hough, rows, angle_precision,
 			hough_threshold, 1, 0, linesX, linesY);
@@ -79,12 +113,14 @@ int main(int argc, char** argv){
 	free(linesY);
 	//linesX = mergex;
 	//linesY = mergey;
-    printf("Detecting grid...\n");
+	if (verbose)
+    	printf("Detecting grid...\n");
 
 	Segment *xseg = get_segments(dilsur, mergex, len_li.x);
 	Segment *yseg = get_segments(dilsur, mergey, len_li.y);
 
-    printf("Extracting grid squares...\n");
+	if (verbose)
+    	printf("Extracting grid squares...\n");
 	Segment *grid = get_grid_seg(xseg, yseg, len_li);
 
 	Square *sq = get_squares_seg(grid);
@@ -120,7 +156,8 @@ int main(int argc, char** argv){
         SDL_RenderClear(renderer);
         SDL_RenderCopy(renderer, texture, NULL, &img_size);
 
-        for (int i = 0; i < len_li.x; i++){
+        for (int i = 0; i < len_li.x; i++)
+		{
             int rho = mergex[i].rho;
             float theta = mergex[i].theta * M_PI / 180;
             double sinA = sin(theta);
@@ -138,7 +175,8 @@ int main(int argc, char** argv){
 			SDL_RenderDrawPoint(renderer, x1, y1);
 
         }
-		for (int i = 0; i < len_li.y; i++){
+		for (int i = 0; i < len_li.y; i++)
+		{
             int rho = mergey[i].rho;
             float theta = mergey[i].theta * M_PI / 180;
             double sinA = sin(theta);
@@ -155,6 +193,7 @@ int main(int argc, char** argv){
 			SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
 
         }
+		*/
 	/*
 		for (int i = 0; i < xtemp; i++){
 			for (int j = 0; j < ytemp; j++){
@@ -170,7 +209,7 @@ int main(int argc, char** argv){
 				}
         	}
 		}
-		*/
+		
 
         //copy texture to output device
 		SDL_SetRenderDrawColor(renderer, 0, 255, 255, SDL_ALPHA_OPAQUE);
@@ -180,15 +219,18 @@ int main(int argc, char** argv){
 
     }
 
-    SDL_DestroyTexture(texture);
-    SDL_DestroyWindow(window);
-    SDL_DestroyRenderer(renderer);
+	*/
+
+
+    //SDL_DestroyTexture(texture);
+    //SDL_DestroyWindow(window);
+    //SDL_DestroyRenderer(renderer);
     SDL_FreeSurface(test);
+    SDL_FreeSurface(original);
     SDL_Quit();
 
-
-    free(yseg);
-    free(xseg);
+    //free(yseg);
+    //free(xseg);
 
 }
 

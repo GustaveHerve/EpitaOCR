@@ -2,7 +2,7 @@ CC=gcc
 CLAGS= -Wall -Wextra -g -Werror -fsanitize=address
 LDFLAGS= -lSDL2 -lSDL2_image -lm
 
-SRC= matrix.c test.c image_processing.c geometry.c utils.c image_loading.c pixel.c edge_detection.c grid_detection.c morph.c thresholding.c grid_extraction.c
+SRC= matrix.c test.c image_processing.c geometry.c utils.c image_loading.c pixel.c edge_detection.c grid_detection.c morph.c thresholding.c grid_extraction.c display.c
 OBJ= ${SRC:.c=.o}
 EXEC = debug
 

@@ -5,8 +5,8 @@
 
 //polar_intersection: computes intersection point x,y of line1 and line2
 //returns 1 if success, 0 if no intersection point exists
-int polar_intersection(TupleInt *res, Line line1, Line line2){
-
+int polar_intersection(TupleInt *res, Line line1, Line line2)
+{
 	//Convert to radians
     float ang1 = line1.theta * M_PI / 180;
     float ang2 = line2.theta * M_PI / 180;
@@ -18,18 +18,58 @@ int polar_intersection(TupleInt *res, Line line1, Line line2){
 
     float d = ct1 * st2 - st1*ct2;
 
-    if (d!=0.0f){
+    if (d!=0.0f)
+	{
         res->x = (int)((st2*line1.rho-st1*line2.rho)/d);
         res->y = (int)((-ct2*line1.rho+ct1*line2.rho)/d);
     }
 	//Both lines never intersect
 	else
 		return 0;
+
 	return 1;
 }
 
-Segment get_segment(SDL_Surface *image, Line *line){
+void draw_line(SDL_Surface *surf, Line *line)
+{
+	SDL_LockSurface(surf);
+	//Convert to rad theta
+	float theta = line->theta * M_PI / 180;
+	int r = line->rho;
+	double sinA = sin(theta);
+    double cosA = cos(theta);
+	
+	Uint32 *pixels = surf->pixels;
+	SDL_PixelFormat* format = surf->format;
+	int width = surf->w;
+	int height = surf->h;
 
+	Uint32 red = SDL_MapRGB(format, 255, 0, 0);
+
+	if (sinA != 0)
+	{
+		for (int x = 0; x < width; x++)
+		{
+			int y = -cosA/sinA * x + r/sinA;
+			if (y >= 0 && y < height)
+				pixels[y * width + x] = red;
+		}
+	}
+	//Vertical lines handling
+	else if (r >= 0 && r < width)
+	{
+		int x = r;
+		for (int y = 0; y < height; y++)
+		{
+			pixels[y * width + x] = red;
+		}
+	}
+
+	SDL_UnlockSurface(surf);
+}
+
+Segment get_segment(SDL_Surface *image, Line *line)
+{
 	unsigned int width = image->w;
 	size_t max = 0;
 	size_t acc = 0;
@@ -44,31 +84,36 @@ Segment get_segment(SDL_Surface *image, Line *line){
 
 	//avoid dividing by 0
 	//if sin is 0, cos can't be 0
-	if (line->theta != 0 && line->theta != 180){
+	if (line->theta != 0 && line->theta != 180)
+	{
 		int online = 0;
-		for (size_t j = 0; j < width; j++){
-
+		for (size_t j = 0; j < width; j++)
+		{
 			int i = ((line->rho - j*cos_v) / sin_v);
 
 			Uint32 pixel = get_pixel(image, j, i);
 			Uint8 val = 0;
 			SDL_GetRGB(pixel, image->format, &val, &val, &val);
 
-			if (val == 255){
+			if (val == 255)
+			{
 				acc++;
-				if (!online){
+				if (!online)
+				{
 					first.x = j;
 					first.y = i;
 					online = 1;
 				}
 
-				else{
+				else
+				{
 					last.x = j;
 					last.y = i;
 				}
 			}
 
-			if (val == 0){
+			if (val == 0)
+			{
 				if (online)
 					online = 0;
 				
@@ -90,32 +135,36 @@ Segment get_segment(SDL_Surface *image, Line *line){
 	
 	}
 
-	else{
-
+	else
+	{
 		int online = 0;
-		for (size_t i = 0; i < width; i++){
-
+		for (size_t i = 0; i < width; i++)
+		{
 			int j = ((line->rho - i*sin_v) / cos_v);
 
 			Uint32 pixel = get_pixel(image, j, i);
 			Uint8 val = 0;
 			SDL_GetRGB(pixel, image->format, &val, &val, &val);
 
-			if (val == 255){
+			if (val == 255)
+			{
 				acc++;
-				if (!online){
+				if (!online)
+				{
 					first.x = j;
 					first.y = i;
 					online = 1;
 				}
 
-				else{
+				else
+				{
 					last.x = j;
 					last.y = i;
 				}
 			}
 
-			if (val == 0){
+			if (val == 0)
+			{
 				if (online)
 					online = 0;
 				
@@ -132,23 +181,25 @@ Segment get_segment(SDL_Surface *image, Line *line){
 				acc = 0;
 
 			}
-
 		}
 	}
 	
 	return res;
 }
 
-Segment *get_segments(SDL_Surface *image, Line *lines, int len){
+Segment *get_segments(SDL_Surface *image, Line *lines, int len)
+{
 	Segment *res = malloc(sizeof(Segment) * len);
-	for (int i = 0; i < len; i++){
+	for (int i = 0; i < len; i++)
+	{
 		Segment temp = get_segment(image, &lines[i]);
 		res[i] = temp;
 	}
 	return res;
 }
 
-int intersect(Segment s1, Segment s2){
+int intersect(Segment s1, Segment s2)
+{
 	if (s2.pt1.x > s1.pt2.x || s2.pt2.x < s1.pt1.x)
 		return 0;
 	if (s2.pt2.y < s1.pt1.y || s2.pt1.y > s1.pt2.y)
