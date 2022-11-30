@@ -25,6 +25,8 @@ typedef struct Square
 
 
 int polar_intersection(TupleInt *res, Line line1, Line line2);
+int line_intersect(TupleInt *res, Line line1, Line line2,
+	   	int width, int height);
 void draw_line(SDL_Surface *surf, Line *line);
 Segment get_segment(SDL_Surface *image, Line *line);
 Segment *get_segments(SDL_Surface *image, Line *lines, int len);

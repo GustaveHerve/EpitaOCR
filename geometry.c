@@ -30,6 +30,23 @@ int polar_intersection(TupleInt *res, Line line1, Line line2)
 	return 1;
 }
 
+int line_intersect(TupleInt *res, Line line1, Line line2, int width, int height)
+{
+	polar_intersection(res, line1, line2);
+	if (res->x < 0 || res->x >= width)
+		return 0;
+	if (res->y < 0 || res->y >= height)
+		return 0;
+	return 1;
+}
+
+int is_square(Square *sq)
+{
+
+	return 1;
+
+}
+
 void draw_line(SDL_Surface *surf, Line *line)
 {
 	SDL_LockSurface(surf);
@@ -46,7 +63,7 @@ void draw_line(SDL_Surface *surf, Line *line)
 
 	Uint32 red = SDL_MapRGB(format, 255, 0, 0);
 
-	if (sinA != 0)
+	if (sinA != 0.0)
 	{
 		for (int x = 0; x < width; x++)
 		{

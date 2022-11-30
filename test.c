@@ -42,12 +42,8 @@ int main(int argc, char** argv)
 	greyscale(test);
 
 	blur(test, 5);
-	blur(test, 5);
-	blur(test, 5);
-	blur(test, 5);
-	blur(test, 5);
-    IMG_SavePNG(test, "temp/blur.png");
 	dilate(test, 5);
+    IMG_SavePNG(test, "temp/blur.png");
 
     IMG_SavePNG(test, "temp/dilate.png");
 	//Convert surface to greyscale
@@ -89,6 +85,8 @@ int main(int argc, char** argv)
 	for (int i = 0; i < line_nb; i++)
 		draw_line(test, &lines[i]);
     IMG_SavePNG(test, "temp/lines.png");
+
+	Square *blobtest = get_blobs(lines, line_nb, (int)width, (int)height);
 
 	/*
 

@@ -234,6 +234,54 @@ int average_weight(Line* lines, int len, int *hough)
 	return sum / len;
 }
 
+Square* get_blobs(Line* lines, int len, int width, int height)
+{
+	for (int i = 0; i < len; i++)
+	{
+		for (int j = 0; j < len; j++)
+		{
+			if (lines[i].theta == lines[j].theta)
+			   continue;
+
+			TupleInt pt1 = {0,0};
+			if (line_intersect(&pt1, lines[i], lines[j], width, height))
+			{
+				for (int k = 0; k < len; k++)
+				{
+					if (lines[j].theta == lines[k].theta)
+			   			continue;
+
+					TupleInt pt2 = {0,0};
+					if (line_intersect(&pt2, lines[j], lines[k], width, height) && pt2.x > pt1.x)
+					{
+						for (int l = 0; l < len; l++)
+						{
+							if (lines[k].theta == lines[l].theta)
+			   					continue;
+							TupleInt pt3 = {0,0};
+							if (line_intersect(&pt3, lines[k], lines[l], width, height) && pt3.y > pt2.y)
+							{
+								TupleInt pt4 = {0,0};
+								if (line_intersect(&pt4, lines[i], lines[l], width, height))
+								{
+									Square *res = malloc(sizeof(Square));
+									res->NW = pt1;
+									res->NE = pt2;
+									res->SW = pt3;
+									res->SE = pt4;
+									//return res;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return NULL;
+}
+
 int get_grid_linesold(Line* lines, int len, int* dis, int tolerance, 
 		Line* res, int *hough)
 {

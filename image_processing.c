@@ -9,14 +9,15 @@
 #include "include/matrix.h"
 #include "include/image_processing.h"
 
-void greyscale(SDL_Surface *image){
-
+void greyscale(SDL_Surface *image)
+{
 	unsigned int width = image->w;
 	unsigned int height = image->h;
 
-	for (unsigned int i = 0; i < height; i++){
-		for (unsigned int j = 0; j < width; j++){
-
+	for (unsigned int i = 0; i < height; i++)
+	{
+		for (unsigned int j = 0; j < width; j++)
+		{
 			Uint32 pixel = get_pixel(image, j, i);
 			Uint8 r = 0, g = 0, b = 0;
 
@@ -31,8 +32,8 @@ void greyscale(SDL_Surface *image){
 	}
 }
 
-void blur(SDL_Surface* image, int kersize){
-
+void blur(SDL_Surface* image, int kersize)
+{
     int *b = malloc(sizeof(int) * image->w * image->h);
     if (b == NULL)
         errx(1, "blur_c: couldn't allocate memory for blurring");
@@ -55,7 +56,7 @@ void blur(SDL_Surface* image, int kersize){
 			   	6.0/256, 24.0/256, 36.0/256, 24.0/256, 6.0/256, 
 				4.0/256, 16.0/256, 24.0/256, 16.0/256, 4.0/256, 
 				1.0/256, 4.0/256, 6.0/256, 4.0/256, 1.0/256};
-			convolution(image, blur, 5, 5, b, 1);
+			blur_convolution(image, blur, 5, 5, b);
 			break;}
 
 		default:
