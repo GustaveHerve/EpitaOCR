@@ -83,9 +83,25 @@ void hough_lines_gradient(SDL_Surface* image, int angleNb, Uint8 *edges,
 	}
 }
 
+void nhsuppr(int input[], int x, int y, int xlen, int ylen, TupleInt *size)
+{
+	for (int i = y - ylen/2; i <= y + ylen/2; i++)
+	{
+		if (i < 0 || i > size->x)
+			continue;
+		for (int j = x - xlen/2; j <= x + xlen/2; j++)
+		{
+			if (j < 0 || j > size->y)
+				continue;
+			input[i * 360 + j] = 0;
+		}
+	}
+}
+
 int hough_filter(int input[], int rows, int cols, int threshold, Line res[])
 {
 	int acc = 0;
+	TupleInt size = {rows,cols};
 	for (int i = 0; i < rows; i++)
 	{
 		for (int j = 0; j < cols; j++)
@@ -94,6 +110,7 @@ int hough_filter(int input[], int rows, int cols, int threshold, Line res[])
 				Line new = {i,j};
 				res[acc] = new;
 				acc++;
+				nhsuppr(input, j, i, 5, 50, &size);
 			}
 		}
 	}
