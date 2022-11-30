@@ -19,12 +19,13 @@ void init_sdl(){
 
 //load_image: takes a path image and returns SDL_Surface* after loading
 SDL_Surface* load_image(char* path){
-	SDL_Surface* image = IMG_Load(path);
+	SDL_Surface* img = IMG_Load(path);
 
-	if(!image){		//Checks if image exists
+	if(!img){		//Checks if image exists
 		printf("Couldn't load %s", path);
 		exit(1);
 	}
+    img = SDL_ConvertSurfaceFormat(img, SDL_PIXELFORMAT_RGB888, 0);
 
-	return image;
+	return img;
 }

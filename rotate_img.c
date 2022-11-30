@@ -74,7 +74,6 @@ void rotate_img(SDL_Surface *img, double angle)
 
 void rotate_img90(SDL_Surface *img, double angle)
 {
-
     long width = img ->w;
     long height = img->h;
 
@@ -87,6 +86,7 @@ void rotate_img90(SDL_Surface *img, double angle)
     double sinus = sin(angle);
 
     SDL_Surface *new_img= SDL_CreateRGBSurface(0,width,height,32,0,0,0,0);
+    new_img = SDL_ConvertSurfaceFormat(new_img, img->format->format, 0);
     Uint32* pixels = new_img->pixels;
     for(long i = 0; i < height; i++)
     {
@@ -99,7 +99,7 @@ void rotate_img90(SDL_Surface *img, double angle)
             if(x2 >= 0 && y2 >= 0 && x2<width && y2<height)
             {
                 Uint32 old_pixel = get_pixel(img, x2, y2);
-		pixels[i*width + j] = old_pixel;
+                pixels[i * width + j] = old_pixel;
             }
         }
     }

@@ -16,6 +16,7 @@
 #include "include/thresholding.h"
 #include "include/grid_extraction.h"
 #include "include/display.h"
+#include "include/rotate_img.h"
 
 int main(int argc, char** argv)
 {
@@ -36,8 +37,11 @@ int main(int argc, char** argv)
 	SDL_Surface* test = load_image(argv[1]);
     SDL_Surface* original = load_image(argv[1]);
 
+
     unsigned int width = test->w;
 	unsigned int height = test->h;
+
+    rotate_img90(original, 432);
 
 	greyscale(test);
 
