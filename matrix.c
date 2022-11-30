@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <math.h>
 #include <SDL2/SDL.h>
 #include "include/pixel.h"
@@ -108,7 +107,7 @@ void convolution(SDL_Surface *image, double ker[], int rows,
 
 
 
-int* get_cofactor(int* mat, int* res, int p, int q, int dim)
+double* get_cofactor(double* mat, double* res, int p, int q, int dim)
 {
 	int i = 0;
 	int j = 0;
@@ -119,22 +118,63 @@ int* get_cofactor(int* mat, int* res, int p, int q, int dim)
 		{
 			if(row != p && col != q)
 			{
-				res[i*dim+j] =(int)mat[row*dim+col];
-				j++;
-
-				if(j == dim-1)
-				{
-					j = 0;
-					i++;
-				}
-			}
+                            res[j*dim+i++] = mat[row*dim+col];
+                            //res[i*dim+j++] = mat[row*dim+col];
+                            if(j == dim-1)
+			    {
+		    		j = 0;
+	    			i++;
+    			    }
+                        }			
 		}
 	}
 	return res;
 }
 
+/*
+int get_determinant(double* mat, int dim)
+{
+    double *tmp = calloc(dim*dim, sizeof(double));
+    int sign = 1;
+    int det = 0;
+    if (dim == 1)
+        return mat[0];
+    else
+    {
+        det = 0;
+        for(int cols = 0; cols < dim; cols++)
+        {
+           int m = 0;
+           int n = 0;
+           for(int i = 0; i < dim; i++)
+           {
+                for(int j = 0; j < dim; j++)
+                {
+                  tmp[j*dim+i] = 0;
+                  if( i != 0 && j != cols)
+                  {
+                    tmp[m*dim+n] = mat[j*dim+i];
+                    if(n < (dim-2))
+                        n++;
+                    else
+                    {
+                        n = 0;
+                        m++;
+                    }
+                  }
+                }
+            }
+            det = det + sign * (mat[cols] * get_determinant(tmp, dim-1)); 
+            sign = -1*sign;
+        }
+    }
+    free(tmp);
+    return det;
+}
+*/
 
-int get_determinant(int* mat, int dim)
+
+int get_determinant(double* mat, int dim)
 {
 	int det = 0;
 	if(dim == 1)
@@ -143,39 +183,41 @@ int get_determinant(int* mat, int dim)
 	}
 	int sign = 1;
 
-	int* cofactor = malloc(sizeof(int)*(dim*dim+1));
+	double* cofactor = malloc(sizeof(double)*(dim*dim));
 	for(int i = 0; i<dim; i++)
 	{
 		cofactor = get_cofactor(mat, cofactor, 0, i, dim);
-                det += sign * (int)mat[i] * get_determinant(cofactor, dim-1);
+                det += sign * mat[i] * get_determinant(cofactor, dim-1);
                 sign = -sign;
 	}
+        free(cofactor);
         return det;
 }
 
 
-int* get_adjoint(int* mat, int* adjoint, int dim)
+double* get_adjoint(double* mat, double* adjoint, int dim)
 {
     if(dim == 1)
     {
         adjoint[0] = 1;
     }
     int sign = 1;
-    int* cofactor = malloc(sizeof(int)*(dim*dim+1));
+    double* cofactor = malloc(sizeof(double)*(dim*dim+1));
     for(int i = 0; i < dim; i++)
     {
         for(int j = 0; j < dim; j++)
         {
             cofactor = get_cofactor(mat, cofactor, i, j, dim);
-            sign = (i + j) % 2 == 0 ? 1:-1;
+            sign = ((i + j) % 2 == 0) ? 1:-1;
             adjoint[j*dim+i] = sign*get_determinant(cofactor, dim-1);
         }    
     }
+    free(cofactor);
     return adjoint;
 }
 
 
-int* inverseMat(int* mat, int* inverse, int dim)
+double* inverseMat(double* mat, double* inverse, int dim)
 {
     int det = get_determinant(mat, dim);
    
@@ -184,11 +226,10 @@ int* inverseMat(int* mat, int* inverse, int dim)
     if(det == 0)
     {
         printf("Can't inverse singular matrix..");
-        goto no_inverse;
-        
+        return inverse; 
     }
 
-    int* adjoint = malloc(sizeof(int)*(dim*dim+1));
+    double* adjoint = malloc(sizeof(double)*(dim*dim));
     adjoint = get_adjoint(mat, adjoint, dim);
     
     for(int i = 0; i < dim; i++)
@@ -199,8 +240,6 @@ int* inverseMat(int* mat, int* inverse, int dim)
             //formula: inverse(mat)[i][j] = adj(mat)[i][j] / det(mat)
         }
     }
-    return inverse;
-
-no_inverse:
+    free(adjoint);
     return inverse;
 }
