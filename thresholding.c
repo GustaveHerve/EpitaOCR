@@ -10,47 +10,48 @@
 #include "include/image_processing.h"
 
 //threshold: applies a fixed threshold treatment to a SDL_Surface
-void threshold(SDL_Surface* image, float threshold){
-
+void threshold(SDL_Surface* image, float threshold)
+{
 	unsigned int width = image->w;
 	unsigned int height = image->h;
 	Uint8 t = threshold * 255;
 
-	for (unsigned int i = 0; i < height; i++){
-		for (unsigned int j = 0; j < width; j++){
+	for (unsigned int i = 0; i < height; i++)
+	{
+		for (unsigned int j = 0; j < width; j++)
+		{
 			
 			Uint32 pixel = get_pixel(image, j, i);
 			Uint8 r = 0, g = 0, b = 0;
 
 			SDL_GetRGB(pixel, image->format, &r, &g, &b);
 			Uint8 res = 0;
-			if (r >= t){
+			if (r >= t)
 				res = 255;
-			}
 
 			Uint32 newpixel = SDL_MapRGB(image->format, res, res, res);
 			replace_pixel(image, j, i, newpixel);
-				
 
 		}
 	}
 }
 
-void threshold_value(SDL_Surface* image, int threshold){
-
+void threshold_value(SDL_Surface* image, int threshold)
+{
 	unsigned int width = image->w;
 	unsigned int height = image->h;
 
-	for (unsigned int i = 0; i < height; i++){
-		for (unsigned int j = 0; j < width; j++){
+	for (unsigned int i = 0; i < height; i++)
+	{
+		for (unsigned int j = 0; j < width; j++)
+		{
 			Uint32 pixel = get_pixel(image, j, i);
 			Uint8 r = 0, g = 0, b = 0;
 
 			SDL_GetRGB(pixel, image->format, &r, &g, &b);
 			Uint8 res = 0;
-			if (r > threshold){
+			if (r > threshold)
 				res = 255;
-			}
 
 			Uint32 newpixel = SDL_MapRGB(image->format, res, res, res);
 			replace_pixel(image, j, i, newpixel);
@@ -99,22 +100,23 @@ float otsu_threshold(SDL_Surface* image){
 }
 
 //Computes otsu threshold and apply it
-void otsu(SDL_Surface* image){
-
+void otsu(SDL_Surface* image)
+{
 	float thresh = otsu_threshold(image);
 	threshold_value(image, thresh*255);
-
 }
-void adaptive_thresholding_c(SDL_Surface *image, int size, int *r, int c){
 
+void adaptive_thresholding_c(SDL_Surface *image, int size, int *r, int c)
+{
 	SDL_LockSurface(image);
 	Uint32 *pixels = image->pixels;
 	int width = image->w;
 	int height = image->h;
 
-	for (int i = 0; i < height; i++){
-		for (int j = 0; j < width; j++){
-
+	for (int i = 0; i < height; i++)
+	{
+		for (int j = 0; j < width; j++)
+		{
 			int sum = 0;
 			int roff = size/2;
 			int count = 0;
@@ -122,9 +124,10 @@ void adaptive_thresholding_c(SDL_Surface *image, int size, int *r, int c){
 			SDL_GetRGB(pixels[i*width + j], image->format,
 							   	&curr_val, &curr_val, &curr_val);
 
-			for (int k = -roff; k <= roff; k++){
-				for (int l = -roff; l <= roff; l++){
-
+			for (int k = -roff; k <= roff; k++)
+			{
+				for (int l = -roff; l <= roff; l++)
+				{
 					//Checks that we're not out of range
 					if (i+k >= 0 && j+l >= 0 && i+k <height && j+l < width){
 						Uint8 value = 0;
@@ -149,8 +152,8 @@ void adaptive_thresholding_c(SDL_Surface *image, int size, int *r, int c){
 	SDL_UnlockSurface(image);
 }
 
-void adaptive_thresholding(SDL_Surface *image, int size, int c){
-
+void adaptive_thresholding(SDL_Surface *image, int size, int c)
+{
 	int *r = calloc(image->w * image->h, sizeof(int));
 	adaptive_thresholding_c(image, size, r, c);
 	apply_convolution_int(image, r, image->h, image->w);

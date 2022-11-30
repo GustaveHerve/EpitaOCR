@@ -20,11 +20,12 @@ int main (int argc, char* argv[])
     }
     *(mat+9) = 8;
     *(mat+14) = 0; */
-    int mat[4] = {1,2,3,4};
-    int *inverted = malloc(sizeof(double)*18);
-    inverted = inverseMat(mat, inverted, 4);
-    print_matrix("mat", (double*)mat, 4, 4);
-    print_matrix("inverted", (double*)inverted, 4, 4);
+    double mat[9] = {4,-5,4,9, 2,9,7,1,2};
+    double* inverted = calloc(9, sizeof(double));
+    inverted = inverseMat(mat, inverted, 3);
+    print_matrix("mat", mat, 3, 3);
+    print_matrix("inverted", inverted, 3, 3);
+    free(inverted);
     
 
 

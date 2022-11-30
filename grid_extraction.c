@@ -15,19 +15,21 @@
 #include "include/thresholding.h"
 #include <string.h>
 
-int avg_size(Square *sq, int len){
-
+int avg_size(Square *sq, int len)
+{
 	double sum = 0;
 	for (int i = 0; i < len; i++)
 		sum += sq[i].NE.x - sq[i].NW.x;
 	return sum / len;
 }
 
-int get_squares(Line *x, Line *y, Square *res){
-
+int get_squares(Line *x, Line *y, Square *res)
+{
 	int len = 0;
-	for (int i = 0; i < 9; i++){
-		for (int j = 0; j < 9; j++){
+	for (int i = 0; i < 9; i++)
+	{
+		for (int j = 0; j < 9; j++)
+		{
 			Square sq;
 			TupleInt pt;
 
@@ -48,8 +50,8 @@ int get_squares(Line *x, Line *y, Square *res){
 	return len;
 }
 
-Square *get_squares_seg(Segment *grid){
-
+Square *get_squares_seg(Segment *grid)
+{
 	Square *res = calloc(81, sizeof(Square));
 	int index = 0;
 	int xdis = grid[0].pt2.x - grid[0].pt1.x;
@@ -63,10 +65,12 @@ Square *get_squares_seg(Segment *grid){
 	int posx = start_x;
 	int posy = start_y;
 
-	for (int i = 0; i < 9; i++){
+	for (int i = 0; i < 9; i++)
+	{
 
 		posx = start_x;
-		for (int j = 0; j < 9; j++){
+		for (int j = 0; j < 9; j++)
+		{
 
 			TupleInt NW = {posx, posy};
 			TupleInt SW = {posx, posy + yoffset};
@@ -85,12 +89,13 @@ Square *get_squares_seg(Segment *grid){
 	return res;
 
 }
-void save_squares_seg(Square *sq, SDL_Surface *image, char* path){
 
+void save_squares_seg(Square *sq, SDL_Surface *image, char* path)
+{
 	int avg = avg_size(sq, 81);
 
-	for (int i = 0; i < 81; i++){
-
+	for (int i = 0; i < 81; i++)
+	{
 		char *name = malloc(3 * sizeof(char));
         name[2] = 0;
 		if (i < 10)
@@ -130,8 +135,8 @@ void save_squares_seg(Square *sq, SDL_Surface *image, char* path){
 	}
 }
 
-void save_squares(Square *sq, int len, SDL_Surface *image){
-
+void save_squares(Square *sq, int len, SDL_Surface *image)
+{
 	int avg = avg_size(sq, len);
 
 	for (int i = 0; i < len; i++){
@@ -161,11 +166,12 @@ void save_squares(Square *sq, int len, SDL_Surface *image){
 		rect.y = sq[i].NW.y;
 		rect.w = w;
 		rect.h = h;
-
+		
 		SDL_BlitSurface(image, &rect, temp, NULL);
-		dilate(temp, 3);
+		//dilate(temp, 3);
 
 		SDL_BlitScaled(temp, NULL, crop, NULL);
+		otsu(crop);
 		char *path1 = "/Users/gustave/Documents/c/grid/";
 		char *ext = ".png";
 		char *path = calloc(50, sizeof(char));
@@ -173,5 +179,8 @@ void save_squares(Square *sq, int len, SDL_Surface *image){
 		strcat(path, name);
 		strcat(path, ext);
     	IMG_SavePNG(crop, path);
+
+		SDL_FreeSurface(crop);
+		SDL_FreeSurface(temp);
 	}
 }

@@ -129,7 +129,7 @@ void homographicT(SDL_Surface *img, Square corners)
     double d = sqrt((x1-x3) * (x1-x3) + (y1-y3) * (y1-y3));
     
     printf("a = %lf\n b = %lf\n c = %lf\n d = %lf\n", a, b, c, d);
-    int size = fmax(fmax(a,b), fmax(c,d));
+    double size = fmax(fmax(a,b), fmax(c,d)); //convert to int if pb
     
 
 //here are the coordinates of the points above ((x1,y1), (x2,y2), ...) in the new image

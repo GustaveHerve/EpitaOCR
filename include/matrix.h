@@ -14,4 +14,7 @@ double* get_cofactor(double* mat, double*res, int p, int q, int dim);
 int get_determinant(double* mat, int dim);
 double* get_adjoint(double* mat, double* adjoint, int dim);
 double* inverseMat(double* mat, double* inverse, int dim);
+void blur_convolution(SDL_Surface *image, double ker[], int rows, 
+		int cols, int r[]);
+
 #endif

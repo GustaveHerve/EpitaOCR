@@ -105,7 +105,45 @@ void convolution(SDL_Surface *image, double ker[], int rows,
 	free(pixels);
 }
 
+void blur_convolution(SDL_Surface *image, double ker[], int rows, 
+		int cols, int r[])
+{
+	int width = image->w;
+	int height = image->h;
+	int len = height * width;
 
+	Uint32 *pixels = malloc(sizeof(Uint32) * len);
+	get_pixel_array(image, pixels);
+
+	for (int i = 0; i < height; i++)
+	{
+		for (int j = 0; j < width; j++)
+		{
+			double acc = 0;
+			int roff = rows/2;
+			int coff = cols/2;
+			for (int k = -roff; k <= roff; k++)
+			{
+				for (int l = -coff; l <= coff; l++)
+				{
+					if (i+k >= 0 && j+l >= 0 && i+k <height && j+l < width)
+					{
+					    double res = 0.0;
+						Uint8 value = 0;
+						SDL_GetRGB(pixels[(i+k)*width+(j+l)], image->format,
+							   	&value, &value, &value);
+						res = ker[(k+roff) * cols + l+coff] * (double)value;	
+						acc += res;
+					}
+					else
+						continue;
+				}
+			}
+			r[i*width + j] = acc;
+		}
+	}
+	free(pixels);
+}
 
 double* get_cofactor(double* mat, double* res, int p, int q, int dim)
 {

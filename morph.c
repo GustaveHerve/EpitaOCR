@@ -3,22 +3,26 @@
 #include "include/pixel.h"
 #include "include/image_processing.h"
 
-void dilate_c(SDL_Surface *image, int kersize, int r[]){
-
+void dilate_c(SDL_Surface *image, int kersize, int r[])
+{
 	int width = image->w;
 	int height = image->h;
 
 	Uint32 *pixels = image->pixels; 
 
-	for (int i = 0; i < height; i++){
-		for (int j = 0; j < width; j++){
-
+	for (int i = 0; i < height; i++)
+	{
+		for (int j = 0; j < width; j++)
+		{
 			Uint8 acc = 0;
 			int roff = kersize/2;
 
-			for (int k = -roff; k <= roff; k++){
-				for (int l = -roff; l <= roff; l++){
-					if (i+k >= 0 && j+l >= 0 && i+k < height && j+l < width){
+			for (int k = -roff; k <= roff; k++)
+			{
+				for (int l = -roff; l <= roff; l++)
+				{
+					if (i+k >= 0 && j+l >= 0 && i+k < height && j+l < width)
+					{
 						Uint8 value;
 						SDL_GetRGB(pixels[(i+k)*width+(j+l)], image->format,
 							   	&value, &value, &value);
@@ -32,8 +36,8 @@ void dilate_c(SDL_Surface *image, int kersize, int r[]){
 	}
 }
 
-void dilate(SDL_Surface *image, int kersize){
-
+void dilate(SDL_Surface *image, int kersize)
+{
 	int *arr = calloc(image->w * image->h, sizeof(int));
 	dilate_c(image, kersize, arr); 
 	apply_convolution_int(image, arr, image->h, image->w);
@@ -41,8 +45,8 @@ void dilate(SDL_Surface *image, int kersize){
 
 }
 
-void erose_c(SDL_Surface *image, int kersize, int r[]){
-
+void erose_c(SDL_Surface *image, int kersize, int r[])
+{
 	int width = image->w;
 	int height = image->h;
 	int len = height * width;
@@ -50,9 +54,10 @@ void erose_c(SDL_Surface *image, int kersize, int r[]){
 	Uint32 *pixels = malloc(sizeof(Uint32) * len);
 	get_pixel_array(image, pixels);
 
-	for (int i = 0; i < height; i++){
-		for (int j = 0; j < width; j++){
-
+	for (int i = 0; i < height; i++)
+	{
+		for (int j = 0; j < width; j++)
+		{
 			double acc = 0;
 			int roff = kersize/2;
 			int coff = kersize/2;
@@ -82,8 +87,8 @@ void erose_c(SDL_Surface *image, int kersize, int r[]){
 	free(pixels);
 }
 
-void erose(SDL_Surface *image, int kersize){
-
+void erose(SDL_Surface *image, int kersize)
+{
 	int *arr = calloc(image->w * image->h, sizeof(int));
 	erose_c(image, kersize, arr); 
 	apply_convolution_int(image, arr, image->h, image->w);
@@ -91,15 +96,15 @@ void erose(SDL_Surface *image, int kersize){
 
 }
 
-void opening(SDL_Surface *image, int kersize){
-
+void opening(SDL_Surface *image, int kersize)
+{
 	erose(image, kersize);
 	dilate(image, kersize);
 
 }
 
-void closing(SDL_Surface *image, int kersize){
-
+void closing(SDL_Surface *image, int kersize)
+{
 	dilate(image, kersize);
 	erose(image, kersize);
 }

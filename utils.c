@@ -4,30 +4,30 @@
 #include "include/pixel.h"
 #include <err.h>
 
-int max2(int a, int b){
-
+int max2(int a, int b)
+{
     if (a < b)
         return b;
     return a;
 }
 
-int max3(int a, int b, int c){
-
+int max3(int a, int b, int c)
+{
     int temp = max2(a,b);
     if (temp < c)
         return c;
     return temp;
 }
 
-int min2(int a, int b){
-
+int min2(int a, int b)
+{
     if (a > b)
         return b;
     return a;
 }
 
-int min3(int a, int b, int c){
-
+int min3(int a, int b, int c)
+{
     int temp = min2(a,b);
     if (temp > c)
         return c;
@@ -36,21 +36,22 @@ int min3(int a, int b, int c){
 
 //HIST
 
-void histo_init(Histo* hist){
-
+void histo_init(Histo* hist)
+{
 	for (unsigned int i = 0; i < 256; i++){
 		hist->values[i] = 0;
 	}
 }
 
-void histo_compute(SDL_Surface* image, Histo* hist){
-
+void histo_compute(SDL_Surface* image, Histo* hist)
+{
 	unsigned int width = image->w;
 	unsigned int height = image->h;
 
-	for (unsigned int i = 0; i < height; i++){
-		for (unsigned int j = 0; j < width; j++){
-
+	for (unsigned int i = 0; i < height; i++)
+	{
+		for (unsigned int j = 0; j < width; j++)
+		{
 			Uint32 pixel = get_pixel(image, j, i);
 			Uint8 r = 0, g = 0, b = 0;
 
@@ -61,11 +62,13 @@ void histo_compute(SDL_Surface* image, Histo* hist){
 	}
 }
 
-int get_biggest_bin(int* hough, int maxr, int maxtheta){
-
+int get_biggest_bin(int* hough, int maxr, int maxtheta)
+{
 	int max = 0;
-	for (int i = 0; i < maxr; i++){
-		for (int j = 0; j < maxtheta; j++){
+	for (int i = 0; i < maxr; i++)
+	{
+		for (int j = 0; j < maxtheta; j++)
+		{
 			int c = i * maxtheta + j;
 			if (hough[c] > max)
 				max = hough[c];
@@ -74,21 +77,22 @@ int get_biggest_bin(int* hough, int maxr, int maxtheta){
 	return max;
 }
 
-float array_sum(float arr[], int begin, int end){
-
+float array_sum(float arr[], int begin, int end)
+{
 	float res = 0;
-	for (int i = begin; i < end; i++){
+	for (int i = begin; i < end; i++)
+	{
 		res += arr[i];
 	}
 
 	return res;
 }
 
-int array_min_index(float arr[], size_t len){
-
+int array_min_index(float arr[], size_t len)
+{
 	size_t min = 0;
-	for (size_t i = 1; i < len; i++){
-		
+	for (size_t i = 1; i < len; i++)
+	{
 		if (arr[i] < arr[min])
 			min = i;
 	}
@@ -98,7 +102,8 @@ int array_min_index(float arr[], size_t len){
 
 //STACK
 
-Stack_Tint* newStack_Tint(int size){
+Stack_Tint* newStack_Tint(int size)
+{
 	Stack_Tint* res = malloc(sizeof(Stack_Tint));	
 	res->maxsize = size;
 	res->arr = malloc(size * sizeof(TupleInt));
@@ -107,13 +112,15 @@ Stack_Tint* newStack_Tint(int size){
 
 }
 
-int stackTint_is_empty(Stack_Tint* s){
+int stackTint_is_empty(Stack_Tint* s)
+{
 	if (s->top == -1)
 		return 1;
 	return 0;
 }
 
-int stackTint_push(Stack_Tint* s, TupleInt e){
+int stackTint_push(Stack_Tint* s, TupleInt e)
+{
 	if (s->top == s->maxsize - 1)
 		return 0;
 
@@ -122,7 +129,8 @@ int stackTint_push(Stack_Tint* s, TupleInt e){
 	return 1;
 }
 
-TupleInt stackTint_pop(Stack_Tint* s){
+TupleInt stackTint_pop(Stack_Tint* s)
+{
 	if (s->top == -1)
 		errx(1, "Tried to pop empty stack");
 	s->top--;

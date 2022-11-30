@@ -10,11 +10,11 @@
 // define the number of each type of nodes
 #define nInputs 784
 #define nOutputs 10
-#define nHiddenNodes 40
+#define nHiddenNodes 175
 #define filename "Brain"
 
 void InputValues(char* file, double hWeights[nInputs][nHiddenNodes],
-    double oWeights[nHiddenNodes][nOutputs], double oBias[nOutputs], 
+    double oWeights[nHiddenNodes][nOutputs], double oBias[nOutputs],
     double hBias[], double hLayer[], double oLayer[])
 {
     // this function is the beggining of the NN, it intputs the starting values
@@ -24,7 +24,7 @@ void InputValues(char* file, double hWeights[nInputs][nHiddenNodes],
  fp = fopen(filename, "r");
  if (fp)
  {   // Input the previous values of weights and bias if they exist
-        
+
      double myvariable;
 
     // Weights first
@@ -218,47 +218,47 @@ int main(int argc, char **argv)
 
      else 
      {
-     
+
      image = load_image("Train/SET5/00.png");
      parcours_pixel(image,trainInput[0]);
-     image = load_image("Train/SET5/01.png");
+     image = load_image("Train/SET4/01.png");
      parcours_pixel(image,trainInput[1]);
      image = load_image("Train/SET5/02.png");
      parcours_pixel(image,trainInput[2]);
-     image = load_image("Train/SET5/03.png");
+     image = load_image("Train/SET4/03.png");
      parcours_pixel(image,trainInput[3]);
-     image = load_image("Train/SET5/04.png");
+     image = load_image("Train/SET4/04.png");
      parcours_pixel(image,trainInput[4]);
      image = load_image("Train/SET5/05.png");
      parcours_pixel(image,trainInput[5]);
-     image = load_image("Train/SET5/06.png");
+     image = load_image("Train/SET4/06.png");
      parcours_pixel(image,trainInput[6]);
      image = load_image("Train/SET5/07.png");
      parcours_pixel(image,trainInput[7]);
-     image = load_image("Train/SET5/08.png");
+     image = load_image("Train/SET4/08.png");
      parcours_pixel(image,trainInput[8]);
      image = load_image("Train/SET5/09.png");
      parcours_pixel(image,trainInput[9]);
      /*
-     image = load_image("Train/SET5/00.png");
+     image = load_image("Train/SET4/00.png");
      parcours_pixel(image,trainInput[0]);
-     image = load_image("Train/SET5/01.png");
+     image = load_image("Train/SET4/01.png");
      parcours_pixel(image,trainInput[1]);
      image = load_image("Train/SET5/02.png");
      parcours_pixel(image,trainInput[2]);
-     image = load_image("Train/SET5/03.png");
+     image = load_image("Train/SET4/03.png");
      parcours_pixel(image,trainInput[3]);
-     image = load_image("Train/SET5/04.png");
+     image = load_image("Train/SET4/04.png");
      parcours_pixel(image,trainInput[4]);
      image = load_image("Train/SET4/05.png");
      parcours_pixel(image,trainInput[5]);
-     image = load_image("Train/SET5/06.png");
+     image = load_image("Train/SET4/06.png");
      parcours_pixel(image,trainInput[6]);
-     image = load_image("Train/SET5/07.png");
+     image = load_image("Train/SET4/07.png");
      parcours_pixel(image,trainInput[7]);
-     image = load_image("Train/SET5/08.png");
+     image = load_image("Train/SET4/08.png");
      parcours_pixel(image,trainInput[8]);
-     image = load_image("Train/SET5/09.png");
+     image = load_image("Train/SET4/09.png");
      parcours_pixel(image,trainInput[9]);
      */
     }
@@ -307,11 +307,11 @@ int main(int argc, char **argv)
 			}
 
             Result = GetMax(nOutputs, oLayer);
-            memory[memo_val] = (Result == i%10); //modify
+            memory[memo_val] = (Result == i); //modify
             memo_val++;
             if (!argc)
 			    printf("Input : %d  Output: %d \n",
-                    (i%10),Result);
+                    i,Result);
             else 
                 printf("Image is a %d \n", Result);
 
