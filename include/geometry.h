@@ -31,5 +31,6 @@ void draw_line(SDL_Surface *surf, Line *line);
 Segment get_segment(SDL_Surface *image, Line *line);
 Segment *get_segments(SDL_Surface *image, Line *lines, int len);
 int intersect(Segment s1, Segment s2);
+int is_square(Square *sq, float tolerance);
 
 #endif

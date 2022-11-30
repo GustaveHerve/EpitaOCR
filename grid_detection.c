@@ -87,11 +87,11 @@ void nhsuppr(int input[], int x, int y, int xlen, int ylen, TupleInt *size)
 {
 	for (int i = y - ylen/2; i <= y + ylen/2; i++)
 	{
-		if (i < 0 || i > size->x)
+		if (i < 0 || i >= size->x)
 			continue;
 		for (int j = x - xlen/2; j <= x + xlen/2; j++)
 		{
-			if (j < 0 || j > size->y)
+			if (j < 0 || j >= size->y)
 				continue;
 			input[i * 360 + j] = 0;
 		}
@@ -110,7 +110,7 @@ int hough_filter(int input[], int rows, int cols, int threshold, Line res[])
 				Line new = {i,j};
 				res[acc] = new;
 				acc++;
-				nhsuppr(input, j, i, 5, 50, &size);
+				nhsuppr(input, j, i, 10, 50, &size);
 			}
 		}
 	}
@@ -253,8 +253,10 @@ int average_weight(Line* lines, int len, int *hough)
 
 Square* get_blobs(Line* lines, int len, int width, int height)
 {
+	int rightfirst = 0;
 	for (int i = 0; i < len; i++)
 	{
+		rightfirst = 0;
 		for (int j = 0; j < len; j++)
 		{
 			if (lines[i].theta == lines[j].theta)
@@ -265,28 +267,41 @@ Square* get_blobs(Line* lines, int len, int width, int height)
 			{
 				for (int k = 0; k < len; k++)
 				{
-					if (lines[j].theta == lines[k].theta)
+					if (lines[j].theta == lines[k].theta || k == i)
 			   			continue;
 
 					TupleInt pt2 = {0,0};
-					if (line_intersect(&pt2, lines[j], lines[k], width, height) && pt2.x > pt1.x)
+					if (pt2.x > pt1.x)
+						rightfirst = 1;
+
+					if (line_intersect(&pt2, lines[j], lines[k], width, height) && pt2.x >= pt1.x && pt2.y >= pt1.y)
 					{
 						for (int l = 0; l < len; l++)
 						{
-							if (lines[k].theta == lines[l].theta)
+							if (lines[k].theta == lines[l].theta || l == j || l == i)
 			   					continue;
 							TupleInt pt3 = {0,0};
-							if (line_intersect(&pt3, lines[k], lines[l], width, height) && pt3.y > pt2.y)
+							if (line_intersect(&pt3, lines[k], lines[l], width, height) && pt3.y >= pt2.y && pt3.x >= pt2.x)
 							{
 								TupleInt pt4 = {0,0};
 								if (line_intersect(&pt4, lines[i], lines[l], width, height))
 								{
 									Square *res = malloc(sizeof(Square));
-									res->NW = pt1;
-									res->NE = pt2;
-									res->SW = pt3;
-									res->SE = pt4;
-									//return res;
+									if (rightfirst)
+									{
+										res->NW = pt1;
+										res->NE = pt2;
+										res->SW = pt3;
+										res->SE = pt4;
+									}
+									else
+									{
+										res->NW = pt1;
+										res->NE = pt4;
+										res->SW = pt2;
+										res->SE = pt3;
+									}
+									int squaretest = is_square(res, 0.08);
 								}
 							}
 						}
@@ -295,7 +310,6 @@ Square* get_blobs(Line* lines, int len, int width, int height)
 			}
 		}
 	}
-
 	return NULL;
 }
 

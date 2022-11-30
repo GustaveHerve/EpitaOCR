@@ -37,11 +37,8 @@ int main(int argc, char** argv)
 	SDL_Surface* test = load_image(argv[1]);
     SDL_Surface* original = load_image(argv[1]);
 
-
     unsigned int width = test->w;
 	unsigned int height = test->h;
-
-    rotate_img90(original, 432);
 
 	greyscale(test);
 
@@ -88,7 +85,7 @@ int main(int argc, char** argv)
 
 	for (int i = 0; i < line_nb; i++)
 		draw_line(test, &lines[i]);
-    IMG_SavePNG(test, "temp/lines.png");
+	IMG_SavePNG(test, "temp/lines.png");
 
 	Square *blobtest = get_blobs(lines, line_nb, (int)width, (int)height);
 

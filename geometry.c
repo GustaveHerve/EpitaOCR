@@ -1,4 +1,5 @@
 #include <math.h>
+#include <stdlib.h>
 #include <SDL2/SDL.h>
 #include "include/geometry.h"
 #include "include/pixel.h"
@@ -40,11 +41,35 @@ int line_intersect(TupleInt *res, Line line1, Line line2, int width, int height)
 	return 1;
 }
 
-int is_square(Square *sq)
+int is_square(Square *sq, float tolerance)
 {
+	int tempx = sq->NE.x - sq->NW.x;
+	int tempy = sq->NE.y - sq->NW.y;
+	int a = sqrt(tempx * tempx + tempy * tempy);
 
+	tempx = sq->SE.x - sq->NE.x;
+	tempy = sq->SE.y - sq->NE.y;
+	int b = sqrt(tempx * tempx + tempy * tempy);
+
+	/*
+	int tempx = sq->SW.x - sq->SE.x;
+	int tempy = sq->SW.y - sq->SE.y;
+	int c = sqrt(tempx * tempx + tempy * tempy);
+
+	int tempx = sq->NW.x - sq->SW.x;
+	int tempy = sq->NW.y - sq->SW.y;
+	int d = sqrt(tempx * tempx + tempy * tempy);
+	*/
+
+	float deviation = 0;
+	if (a > b)
+		deviation = 1 - b/a;
+	else
+		deviation = 1 - a/b;
+
+	if (deviation > tolerance)
+		return 0;
 	return 1;
-
 }
 
 void draw_line(SDL_Surface *surf, Line *line)
