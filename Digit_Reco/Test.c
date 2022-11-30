@@ -11,7 +11,7 @@
 // define the number of each type of nodes
 #define nInputs 784
 #define nOutputs 10
-#define nHiddenNodes 175
+#define nHiddenNodes 10
 #define filename "Brain"
 
 void InputValues(char* file, double hWeights[nInputs][nHiddenNodes],
@@ -119,13 +119,13 @@ void OutputValues(char* file, double hWeights[nInputs][nHiddenNodes],
           fprintf(fp,"%f\n",oBias[j]);
 
      for (int j = 0; j < nHiddenNodes; j++)
-          fprintf(fp,"%lf",hBias[j]);
+          fprintf(fp,"%lf\n",hBias[j]);
 
      for (int j = 0; j < nHiddenNodes; j++)
-          fprintf(fp,"%lf",hLayer[j]);
+          fprintf(fp,"%lf\n",hLayer[j]);
 
      for (int j = 0; j < nOutputs; j++)
-          fprintf(fp,"%lf",oLayer[j]);
+          fprintf(fp,"%lf\n",oLayer[j]);
 
      fclose(fp);
 
@@ -134,7 +134,7 @@ void OutputValues(char* file, double hWeights[nInputs][nHiddenNodes],
 
 int Train(int argc, char *argv)
 {
-    printf("here \n");
+
     if (argc > 2)
     {
         fprintf(stderr, "To many arguments \n");
@@ -143,13 +143,13 @@ int Train(int argc, char *argv)
     argc--;
 	double lr = 0.1f; //Learning Rate
 
-	double hLayer[nHiddenNodes];
-	double (*oLayer) = malloc(sizeof(double[nOutputs]));;
+	double (*hLayer) = malloc(sizeof(double[nHiddenNodes])); 
+	double (*oLayer) = malloc(sizeof(double[nOutputs]));
 
-	double hBias[nHiddenNodes];
-	double oBias[nOutputs];
+	double (*hBias) = malloc(sizeof(double[nHiddenNodes])); 
+	double (*oBias) = malloc(sizeof(double[nOutputs])); 
 
-    int numberOfTimes = 2000;
+    int numberOfTimes = 5000;
     if (argc)
         numberOfTimes = 1;
 
@@ -206,14 +206,16 @@ int Train(int argc, char *argv)
 
 
     }; // Excpected results
-
      init_sdl();
      SDL_Surface* image;
      // Training sets
      if (argc)
      {
-        printf("Couscous");
-        image = load_image(argv);
+        char fn[50];
+        strcpy( fn, "Train/SET5/" );
+        char* s = strcat(fn,argv);
+        printf("%s \n",s);
+        image = load_image(s);
         parcours_pixel(image,trainInput[0]);
      }
 
@@ -222,21 +224,21 @@ int Train(int argc, char *argv)
 
      image = load_image("Train/SET5/00.png");
      parcours_pixel(image,trainInput[0]);
-     image = load_image("Train/SET4/01.png");
+     image = load_image("Train/SET5/01.png");
      parcours_pixel(image,trainInput[1]);
      image = load_image("Train/SET5/02.png");
      parcours_pixel(image,trainInput[2]);
-     image = load_image("Train/SET4/03.png");
+     image = load_image("Train/SET5/03.png");
      parcours_pixel(image,trainInput[3]);
-     image = load_image("Train/SET4/04.png");
+     image = load_image("Train/SET5/04.png");
      parcours_pixel(image,trainInput[4]);
      image = load_image("Train/SET5/05.png");
      parcours_pixel(image,trainInput[5]);
-     image = load_image("Train/SET4/06.png");
+     image = load_image("Train/SET5/06.png");
      parcours_pixel(image,trainInput[6]);
      image = load_image("Train/SET5/07.png");
      parcours_pixel(image,trainInput[7]);
-     image = load_image("Train/SET4/08.png");
+     image = load_image("Train/SET5/08.png");
      parcours_pixel(image,trainInput[8]);
      image = load_image("Train/SET5/09.png");
      parcours_pixel(image,trainInput[9]);
@@ -310,13 +312,13 @@ int Train(int argc, char *argv)
             Result = GetMax(nOutputs, oLayer);
             memory[memo_val] = (Result == i); //modify
             memo_val++;
-            /*
+            
             if (!argc)
 			    printf("Input : %d  Output: %d \n",
                     i,Result);
             else
                 printf("Image is a %d \n", Result);
-            */
+            
 
 			// Backprop => Update the weights in function of the errors
             if (!argc)
@@ -377,13 +379,14 @@ int Train(int argc, char *argv)
     */
 
     // Here we print the values of the weights
-
-    //PrintValues(nInputs,nHiddenNodes,hWeights,"Hidden Weights");
+    //if (argc)
+        //PrintValues(nInputs,nHiddenNodes,hWeights,"Hidden Weights");
     //PrintValues(nHiddenNodes, nOutputs,oWeights, "Output Weights");
 
     // Finally we save the values of Weights and output bias in a file.
-
-    OutputValues(filename, hWeights, oWeights, oBias, hBias, hLayer, oLayer);
+    
+    if (!argc)
+        OutputValues(filename, hWeights, oWeights, oBias, hBias, hLayer, oLayer);
 
     free(hWeights);
     free(trainInput);
@@ -399,7 +402,7 @@ int Train(int argc, char *argv)
 int main(int argc, char **argv)
 {
 
-    Train(1,NULL);
+    //Train(1,NULL);
     DIR *d;
     struct dirent *dir;
     d = opendir(argv[1]);
@@ -407,8 +410,11 @@ int main(int argc, char **argv)
     {
         while ((dir = readdir(d)) != NULL)
         {
-            printf("%s \n", dir->d_name);
-            printf("%d\n", Train(2,dir->d_name));
+            if (strstr(dir->d_name, "png") != NULL)
+            {   
+                printf("%s \n", dir->d_name);
+                Train(2,dir->d_name);
+            }
         }
         closedir(d);
     }
