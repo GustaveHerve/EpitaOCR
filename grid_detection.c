@@ -271,17 +271,37 @@ Square* get_blobs(Line* lines, int len, int width, int height)
 			   			continue;
 
 					TupleInt pt2 = {0,0};
+					
+					int condition = line_intersect(&pt2, lines[j], lines[k],
+						   	width, height);
+
 					if (pt2.x > pt1.x)
 						rightfirst = 1;
+					else
+						rightfirst = 0;
 
-					if (line_intersect(&pt2, lines[j], lines[k], width, height) && pt2.x >= pt1.x && pt2.y >= pt1.y)
+					if (condition && rightfirst && pt2.x >= pt1.x)
+						condition = 1;
+					else if (condition && !rightfirst && pt2.y >= pt1.y)
+						condition = 1;
+
+					if (condition)
 					{
 						for (int l = 0; l < len; l++)
 						{
 							if (lines[k].theta == lines[l].theta || l == j || l == i)
 			   					continue;
+
 							TupleInt pt3 = {0,0};
-							if (line_intersect(&pt3, lines[k], lines[l], width, height) && pt3.y >= pt2.y && pt3.x >= pt2.x)
+							condition = line_intersect(&pt3, lines[k], lines[l],
+						   	width, height);
+
+							if (condition && rightfirst && pt3.y >= pt2.y)
+								condition = 1;
+							else if (condition && !rightfirst && pt3.x >= pt2.x)
+								condition = 1;
+
+							if (condition)
 							{
 								TupleInt pt4 = {0,0};
 								if (line_intersect(&pt4, lines[i], lines[l], width, height))

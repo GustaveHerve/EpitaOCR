@@ -41,6 +41,56 @@ int line_intersect(TupleInt *res, Line line1, Line line2, int width, int height)
 	return 1;
 }
 
+void reorganize_square(Square *sq)
+{
+/*	//Y inversion checking
+	TupleInt miny1;
+	TupleInt miny2;
+	TupleInt miny3;
+	TupleInt miny4;
+
+	if (sq->NW.y <= sq->NE.y)
+	{
+		if (sq->NW.y <= sq->
+		miny1 = sq->NW;
+		miny3 = sq->NE;
+	}
+	else
+	{
+		miny1 = sq->NE;
+		miny3 = sq->NW;
+	}
+
+	if (sq->SW.y <= sq->SE.y)
+		miny2 = sq->SW;
+	else
+		miny2 = sq->SE;
+
+	if (miny1.y > miny2.y)
+	{
+		TupleInt tmp = miny1;
+		miny1 = miny2;
+		miny2 = tmp;
+	}
+
+	//X inversion checking
+	if (sq->NW.x >= sq->NE.x)
+	{
+		tmp = sq->NW;
+		sq->NW = sq->NE;
+		sq->NE = tmp;
+	}
+
+	if (sq->SW.x >= sq->SE.x)
+	{
+		tmp = sq->SW;
+		sq->SW = sq->SE;
+		sq->SE = tmp;
+	}
+	*/
+
+}
+
 int is_square(Square *sq, float tolerance)
 {
 	int tempx = sq->NE.x - sq->NW.x;
@@ -50,6 +100,9 @@ int is_square(Square *sq, float tolerance)
 	tempx = sq->SE.x - sq->NE.x;
 	tempy = sq->SE.y - sq->NE.y;
 	int b = sqrt(tempx * tempx + tempy * tempy);
+
+	float af = a;
+	float bf = b;
 
 	/*
 	int tempx = sq->SW.x - sq->SE.x;
@@ -63,9 +116,9 @@ int is_square(Square *sq, float tolerance)
 
 	float deviation = 0;
 	if (a > b)
-		deviation = 1 - b/a;
+		deviation = 1 - bf/af;
 	else
-		deviation = 1 - a/b;
+		deviation = 1 - af/bf;
 
 	if (deviation > tolerance)
 		return 0;

@@ -136,3 +136,27 @@ TupleInt stackTint_pop(Stack_Tint* s)
 	s->top--;
 	return s->arr[s->top+1];
 }
+
+// SQUARE TUPLEINT
+TupleInt minY2(TupleInt A, TupleInt B)
+{
+	if (A.y <= B.y)
+		return A;
+	return B;
+}
+
+TupleInt minY3(TupleInt A, TupleInt B, TupleInt C)
+{
+	TupleInt temp = minY2(A,B);
+	if (temp.y < C.y)
+		return temp;
+	return C;
+}
+
+TupleInt minY4(TupleInt A, TupleInt B, TupleInt C, TupleInt D)
+{
+	TupleInt temp = minY2(A,B);
+	if (temp.y < C.y)
+		return temp;
+	return C;
+}
