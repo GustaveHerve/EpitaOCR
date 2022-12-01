@@ -14,7 +14,7 @@
 #define nOutputs 10
 #define nHiddenNodes 20
 #define filename "Brain"
-#define savefile "grid_00.result"
+#define savefile "grid_00"
 
 /*
 void InputValues(char* file, double hWeights[nInputs][nHiddenNodes],
@@ -435,6 +435,8 @@ int main(int argc, char **argv)
         struct dirent *dir;
         d = opendir(argv[1]);
         FILE * fp;
+        int arr[81];
+        int i = 0;
         fp = fopen(savefile, "w+"); 
         if (d)
         {
@@ -446,10 +448,35 @@ int main(int argc, char **argv)
                     strcpy( fn, argv[1] );
                     char* s = strcat(fn,dir->d_name);
                     printf("%s \n", s);
-                    fprintf(fp, "%d\n", ai(2,s));  
+                    arr[i] = ai(2,s);
+                    i++;
+                    //fprintf(fp, "%d\n", ai(2,s));
                     //Train(2,s);
                 }
             }
+
+            int tmp = 0;
+            for (int i = 1; i < 10;i++)
+            {
+                int g = tmp;
+                int h = tmp + 9;
+                for (int j = g; j < h; j++)
+                {
+                    tmp = j;
+                    if (j != 0 && j%3 == 0 && j%9 != 0)
+                        fprintf(fp, "%s", " ");
+                    if (arr[j] == 0)
+                        fprintf(fp, "%s", ".");
+                    if (arr[j] != 0)
+                        fprintf(fp, "%d", arr[j]);
+                }
+                fprintf(fp, "%s", "\n");
+                if (i != 1 && i%3 == 0 && i%9 != 0)
+                    fprintf(fp, "%s", "\n");
+
+                tmp++;
+            }
+
             closedir(d);
             fclose(fp);
         }

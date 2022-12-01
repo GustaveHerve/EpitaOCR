@@ -4,5 +4,5 @@ main: Test.c funcs.c
 clean:
 	rm -f main
 	rm -f Brain
-	rm -f grid_00.result
+	rm -f grid_00
 
