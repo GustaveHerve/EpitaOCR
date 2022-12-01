@@ -218,6 +218,8 @@ int ai(int argc, char *argv)
      {
         image = load_image(argv);
         parcours_pixel(image,trainInput[0]);
+        //for (int i = 0; i < nInputs;i++)
+          //printf("%lf", trainInput[0][i]);
      }
 
      else 
@@ -239,6 +241,8 @@ int ai(int argc, char *argv)
      parcours_pixel(image,trainInput[6]);
      image = load_image("Train/SET5/07.png");
      parcours_pixel(image,trainInput[7]);
+     //for (int i = 0; i < nInputs;i++)
+         //printf("%lf", trainInput[7][i]);
      image = load_image("Train/SET5/08.png");
      parcours_pixel(image,trainInput[8]);
      image = load_image("Train/SET5/09.png");
