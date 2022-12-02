@@ -5,7 +5,9 @@
 #ifndef NEW_AI_H
 #define NEW_AI_H
 
+void Call();
 int ai(int argc, char *argv);
+
 
 #endif
 
