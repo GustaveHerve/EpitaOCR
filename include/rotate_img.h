@@ -1,5 +1,7 @@
 #include <SDL2/SDL.h>
 #include "geometry.h"
+#include "matrix.h"
+#include "pixel.h"
 
 #ifndef ROTATE_H
 #define ROTATE_H
