@@ -40,10 +40,33 @@ int main(int argc, char** argv)
     unsigned int width = test->w;
 	unsigned int height = test->h;
 
+    
 	greyscale(test);
 
-	blur(test, 5);
-	dilate(test, 5);
+	//dilate(test, 3);
+	//erose(test, 5);
+	gauss_blur(test, 9, 2.5);
+	//blur(test, 5);
+	//blur(test, 5);
+	//blur(test, 5);
+	//blur(test, 5);
+	//blur(test, 5);
+	//blur(test, 5);
+	//blur(test, 5);
+	//blur(test, 5);
+	//blur(test, 5);
+	//blur(test, 5);
+    IMG_SavePNG(test, "temp/guas.png");
+
+	width = width - 18;
+	height = height - 18; 
+	SDL_Surface* blurfix = SDL_CreateRGBSurface(0, width, 
+												height, 32, 0, 0, 0, 0);
+ 	blurfix = SDL_ConvertSurfaceFormat(blurfix, SDL_PIXELFORMAT_RGB888, 0);
+	SDL_Rect blurfixrect = { 9, 9, width, height };
+	SDL_BlitSurface(test, &blurfixrect, blurfix, NULL);
+	test = blurfix;
+
     IMG_SavePNG(test, "temp/blur.png");
 
     IMG_SavePNG(test, "temp/dilate.png");
@@ -57,13 +80,11 @@ int main(int argc, char** argv)
 	if (verbose)
     	printf("Thresholding...\n");
 
-	canny(test);
+	//canny(test);
+	adaptive_gaussthresholding(test, 11, 3);
     IMG_SavePNG(test, "temp/canny.png");
 
 
-	SDL_Surface* dilsur = SDL_CreateRGBSurface(0, width, 
-												height, 32, 0, 0, 0, 0);
-	SDL_BlitSurface(test, NULL, dilsur, NULL);
 	if (verbose)
     	printf("Dilating and closing...\n");
 
@@ -84,7 +105,7 @@ int main(int argc, char** argv)
 	int line_nb = hough_filter(hough, rows, angle_precision, hough_threshold, lines);
 
 	for (int i = 0; i < line_nb; i++)
-		draw_line(test, &lines[i]);
+		drawred(test, &lines[i]);
 	IMG_SavePNG(test, "temp/lines.png");
 
 	Square blobtest = get_blobs(lines, line_nb, (int)width, (int)height);

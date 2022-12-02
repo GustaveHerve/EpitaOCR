@@ -77,6 +77,7 @@ int get_biggest_bin(int* hough, int maxr, int maxtheta)
 	return max;
 }
 
+
 float array_sum(float arr[], int begin, int end)
 {
 	float res = 0;

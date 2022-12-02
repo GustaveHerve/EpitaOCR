@@ -110,7 +110,7 @@ int hough_filter(int input[], int rows, int cols, int threshold, Line res[])
 				Line new = {i,j};
 				res[acc] = new;
 				acc++;
-				nhsuppr(input, j, i, 10, 50, &size);
+				nhsuppr(input, j, i, 30, 90, &size);
 			}
 		}
 	}

@@ -135,8 +135,6 @@ void blur_convolution(SDL_Surface *image, double ker[], int rows,
 						res = ker[(k+roff) * cols + l+coff] * (double)value;	
 						acc += res;
 					}
-					else
-						continue;
 				}
 			}
 			r[i*width + j] = acc;

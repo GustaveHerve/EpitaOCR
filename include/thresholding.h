@@ -8,5 +8,6 @@ void otsu(SDL_Surface* image);
 
 void threshold(SDL_Surface* image, float threshold);
 void adaptive_thresholding(SDL_Surface *image, int size, int c);
+void adaptive_gaussthresholding(SDL_Surface *image, int size, int c);
 
 #endif

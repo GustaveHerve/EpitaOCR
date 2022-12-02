@@ -194,6 +194,59 @@ void draw_line(SDL_Surface *surf, Line *line)
 	SDL_UnlockSurface(surf);
 }
 
+void plotLine(SDL_Surface *surf, Line *line, Uint32 color)
+{
+	int rho = line->rho;
+	float theta = line->theta * M_PI / 180;
+	int rows = surf->h;
+	int cols = surf->w;
+	Uint32 *pixels = surf->pixels;
+
+	double sinA = sin(theta);
+    double cosA = cos(theta);
+	float xtmp = cosA * rho;
+	float ytmp = sinA * rho;
+	int x0 = (xtmp + rows * (-1 * sinA));
+	int y0 = (ytmp + rows * (cosA));
+	int x1 = (xtmp - rows * (-1 * sinA));
+	int y1 = (ytmp - rows * (cosA));
+
+	int dx = abs(x1 - x0);
+	int sx = x0 < x1 ? 1 : -1;
+	int dy = -abs(y1 - y0);
+	int sy = y0 < y1 ? 1 : -1;
+	int error = dx + dy;
+
+	while (1)
+	{
+		if (x0 >= 0 && x0 < cols && y0 >= 0 && y0 < rows)
+			pixels[y0 * cols + x0] = color;
+		if (x0 == x1 && y0 == y1)
+			break;
+		int e2 = 2 * error;
+		if (e2 >= dy)
+		{
+			if (x0 == x1)
+				break;
+			error = error + dy;
+			x0 = x0 + sx;
+		}
+		if (e2 <= dx)
+		{
+			if (y0 == y1)
+				break;
+			error = error + dx;
+			y0 = y0 + sy;
+		}
+	}
+}
+
+void drawred(SDL_Surface *surf, Line *line)
+{
+	Uint32 red = SDL_MapRGB(surf->format, 255, 0, 0);
+	plotLine(surf, line, red);
+}
+
 Segment get_segment(SDL_Surface *image, Line *line)
 {
 	unsigned int width = image->w;

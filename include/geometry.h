@@ -34,5 +34,7 @@ int intersect(Segment s1, Segment s2);
 void reorganize_square(Square *sq);
 int is_square(Square *sq, float tolerance);
 int square_len(Square *sq);
+void plotLine(SDL_Surface *surf, Line *line, Uint32 color);
+void drawred(SDL_Surface *surf, Line *line);
 
 #endif
