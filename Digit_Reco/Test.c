@@ -428,14 +428,14 @@ int main(int argc, char **argv)
 {
 
     if (argc < 2)
-        ai(1,NULL);
+        Call();
     else 
     {
         DIR *d;
         struct dirent *dir;
         d = opendir(argv[1]);
         FILE * fp;
-        int arr[81];
+        int arr[82];
         int i = 0;
         fp = fopen(savefile, "w+"); 
         if (d)
