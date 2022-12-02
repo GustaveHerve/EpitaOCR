@@ -43,51 +43,73 @@ int line_intersect(TupleInt *res, Line line1, Line line2, int width, int height)
 
 void reorganize_square(Square *sq)
 {
-/*	//Y inversion checking
-	TupleInt miny1;
-	TupleInt miny2;
-	TupleInt miny3;
-	TupleInt miny4;
+	//Y inversion checking
+	TupleInt *list[4];
+   	list[0]	= &sq->NW;
+	list[1] = &sq->NE;
+	list[2] = &sq->SE;
+	list[3] = &sq->SW;
 
-	if (sq->NW.y <= sq->NE.y)
-	{
-		if (sq->NW.y <= sq->
-		miny1 = sq->NW;
-		miny3 = sq->NE;
-	}
-	else
-	{
-		miny1 = sq->NE;
-		miny3 = sq->NW;
-	}
+	TupleInt *miny1;
+	TupleInt *miny2;
 
-	if (sq->SW.y <= sq->SE.y)
-		miny2 = sq->SW;
-	else
-		miny2 = sq->SE;
-
-	if (miny1.y > miny2.y)
+	miny1 = list[0];
+	miny2 = list[1];
+	if (miny2->y < miny1->y)
 	{
-		TupleInt tmp = miny1;
+		TupleInt *t = miny2;
+		miny2 = miny1;
 		miny1 = miny2;
-		miny2 = tmp;
 	}
 
+	for (int i = 2; i < 4; i++)
+	{
+		if (list[i]->y < miny1->y)
+		{
+			miny2 = miny1;
+			miny1 = list[i];
+		}
+		else if (list[i]->y < miny2->y)
+		{
+			miny2 = list[i];
+		}
+	}
+
+	TupleInt *miny3 = NULL;
+	TupleInt *miny4 = NULL;
+	for (int i = 0; i < 4; i++)
+	{
+		if (list[i] != miny1 && list[i] != miny2)
+		{
+			if (miny3 == NULL)
+				miny3 = list[i];
+			else
+				miny4 = list[i];
+		}
+	}
+	
 	//X inversion checking
-	if (sq->NW.x >= sq->NE.x)
+	if (miny1->x > miny2->x)
 	{
-		tmp = sq->NW;
-		sq->NW = sq->NE;
-		sq->NE = tmp;
+		TupleInt *t = miny2;
+		miny2 = miny1;
+		miny1 = t;
 	}
+	if (miny4->x > miny3->x)
+	{
+		TupleInt *t = miny3;
+		miny3 = miny4;
+		miny4 = t;
+	}
+	TupleInt temp1 = *miny1;
+	TupleInt temp2 = *miny2;
+	TupleInt temp3 = *miny3;
+	TupleInt temp4 = *miny4;
 
-	if (sq->SW.x >= sq->SE.x)
-	{
-		tmp = sq->SW;
-		sq->SW = sq->SE;
-		sq->SE = tmp;
-	}
-	*/
+	sq->NW = temp1;
+	sq->NE = temp2;
+	sq->SE = temp3;
+	sq->SW = temp4;
 
 }
 
@@ -124,6 +146,15 @@ int is_square(Square *sq, float tolerance)
 		return 0;
 	return 1;
 }
+
+int square_len(Square *sq)
+{
+	int tempx = sq->NE.x - sq->NW.x;
+	int tempy = sq->NE.y - sq->NW.y;
+	int a = sqrt(tempx * tempx + tempy * tempy);
+	return a;
+}
+
 
 void draw_line(SDL_Surface *surf, Line *line)
 {

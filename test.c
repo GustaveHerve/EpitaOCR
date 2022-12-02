@@ -87,7 +87,7 @@ int main(int argc, char** argv)
 		draw_line(test, &lines[i]);
 	IMG_SavePNG(test, "temp/lines.png");
 
-	Square *blobtest = get_blobs(lines, line_nb, (int)width, (int)height);
+	Square blobtest = get_blobs(lines, line_nb, (int)width, (int)height);
 
 	/*
 

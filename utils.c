@@ -148,15 +148,15 @@ TupleInt minY2(TupleInt A, TupleInt B)
 TupleInt minY3(TupleInt A, TupleInt B, TupleInt C)
 {
 	TupleInt temp = minY2(A,B);
-	if (temp.y < C.y)
+	if (temp.y <= C.y)
 		return temp;
 	return C;
 }
 
 TupleInt minY4(TupleInt A, TupleInt B, TupleInt C, TupleInt D)
 {
-	TupleInt temp = minY2(A,B);
-	if (temp.y < C.y)
+	TupleInt temp = minY3(A, B, C);
+	if (temp.y <= D.y)
 		return temp;
-	return C;
+	return D;
 }
