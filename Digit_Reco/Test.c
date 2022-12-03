@@ -437,7 +437,7 @@ int main(int argc, char **argv)
         FILE * fp;
         int arr[82];
         int i = 0;
-        fp = fopen(savefile, "w+"); 
+        fp = fopen(savefile, "w"); 
         if (d)
         {
             while ((dir = readdir(d)) != NULL)

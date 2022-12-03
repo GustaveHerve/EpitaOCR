@@ -50,7 +50,6 @@ void parcours_pixel(SDL_Surface* image, double trainInput[])
                 val = 0;
             else
                 val = 1;
-
             trainInput[acc] = val;
             acc++;
 
