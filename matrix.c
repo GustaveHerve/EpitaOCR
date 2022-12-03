@@ -41,7 +41,7 @@ void mul(double m1[], double m2[], size_t r1, size_t c1, size_t c2, double r[])
 			for (size_t k = 0; k < c1; k++){
 				sum += m1[i * c1 + k] * m2[k * c2 + j];
 			}
-			r[i * r1 + j] = sum;
+			r[i * c2/*r1*/ + j] = sum;
 		}
 	}
 }

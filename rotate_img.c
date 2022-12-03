@@ -130,26 +130,37 @@ double* get_hMatrix(int* old, int* new)
                                         old[7]*new[7], new[7], 
                                       0, 0, 0, 0, 0, 0, 0, 0, 1};
 
-    //print_matrix("matrix 9*9 base: ", matrix, 9, 9);
     double col[9] = {0, 0, 0, 0, 0, 0, 0, 0, 1};
-
     double* inverse = inverseMat(matrix, 9);
-   
-    //print_matrix("matrix inverted: ", inverse, 9, 9);
-    double* hmatrixc = (double*) malloc(9*sizeof(double));
-    mul(inverse, col, 9, 9, 3, hmatrixc);
-   
-    print_matrix("after mul: ", hmatrixc, 9, 1);
+
+    double* hmatrixcol = (double*) malloc(9*sizeof(double));
+    double* hmatrixc = malloc(sizeof(double)*9);
+    mul(inverse, col, 9, 9, 1, hmatrixc);
+
+    //converts hmatrixcol in column matrix;
+    //double* hmatrixc = malloc(sizeof(double)*9);
+    
+    /* int k1 = 0;
+    for(int i = 0; i < 9; i++)
+    {
+    	for(int j = 0; j < 9; j++)
+	{
+		hmatrixc[i*1+j] = hmatrixcol[k1];
+		k1++;
+	}
+    }
+    */
+
     //transforming our column matrix into a 3*3 square matrix 
     double* hmatrix = (double*) malloc(9*sizeof(double));
-    int k = 0;
+    int k2 = 0;
 
     for(int i = 0; i < 3; i++)
     {
         for(int j = 0; j < 3; j++)
         {
-            hmatrix[i*3+j] = hmatrixc[k];
-            k++;
+            hmatrix[i*3+j] = hmatrixc[k2];
+            k2++;
         }
     }
     hmatrix = inverseMat(hmatrix, 3);
@@ -172,7 +183,7 @@ void homographic_Transform(SDL_Surface *img, Square corners)
 
     int x4 = corners.SW.x;
     int y4 = corners.SW.y;
-    
+
     //find size of the image we will get after homographic transform
 
     int a = sqrt((x2-x1) * (x2-x1) + (y1-y2) * (y1-y2)); 
@@ -180,38 +191,37 @@ void homographic_Transform(SDL_Surface *img, Square corners)
     int c = sqrt((x4-x3) * (x4-x3) + (y3-y4) * (y3-y4));
     int d = sqrt((x1-x4) * (x1-x4) + (y1-y4) * (y1-y4));
     double size = fmax(fmax(a,b), fmax(c,d)); 
-   
+
     int grid_corners[8] = {x1, y1, x2, y2, x3, y3, x4, y4};
     int newGrid_corners[8] = {0, 0, size, 0, size, size, 0, size};
 
     double* hmatrix = get_hMatrix(grid_corners, newGrid_corners);
-    double* newCos = malloc(sizeof(double)*3);
-    
+	
+    print_matrix("final 3*3: ", hmatrix, 3, 3);
     SDL_Surface *new_img= SDL_CreateRGBSurface(0,size,size,32,0,0,0,0);
     Uint32* pixels = new_img->pixels;
     Uint32* oldpixels = img->pixels;
-    
-    double h = img->h;
-    double w = img->w;
+
+    double h = size;
+    double w = size;
 
     for(int y = 0; y < h; y++)
     {
        for(int x = 0; x < w; x++)
        {
             double pixelC[3] = {x, y, 1};
-            mul(hmatrix, pixelC, 3, 3, 1, newCos); 
-            
-            double new_x = newCos[0]/newCos[2];
-            double new_y = newCos[1]/newCos[2];
+            double* newCos = malloc(3*sizeof(double));
+            mul(hmatrix, pixelC, 3, 3, 1, newCos);
+            int new_x = newCos[0]/newCos[2];
+            int new_y = newCos[1]/newCos[2];
 
-            if(new_x >= 0 && new_x <= size && new_y >= 0 && new_y <=size)
-            {
-                Uint32 old_pixel = oldpixels[(int)(new_y * w + new_x)];
+	    //if(new_x >= 0 && new_x <= size && new_y >= 0 && new_y <=size)
+            //{
+                Uint32 old_pixel = oldpixels[(new_y * (int)w + new_x)];
                 pixels[y * (int)w +x] = old_pixel;
-            }                  
-       } 
+            //}
+       }
     }
-    free(newCos);
     free(hmatrix);
 
     IMG_SavePNG(new_img, "homographic_image.png");
