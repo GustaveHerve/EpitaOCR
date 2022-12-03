@@ -98,6 +98,41 @@ void nhsuppr(int input[], int x, int y, int xlen, int ylen, TupleInt *size)
 	}
 }
 
+void  biggernh(int input[], int i, int j, int rows, int cols)
+{
+	int curr = input[i*cols + j];
+	int c = 0;
+	int found = 1;
+	while (found)
+	{
+		found = 0;
+		if (j+1 < cols)
+		{
+			c = i * cols + j+1;
+			if (input[c] > curr)
+			{
+				input[i * cols + j] = 0;
+				j++;
+				curr = input[c];
+				found = 1;
+			}
+
+		}
+
+		if (j-1 >= 0)
+		{
+			c = i * cols + j-1;
+			if (input[c] > curr)
+			{
+				input[i * cols + j] = 0;
+				j--;
+				curr = input[c];
+				found = 1;
+			}
+		}
+	}
+}
+
 int hough_filter(int input[], int rows, int cols, int threshold, Line res[])
 {
 	int acc = 0;
@@ -106,7 +141,9 @@ int hough_filter(int input[], int rows, int cols, int threshold, Line res[])
 	{
 		for (int j = 0; j < cols; j++)
 		{
-			if (input[i * cols + j] >= threshold){
+			//biggernh(input, i, j, rows, cols);
+			if (input[i * cols + j] >= threshold)
+			{
 				Line new = {i,j};
 				res[acc] = new;
 				acc++;
@@ -278,17 +315,19 @@ Square get_blobs(Line* lines, int len, int width, int height)
 					{
 						for (int l = 0; l < len; l++)
 						{
-							if (lines[k].theta == lines[l].theta || l == j || l == i)
+							if (lines[k].theta == lines[l].theta || l == j 
+									|| l == i)
 			   					continue;
 
 							TupleInt pt3 = {0,0};
-							condition = line_intersect(&pt3, lines[k], lines[l],
-						   	width, height);
+							condition = line_intersect(&pt3, lines[k], 
+									lines[l], width, height);
 
 							if (condition)
 							{
 								TupleInt pt4 = {0,0};
-								if (line_intersect(&pt4, lines[i], lines[l], width, height))
+								if (line_intersect(&pt4, lines[i], lines[l], 
+											width, height))
 								{
 									Square *res = malloc(sizeof(Square));
 									res->NW = pt1;

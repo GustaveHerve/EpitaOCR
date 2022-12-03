@@ -90,6 +90,66 @@ Square *get_squares_seg(Segment *grid)
 
 }
 
+void extract_cells(Square *sq, SDL_Surface *image, char* path)
+{
+	int avgy = ((sq->SW.y - sq->NW.y) + (sq->SE.y - sq->NE.y)) / 2 / 9;
+	int avgx = ((sq->NE.x - sq->NW.x) + (sq->SE.x - sq->SW.x)) / 2 / 9;
+	int counter = 0;
+	int x0 = sq->NW.x;
+	int y0 = sq->NW.y;
+
+	for (int i = 0; i < 9; i++)
+	{
+		x0 = sq->NW.x;
+		for (int j = 0; j < 9; j++)
+		{
+			char *name = malloc(3 * sizeof(char));
+			name[2] = 0;
+			if (counter < 10)
+				name[0] = '0';
+			else
+			{
+				int temp = counter / 10;
+				name[0] = temp + '0';
+			}
+			name[1] = (counter % 10) + '0';
+
+			SDL_Surface* crop_s = 
+				SDL_CreateRGBSurface(0, 28, 28, 32, 0, 0, 0, 0);
+			SDL_Surface* temp_s = 
+				SDL_CreateRGBSurface(0, avgx, avgy, 32, 0, 0, 0, 0);
+    		SDL_Surface* crop = 
+				SDL_ConvertSurfaceFormat(crop_s, SDL_PIXELFORMAT_RGB888, 0);
+    		SDL_Surface* temp = 
+				SDL_ConvertSurfaceFormat(temp_s, SDL_PIXELFORMAT_RGB888, 0);
+			SDL_FreeSurface(crop_s);
+			SDL_FreeSurface(temp_s);
+			SDL_Rect rect = { x0, y0, avgx, avgy };
+
+			SDL_BlitSurface(image, &rect, temp, NULL);
+			IMG_SavePNG(temp, "temp/zzcc.png");
+			SDL_BlitScaled(temp, NULL, crop, NULL);
+			IMG_SavePNG(temp, "temp/beforeextract.png");
+
+			char *ext = ".png";
+			char *pathres = calloc(50 ,sizeof(char));
+			strcat(pathres, path);
+			strcat(pathres, name);
+			strcat(pathres, ext);
+			IMG_SavePNG(crop, pathres);
+
+			SDL_FreeSurface(crop);
+			SDL_FreeSurface(temp);
+			free(pathres);
+			free(name);
+
+			x0 += avgx;
+			counter++;
+		}
+
+		y0 += avgy;
+	}
+}
 void save_squares_seg(Square *sq, SDL_Surface *image, char* path)
 {
 	int avg = avg_size(sq, 81);
@@ -131,6 +191,7 @@ void save_squares_seg(Square *sq, SDL_Surface *image, char* path)
 
         SDL_FreeSurface(crop);
         SDL_FreeSurface(temp);
+		free(pathres);
         free(name);
 	}
 }

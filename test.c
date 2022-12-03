@@ -47,25 +47,10 @@ int main(int argc, char** argv)
 	//erose(test, 5);
 	gauss_blur(test, 9, 2.5);
 	//blur(test, 5);
-	//blur(test, 5);
-	//blur(test, 5);
-	//blur(test, 5);
-	//blur(test, 5);
-	//blur(test, 5);
-	//blur(test, 5);
-	//blur(test, 5);
-	//blur(test, 5);
-	//blur(test, 5);
     IMG_SavePNG(test, "temp/guas.png");
 
 	width = width;
 	height = height; 
-	SDL_Surface* blurfix = SDL_CreateRGBSurface(0, width, 
-												height, 32, 0, 0, 0, 0);
- 	blurfix = SDL_ConvertSurfaceFormat(blurfix, SDL_PIXELFORMAT_RGB888, 0);
-	SDL_Rect blurfixrect = { 0, 0, width, height };
-	SDL_BlitSurface(test, &blurfixrect, blurfix, NULL);
-	test = blurfix;
 
     IMG_SavePNG(test, "temp/blur.png");
 
@@ -120,148 +105,11 @@ int main(int argc, char** argv)
 	draw_square(original, &blobtest);
 	IMG_SavePNG(original, "temp/grid_detection.png");
 
+	IMG_SavePNG(test, "temp/beforeextract.png");
+	extract_cells(&blobtest, test, "temp/cells/");
 
-	/*
-
-
-	Line *linesX = calloc(angle_precision * rows, sizeof(Line));
-	Line *linesY = calloc(angle_precision * rows, sizeof(Line));
-
-
-    TupleInt len_li = hough_filter_local(hough, rows, angle_precision,
-			hough_threshold, 1, 0, linesX, linesY);
-
-    linesX = (Line *)realloc(linesX, len_li.x * sizeof(Line));
-    linesY = (Line *)realloc(linesY, len_li.y * sizeof(Line));
-
-	Line *mergey = malloc(len_li.y * sizeof(Line));
-	Line *mergex = malloc(len_li.x * sizeof(Line));
-
-	len_li.y =  merge_lines(linesY, len_li.y, 40, mergey);
-	len_li.x =  merge_lines(linesX, len_li.x, 40, mergex);
-
-	free(linesX);
-	free(linesY);
-	//linesX = mergex;
-	//linesY = mergey;
-	if (verbose)
-    	printf("Detecting grid...\n");
-
-	Segment *xseg = get_segments(dilsur, mergex, len_li.x);
-	Segment *yseg = get_segments(dilsur, mergey, len_li.y);
-
-	if (verbose)
-    	printf("Extracting grid squares...\n");
-	Segment *grid = get_grid_seg(xseg, yseg, len_li);
-
-	Square *sq = get_squares_seg(grid);
-
-	save_squares_seg(sq, test, "temp/");
-
-    SDL_FreeSurface(dilsur);
-    free(sq);
-    free(grid);
-
-    SDL_Window *window = SDL_CreateWindow("Cookin'VR",SDL_WINDOWPOS_UNDEFINED
-			,SDL_WINDOWPOS_UNDEFINED,test->w,test->h,SDL_WINDOW_RESIZABLE);
-    if (window == NULL)
-        errx(2, "couldn't create window");
-    SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, 0);
-    SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, test);
-
-    int i = 1;
-    SDL_Event event;
-
-
-    while(i)
-    {
-        SDL_WaitEvent(&event);
-
-        if(event.type == SDL_QUIT)
-            i = 0;
-        SDL_Rect img_size = {0,0,test->w, test->h};
-
-		//SDL_RenderSetScale(renderer, 0.5, 0.5);
-
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
-        SDL_RenderClear(renderer);
-        SDL_RenderCopy(renderer, texture, NULL, &img_size);
-
-        for (int i = 0; i < len_li.x; i++)
-		{
-            int rho = mergex[i].rho;
-            float theta = mergex[i].theta * M_PI / 180;
-            double sinA = sin(theta);
-            double cosA = cos(theta);
-            float x0 = cosA * rho;
-            float y0 = sinA * rho;
-            int x1 = (x0 + rows * (-1 * sinA));
-            int y1 = (y0 + rows * (cosA));
-            int x2 = (x0 - rows * (-1 * sinA));
-            int y2 = (y0 - rows * (cosA));
-
-
-        	SDL_SetRenderDrawColor(renderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
-			SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
-			SDL_RenderDrawPoint(renderer, x1, y1);
-
-        }
-		for (int i = 0; i < len_li.y; i++)
-		{
-            int rho = mergey[i].rho;
-            float theta = mergey[i].theta * M_PI / 180;
-            double sinA = sin(theta);
-            double cosA = cos(theta);
-            float x0 = cosA * rho;
-            float y0 = sinA * rho;
-            int x1 = (x0 + rows * (-1 * sinA));
-            int y1 = (y0 + rows * (cosA));
-            int x2 = (x0 - rows * (-1 * sinA));
-            int y2 = (y0 - rows * (cosA));
-
-
-        	SDL_SetRenderDrawColor(renderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
-			SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
-
-        }
-		*/
-	/*
-		for (int i = 0; i < xtemp; i++){
-			for (int j = 0; j < ytemp; j++){
-				TupleInt pt;
-				if (!polar_intersection(&pt, gridX[i], gridY[j])){
-
-					SDL_SetRenderDrawColor(renderer, 0, 255
-					, 255, SDL_ALPHA_OPAQUE);
-					SDL_RenderDrawLine(renderer, pt.x
-					, pt.y-10, pt.x, pt.y + 10);
-					SDL_RenderDrawLine(renderer, pt.x-10, pt.y, pt.x+10, pt.y);
-
-				}
-        	}
-		}
-		
-
-        //copy texture to output device
-		SDL_SetRenderDrawColor(renderer, 0, 255, 255, SDL_ALPHA_OPAQUE);
-		//SDL_RenderDrawPoint(renderer, pt.x, pt.y);
-        SDL_RenderPresent(renderer);
-        //it sends the renderer to window
-
-    }
-
-	*/
-
-
-    //SDL_DestroyTexture(texture);
-    //SDL_DestroyWindow(window);
-    //SDL_DestroyRenderer(renderer);
     SDL_FreeSurface(test);
     SDL_FreeSurface(original);
     SDL_Quit();
 
-    //free(yseg);
-    //free(xseg);
-
 }
-

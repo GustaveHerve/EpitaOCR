@@ -25,7 +25,8 @@ SDL_Surface* load_image(char* path){
 		printf("Couldn't load %s", path);
 		exit(1);
 	}
-    img = SDL_ConvertSurfaceFormat(img, SDL_PIXELFORMAT_RGB888, 0);
+    SDL_Surface *res = SDL_ConvertSurfaceFormat(img, SDL_PIXELFORMAT_RGB888, 0);
+	SDL_FreeSurface(img);
 
-	return img;
+	return res;
 }
