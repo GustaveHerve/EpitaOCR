@@ -90,6 +90,167 @@ Square *get_squares_seg(Segment *grid)
 
 }
 
+int find_digit(Uint8* arr, int size, int tolerance, TupleShort *s)
+{
+	TupleShort center = { size/2, size/2 };
+	int acc = 0;
+	int found = 0;
+	int c = center.y * size + center.x;
+	if (arr[c] == 255)
+	{
+		*s = center;
+		return 1;
+	}
+
+	TupleShort p1 = center;
+	TupleShort p2 = center;  
+	TupleShort p3 = center;  
+	TupleShort p4 = center;  
+	while (acc < tolerance && !found)
+	{
+		if (!found && p1.y - 1 >= 0)
+		{
+			p1.y--;
+			if (arr[p1.y*size + p1.x] == 255)
+			{
+				found = 1;
+				s->x = p1.x;
+				s->y = p1.y;
+			}
+		}
+
+		if (!found && p2.y + 1 < size)
+		{
+			p2.y++;
+			if (arr[p2.y*size + p2.x] == 255)
+			{
+				found = 1;
+				s->x = p2.x;
+				s->y = p2.y;
+			}
+		}
+
+		if (!found && p3.x + 1 < size)
+		{
+			p3.x++;
+			if (arr[p3.y*size + p3.x] == 255)
+			{
+				found = 1;
+				s->x = p3.x;
+				s->y = p3.y;
+			}
+		}
+
+		if (!found && p4.x - 1 >= 0)
+		{
+			p4.x--;
+			if (arr[p4.y*size + p4.x] == 255)
+			{
+				found = 1;
+				s->x = p4.x;
+				s->y = p4.y;
+			}
+		}
+
+		acc++;
+	}
+
+	if (!found)
+		return 0;
+	return 1;
+}
+
+void cell_fill(Uint8* arr, int size, TupleShort seed)
+{
+	Stack *s = stack_init(s);
+	Uint8 grey = 120;
+	stack_push(s, seed);
+	while (!stack_isempty(s))
+	{
+		TupleShort e = { 0, 0 };
+		stack_pop(s, &e);
+		size_t c = e.y * size + e.x;
+		arr[c] = grey;
+
+		//North
+		if (e.y - 1 >= 0)
+		{
+			if (arr[c - size] == 255)
+			{
+				TupleShort tp = { e.x, e.y - 1 };
+				stack_push(s, tp);
+			}
+		}
+
+		//South
+		if (e.y + 1 < size)
+		{
+			if (arr[c + size] == 255)
+			{
+				TupleShort tp = { e.x, e.y + 1 };
+				stack_push(s, tp);
+			}
+		}
+
+		//West
+		if (e.x - 1 >= 0)
+		{
+			if (arr[c-1] == 255)
+			{
+				TupleShort tp = { e.x - 1, e.y };
+				stack_push(s, tp);
+			}
+		}
+
+		//East
+		if (e.x + 1 < size)
+		{
+			if (arr[c+1] == 255)
+			{
+				TupleShort tp = { e.x + 1, e.y };
+				stack_push(s, tp);
+			}
+		}
+	}
+	stack_free(s);
+}
+
+void restore_digit(Uint8 *arr, int len)
+{
+	for (size_t i = 0; i < len; i++)
+	{
+		if (arr[i] == 120)
+			arr[i] = 255;
+		else
+			arr[i] = 0;
+	}
+}
+
+void clean_cell(SDL_Surface *img)
+{
+	int size = img->w * img->h;
+	Uint8 *arr = malloc(size * sizeof(Uint8));
+	get_binarray(img, arr);
+
+	TupleShort seed = { 0, 0 };
+	int success = find_digit(arr, img->w, 5, &seed);
+	if (success)
+	{
+		cell_fill(arr, img->h, seed);
+		restore_digit(arr, size);
+
+		binarr_to_surf(arr, img, size);
+	}
+	else
+	{
+		Uint8 *empty = calloc(size, sizeof(Uint8));
+		binarr_to_surf(empty, img, size);
+		free(empty);
+	}
+
+	free(arr);
+}
+
 void extract_cells(Square *sq, SDL_Surface *image, char* path)
 {
 	int avgy = ((sq->SW.y - sq->NW.y) + (sq->SE.y - sq->NE.y)) / 2 / 9;
@@ -128,6 +289,7 @@ void extract_cells(Square *sq, SDL_Surface *image, char* path)
 
 			SDL_BlitSurface(image, &rect, temp, NULL);
 			SDL_BlitScaled(temp, NULL, crop, NULL);
+			clean_cell(crop);
 
 			char *ext = ".png";
 			char *pathres = calloc(50 ,sizeof(char));
@@ -146,100 +308,5 @@ void extract_cells(Square *sq, SDL_Surface *image, char* path)
 		}
 
 		y0 += avgy;
-	}
-}
-void save_squares_seg(Square *sq, SDL_Surface *image, char* path)
-{
-	int avg = avg_size(sq, 81);
-
-	for (int i = 0; i < 81; i++)
-	{
-		char *name = malloc(3 * sizeof(char));
-        name[2] = 0;
-		if (i < 10)
-			name[0] = '0';
-		else
-		{
-			int temp = i / 10;
-			name[0] = temp + '0';
-		}
-	    name[1] = (i % 10) + '0';
-		//int w = sq[i].NE.x - sq[i].NW.x;
-		//int h = sq[i].SW.y - sq[i].NW.y;
-		int w = avg;
-		int h = avg;
-
-		SDL_Surface* crop = SDL_CreateRGBSurface(0, 28, 28, 32, 0, 0, 0, 0);
-		SDL_Surface* temp = SDL_CreateRGBSurface(0, avg, avg, 32, 0, 0, 0, 0);
-		SDL_Rect rect;
-		rect.x = sq[i].NW.x;
-		rect.y = sq[i].NW.y;
-		rect.w = w;
-		rect.h = h;
-
-		SDL_BlitSurface(image, &rect, temp, NULL);
-
-		SDL_BlitScaled(temp, NULL, crop, NULL);
-		char *ext = ".png";
-		char *pathres = calloc(50 ,sizeof(char));
-		strcat(pathres, path);
-		strcat(pathres, name);
-		strcat(pathres, ext);
-    	IMG_SavePNG(crop, pathres);
-
-        SDL_FreeSurface(crop);
-        SDL_FreeSurface(temp);
-		free(pathres);
-        free(name);
-	}
-}
-
-void save_squares(Square *sq, int len, SDL_Surface *image)
-{
-	int avg = avg_size(sq, len);
-
-	for (int i = 0; i < len; i++){
-
-		char *name = malloc(3 * sizeof(char));
-		if (i < 10)
-			name[0] = '0';
-		else
-		{
-			int temp = i / 10;
-			name[0] = temp + '0';
-		}
-
-		char *second = malloc(2 * sizeof(char));
-	    second[0] = (i % 10) + '0';
-		strcat(name, second);
-
-		//int w = sq[i].NE.x - sq[i].NW.x;
-		//int h = sq[i].SW.y - sq[i].NW.y;
-		int w = avg;
-		int h = avg;
-
-		SDL_Surface* crop = SDL_CreateRGBSurface(0, 28, 28, 32, 0, 0, 0, 0);
-		SDL_Surface* temp = SDL_CreateRGBSurface(0, avg, avg, 32, 0, 0, 0, 0);
-		SDL_Rect rect;
-		rect.x = sq[i].NW.x;
-		rect.y = sq[i].NW.y;
-		rect.w = w;
-		rect.h = h;
-		
-		SDL_BlitSurface(image, &rect, temp, NULL);
-		//dilate(temp, 3);
-
-		SDL_BlitScaled(temp, NULL, crop, NULL);
-		otsu(crop);
-		char *path1 = "/Users/gustave/Documents/c/grid/";
-		char *ext = ".png";
-		char *path = calloc(50, sizeof(char));
-		strcat(path, path1);
-		strcat(path, name);
-		strcat(path, ext);
-    	IMG_SavePNG(crop, path);
-
-		SDL_FreeSurface(crop);
-		SDL_FreeSurface(temp);
 	}
 }

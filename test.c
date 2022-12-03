@@ -69,6 +69,7 @@ int main(int argc, char** argv)
     IMG_SavePNG(test, "temp/canny.png");
 
 	dilate(test, 3);
+	closing(test, 3);
 
     IMG_SavePNG(test, "temp/dilate.png");
 
