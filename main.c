@@ -12,45 +12,48 @@
 int main (int argc, char* argv[])
 {
     /*
-    double *mat = malloc(sizeof(double)*18);
-    for(int i = 0; i <= 15; i++)
-    {
-	double j = i;
-        *(mat+i) = j+1;
-    }
-    *(mat+9) = 8;
-    *(mat+14) = 0; */
-    double mat[9] = {4,-5,4,9, 2,9,7,1,2};
-    double* inverted = calloc(9, sizeof(double));
-    inverted = inverseMat(mat, inverted, 3);
-    print_matrix("mat", mat, 3, 3);
-    print_matrix("inverted", inverted, 3, 3);
+    double mat[4] = {4,-5,4,9};
+    double mat2[4] = {2, 3, 7, 12};
+    double* res = malloc(sizeof(double)*4);
+    mul(mat, mat2, 2, 2, 2, res);
+    print_matrix("result mult: ", res, 2, 2);
+    */
+
+
+    /*
+    double mat[4] = {4,-5,4,9};
+    double* inverted = calloc(4, sizeof(double));
+    inverted = inverseMat(mat, 2);
+    print_matrix("mat", mat,2, 2);
+    print_matrix("inverted", inverted, 2, 2);
     free(inverted);
-    
+    */
 
 
     //homographic transform main
     
-    /*
+    
     init_sdl();
     SDL_Surface *img = load_image(argv[1]);
-    TupleInt p1 = {630, 178};
-    TupleInt p2 = {1368, 695};
-    TupleInt p3 = {109,918};
-    TupleInt p4 = {850, 1436};
+    TupleInt p1 = {630,178};
+    TupleInt p2 = {1368,695};
+    TupleInt p3 = {850,1436};
+    TupleInt p4 = {109,918};  //coos of the corners of image 5 grid.
 
-    Square corners = {p1,p3, p2, p4};
+    Square corners = {p1,p4,p2,p3};
     
-    homographicT(img, corners);
+    homographic_Transform(img, corners);
     SDL_FreeSurface(img);
 
     open_img_window("homographic_image.png");
     IMG_Quit();
     SDL_Quit(); 
-    */
     
+    
+
+
     //manual rotation main
-    /*
+    /* 
     init_sdl();
     SDL_Surface *img = load_image(argv[1]);
     double angle = atof(argv[2]);
@@ -72,8 +75,9 @@ int main (int argc, char* argv[])
     SDL_FreeSurface(img);
     IMG_Quit();
     SDL_Quit();
-
     */
+    
+    
 
     return 0;
 }

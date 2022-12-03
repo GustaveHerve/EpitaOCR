@@ -37,19 +37,38 @@ int main(int argc, char** argv)
 	SDL_Surface* test = load_image(argv[1]);
     SDL_Surface* original = load_image(argv[1]);
 
-
     unsigned int width = test->w;
 	unsigned int height = test->h;
 
-    rotate_img90(original, 432);
-
+    
 	greyscale(test);
 
-	blur(test, 5);
-	dilate(test, 5);
+	//dilate(test, 3);
+	//erose(test, 5);
+	gauss_blur(test, 9, 2.5);
+	//blur(test, 5);
+	//blur(test, 5);
+	//blur(test, 5);
+	//blur(test, 5);
+	//blur(test, 5);
+	//blur(test, 5);
+	//blur(test, 5);
+	//blur(test, 5);
+	//blur(test, 5);
+	//blur(test, 5);
+    IMG_SavePNG(test, "temp/guas.png");
+
+	width = width;
+	height = height; 
+	SDL_Surface* blurfix = SDL_CreateRGBSurface(0, width, 
+												height, 32, 0, 0, 0, 0);
+ 	blurfix = SDL_ConvertSurfaceFormat(blurfix, SDL_PIXELFORMAT_RGB888, 0);
+	SDL_Rect blurfixrect = { 0, 0, width, height };
+	SDL_BlitSurface(test, &blurfixrect, blurfix, NULL);
+	test = blurfix;
+
     IMG_SavePNG(test, "temp/blur.png");
 
-    IMG_SavePNG(test, "temp/dilate.png");
 	//Convert surface to greyscale
 	if (verbose)
     	printf("Converting to greyscale..\n");
@@ -60,15 +79,22 @@ int main(int argc, char** argv)
 	if (verbose)
     	printf("Thresholding...\n");
 
-	canny(test);
+	//canny(test);
+	adaptive_gaussthresholding(test, 11, 2);
     IMG_SavePNG(test, "temp/canny.png");
 
+	dilate(test, 3);
 
-	SDL_Surface* dilsur = SDL_CreateRGBSurface(0, width, 
-												height, 32, 0, 0, 0, 0);
-	SDL_BlitSurface(test, NULL, dilsur, NULL);
+    IMG_SavePNG(test, "temp/dilate.png");
+
 	if (verbose)
     	printf("Dilating and closing...\n");
+
+	SDL_Surface *blob = blob_detection(test);
+    IMG_SavePNG(blob, "temp/blob.png");
+
+	erose(blob, 5);
+    IMG_SavePNG(blob, "temp/erose.png");
 
 	//dilate(dilsur, 5);
 
@@ -81,16 +107,16 @@ int main(int argc, char** argv)
 	if (verbose)
     	printf("Detecting lines with Hough Transform...\n");
 
-	hough_lines(test, angle_precision, 1, hough);
+	hough_lines(blob, angle_precision, 1, hough);
 	int hough_threshold = get_biggest_bin(hough, rows, angle_precision) * 0.5;
 	Line *lines = calloc(angle_precision * rows, sizeof(Line));
 	int line_nb = hough_filter(hough, rows, angle_precision, hough_threshold, lines);
 
 	for (int i = 0; i < line_nb; i++)
-		draw_line(test, &lines[i]);
-    IMG_SavePNG(test, "temp/lines.png");
+		drawred(blob, &lines[i]);
+	IMG_SavePNG(blob, "temp/lines.png");
 
-	Square *blobtest = get_blobs(lines, line_nb, (int)width, (int)height);
+	Square blobtest = get_blobs(lines, line_nb, (int)width, (int)height);
 
 	/*
 

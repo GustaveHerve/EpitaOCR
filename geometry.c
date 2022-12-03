@@ -1,4 +1,5 @@
 #include <math.h>
+#include <stdlib.h>
 #include <SDL2/SDL.h>
 #include "include/geometry.h"
 #include "include/pixel.h"
@@ -40,12 +41,120 @@ int line_intersect(TupleInt *res, Line line1, Line line2, int width, int height)
 	return 1;
 }
 
-int is_square(Square *sq)
+void reorganize_square(Square *sq)
 {
+	//Y inversion checking
+	TupleInt *list[4];
+   	list[0]	= &sq->NW;
+	list[1] = &sq->NE;
+	list[2] = &sq->SE;
+	list[3] = &sq->SW;
 
-	return 1;
+	TupleInt *miny1;
+	TupleInt *miny2;
+
+	miny1 = list[0];
+	miny2 = list[1];
+	if (miny2->y < miny1->y)
+	{
+		TupleInt *t = miny2;
+		miny2 = miny1;
+		miny1 = miny2;
+	}
+
+	for (int i = 2; i < 4; i++)
+	{
+		if (list[i]->y < miny1->y)
+		{
+			miny2 = miny1;
+			miny1 = list[i];
+		}
+		else if (list[i]->y < miny2->y)
+		{
+			miny2 = list[i];
+		}
+	}
+
+	TupleInt *miny3 = NULL;
+	TupleInt *miny4 = NULL;
+	for (int i = 0; i < 4; i++)
+	{
+		if (list[i] != miny1 && list[i] != miny2)
+		{
+			if (miny3 == NULL)
+				miny3 = list[i];
+			else
+				miny4 = list[i];
+		}
+	}
+	
+	//X inversion checking
+	if (miny1->x > miny2->x)
+	{
+		TupleInt *t = miny2;
+		miny2 = miny1;
+		miny1 = t;
+	}
+	if (miny4->x > miny3->x)
+	{
+		TupleInt *t = miny3;
+		miny3 = miny4;
+		miny4 = t;
+	}
+	TupleInt temp1 = *miny1;
+	TupleInt temp2 = *miny2;
+	TupleInt temp3 = *miny3;
+	TupleInt temp4 = *miny4;
+
+	sq->NW = temp1;
+	sq->NE = temp2;
+	sq->SE = temp3;
+	sq->SW = temp4;
 
 }
+
+int is_square(Square *sq, float tolerance)
+{
+	int tempx = sq->NE.x - sq->NW.x;
+	int tempy = sq->NE.y - sq->NW.y;
+	int a = sqrt(tempx * tempx + tempy * tempy);
+
+	tempx = sq->SE.x - sq->NE.x;
+	tempy = sq->SE.y - sq->NE.y;
+	int b = sqrt(tempx * tempx + tempy * tempy);
+
+	float af = a;
+	float bf = b;
+
+	/*
+	int tempx = sq->SW.x - sq->SE.x;
+	int tempy = sq->SW.y - sq->SE.y;
+	int c = sqrt(tempx * tempx + tempy * tempy);
+
+	int tempx = sq->NW.x - sq->SW.x;
+	int tempy = sq->NW.y - sq->SW.y;
+	int d = sqrt(tempx * tempx + tempy * tempy);
+	*/
+
+	float deviation = 0;
+	if (a > b)
+		deviation = 1 - bf/af;
+	else
+		deviation = 1 - af/bf;
+
+	if (deviation > tolerance)
+		return 0;
+	return 1;
+}
+
+int square_len(Square *sq)
+{
+	int tempx = sq->NE.x - sq->NW.x;
+	int tempy = sq->NE.y - sq->NW.y;
+	int a = sqrt(tempx * tempx + tempy * tempy);
+	return a;
+}
+
 
 void draw_line(SDL_Surface *surf, Line *line)
 {
@@ -83,6 +192,59 @@ void draw_line(SDL_Surface *surf, Line *line)
 	}
 
 	SDL_UnlockSurface(surf);
+}
+
+void plotLine(SDL_Surface *surf, Line *line, Uint32 color)
+{
+	int rho = line->rho;
+	float theta = line->theta * M_PI / 180;
+	int rows = surf->h;
+	int cols = surf->w;
+	Uint32 *pixels = surf->pixels;
+
+	double sinA = sin(theta);
+    double cosA = cos(theta);
+	float xtmp = cosA * rho;
+	float ytmp = sinA * rho;
+	int x0 = (xtmp + rows * cols * (-1 * sinA));
+	int y0 = (ytmp + rows * cols * (cosA));
+	int x1 = (xtmp - rows * cols * (-1 * sinA));
+	int y1 = (ytmp - rows * cols * (cosA));
+
+	int dx = abs(x1 - x0);
+	int sx = x0 < x1 ? 1 : -1;
+	int dy = -abs(y1 - y0);
+	int sy = y0 < y1 ? 1 : -1;
+	int error = dx + dy;
+
+	while (1)
+	{
+		if (x0 >= 0 && x0 < cols && y0 >= 0 && y0 < rows)
+			pixels[y0 * cols + x0] = color;
+		if (x0 == x1 && y0 == y1)
+			break;
+		int e2 = 2 * error;
+		if (e2 >= dy)
+		{
+			if (x0 == x1)
+				break;
+			error = error + dy;
+			x0 = x0 + sx;
+		}
+		if (e2 <= dx)
+		{
+			if (y0 == y1)
+				break;
+			error = error + dx;
+			y0 = y0 + sy;
+		}
+	}
+}
+
+void drawred(SDL_Surface *surf, Line *line)
+{
+	Uint32 red = SDL_MapRGB(surf->format, 255, 0, 0);
+	plotLine(surf, line, red);
 }
 
 Segment get_segment(SDL_Surface *image, Line *line)

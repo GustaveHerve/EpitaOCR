@@ -10,7 +10,7 @@
 // define the number of each type of nodes
 #define nInputs 784
 #define nOutputs 10
-#define nHiddenNodes 175
+#define nHiddenNodes 20
 #define filename "Brain"
 
 void InputValues(char* file, double hWeights[nInputs][nHiddenNodes],

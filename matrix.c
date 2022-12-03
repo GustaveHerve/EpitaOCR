@@ -7,7 +7,7 @@ void print_matrix(char s[], double m[], size_t rows, size_t cols)
 	printf("%s = \n", s);
 	for (size_t i = 0; i < rows; i++){
 		for (size_t j = 0; j < cols; j++){
-			printf("%4g", m[i * cols + j]); 
+			printf("%4g   ", m[i * cols + j]); 
 		}
 
 		if (i != rows)
@@ -135,8 +135,6 @@ void blur_convolution(SDL_Surface *image, double ker[], int rows,
 						res = ker[(k+roff) * cols + l+coff] * (double)value;	
 						acc += res;
 					}
-					else
-						continue;
 				}
 			}
 			r[i*width + j] = acc;
