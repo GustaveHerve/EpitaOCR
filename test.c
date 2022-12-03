@@ -69,7 +69,6 @@ int main(int argc, char** argv)
 
     IMG_SavePNG(test, "temp/blur.png");
 
-    IMG_SavePNG(test, "temp/dilate.png");
 	//Convert surface to greyscale
 	if (verbose)
     	printf("Converting to greyscale..\n");
@@ -81,12 +80,18 @@ int main(int argc, char** argv)
     	printf("Thresholding...\n");
 
 	//canny(test);
-	adaptive_gaussthresholding(test, 11, 3);
+	adaptive_gaussthresholding(test, 11, 2);
     IMG_SavePNG(test, "temp/canny.png");
 
+	dilate(test, 3);
+
+    IMG_SavePNG(test, "temp/dilate.png");
 
 	if (verbose)
     	printf("Dilating and closing...\n");
+
+	SDL_Surface *blob = blob_detection(test);
+    IMG_SavePNG(blob, "temp/blob.png");
 
 	//dilate(dilsur, 5);
 
@@ -99,14 +104,14 @@ int main(int argc, char** argv)
 	if (verbose)
     	printf("Detecting lines with Hough Transform...\n");
 
-	hough_lines(test, angle_precision, 1, hough);
+	hough_lines(blob, angle_precision, 1, hough);
 	int hough_threshold = get_biggest_bin(hough, rows, angle_precision) * 0.5;
 	Line *lines = calloc(angle_precision * rows, sizeof(Line));
 	int line_nb = hough_filter(hough, rows, angle_precision, hough_threshold, lines);
 
 	for (int i = 0; i < line_nb; i++)
-		drawred(test, &lines[i]);
-	IMG_SavePNG(test, "temp/lines.png");
+		drawred(blob, &lines[i]);
+	IMG_SavePNG(blob, "temp/lines.png");
 
 	Square blobtest = get_blobs(lines, line_nb, (int)width, (int)height);
 

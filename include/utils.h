@@ -2,6 +2,7 @@
 #define UTILS_H
 
 #include <SDL2/SDL.h>
+#include <err.h>
 
 int max2(int a, int b);
 int max3(int a, int b, int c);
@@ -36,12 +37,17 @@ int array_min_index(float arr[], size_t len);
 
 int get_biggest_bin(int* hough, int maxr, int maxtheta);
 
+typedef struct Stack{
+	int size;
+	int capacity;
+	TupleInt *data;
+} Stack;
 
-typedef struct CannyRes{
-	int* edges;
-	Uint8* angles;
-
-} CannyRes;
-
+Stack *stack_init();
+int stack_isempty(Stack* s);
+void stack_free(Stack* s);
+void stack_doublesize(Stack *s);
+void stack_push(Stack *s, TupleInt x);
+int stack_pop(Stack *s, TupleInt *x);
 
 #endif

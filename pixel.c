@@ -1,5 +1,6 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <string.h>
 
 //get_pixel_ref: Get adress of the first byte composing the pixel at (x,y) 
 //coordinates
@@ -78,5 +79,39 @@ void get_pixel_array(SDL_Surface *image, Uint32 r[]){
 		for (unsigned int j = 0; j < width; j++){
 			r[i * width + j] = get_pixel(image, j, i);
 		}
+	}
+}
+
+void get_binarray(SDL_Surface *image, Uint8 *r)
+{
+	size_t width = image->w;
+	size_t height = image->h;
+	Uint32 *pixels = image->pixels;
+
+	for (size_t i = 0; i < height; i++)
+	{
+		for (size_t j = 0; j < width; j++)
+		{
+			Uint8 a = 0;
+			int c = i *width + j;
+			Uint32 pixel = pixels[c];
+			SDL_GetRGB(pixel, image->format, &a, &a, &a);
+			r[i * width + j] = a;
+		}
+	}
+}
+
+void binarraycpy(Uint8 *a, Uint8 *r, int size)
+{
+	memcpy(r, a, size);
+}
+
+void binarr_to_surf(Uint8 *arr, SDL_Surface *dest, int size)
+{
+	Uint32 *pixels = dest->pixels;
+	for (int i = 0; i < size; i++)
+	{
+		Uint32 pixel = SDL_MapRGB(dest->format, arr[i], arr[i], arr[i]);
+		pixels[i] = pixel;
 	}
 }

@@ -20,5 +20,6 @@ int get_intersection_count(Segment s, Segment* segments, int len);
 
 Segment *get_grid_seg(Segment* xseg, Segment* yseg, TupleInt lens);
 Square get_blobs(Line* lines, int len, int width, int height);
+SDL_Surface *blob_detection(SDL_Surface *img);
 
 #endif
