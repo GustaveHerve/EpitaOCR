@@ -133,34 +133,19 @@ double* get_hMatrix(int* old, int* new)
     double col[9] = {0, 0, 0, 0, 0, 0, 0, 0, 1};
     double* inverse = inverseMat(matrix, 9);
 
-    double* hmatrixcol = (double*) malloc(9*sizeof(double));
     double* hmatrixc = malloc(sizeof(double)*9);
     mul(inverse, col, 9, 9, 1, hmatrixc);
 
-    //converts hmatrixcol in column matrix;
-    //double* hmatrixc = malloc(sizeof(double)*9);
-    
-    /* int k1 = 0;
-    for(int i = 0; i < 9; i++)
-    {
-    	for(int j = 0; j < 9; j++)
-	{
-		hmatrixc[i*1+j] = hmatrixcol[k1];
-		k1++;
-	}
-    }
-    */
-
     //transforming our column matrix into a 3*3 square matrix 
     double* hmatrix = (double*) malloc(9*sizeof(double));
-    int k2 = 0;
+    int k = 0;
 
     for(int i = 0; i < 3; i++)
     {
         for(int j = 0; j < 3; j++)
         {
-            hmatrix[i*3+j] = hmatrixc[k2];
-            k2++;
+            hmatrix[i*3+j] = hmatrixc[k];
+            k++;
         }
     }
     hmatrix = inverseMat(hmatrix, 3);
@@ -204,22 +189,20 @@ void homographic_Transform(SDL_Surface *img, Square corners)
 
     double h = size;
     double w = size;
+    double* newCos = malloc(3*sizeof(double));
 
     for(int y = 0; y < h; y++)
     {
        for(int x = 0; x < w; x++)
        {
             double pixelC[3] = {x, y, 1};
-            double* newCos = malloc(3*sizeof(double));
+            
             mul(hmatrix, pixelC, 3, 3, 1, newCos);
             int new_x = newCos[0]/newCos[2];
             int new_y = newCos[1]/newCos[2];
 
-	    //if(new_x >= 0 && new_x <= size && new_y >= 0 && new_y <=size)
-            //{
-                Uint32 old_pixel = oldpixels[(new_y * (int)w + new_x)];
-                pixels[y * (int)w +x] = old_pixel;
-            //}
+            Uint32 old_pixel = oldpixels[(new_y * (int)w + new_x)];
+            pixels[y * (int)w +x] = old_pixel;
        }
     }
     free(hmatrix);
