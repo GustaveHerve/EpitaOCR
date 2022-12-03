@@ -296,7 +296,7 @@ Square get_blobs(Line* lines, int len, int width, int height)
 									res->SW = pt4;
 									res->SE = pt3;
 
-									int squaretest = is_square(res, 0.04);
+									int squaretest = is_square(res, 0.1);
 									if (squaretest)
 									{
 										int tmp = square_len(res);

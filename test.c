@@ -117,6 +117,9 @@ int main(int argc, char** argv)
 	IMG_SavePNG(blob, "temp/lines.png");
 
 	Square blobtest = get_blobs(lines, line_nb, (int)width, (int)height);
+	draw_square(original, &blobtest);
+	IMG_SavePNG(original, "temp/grid_detection.png");
+
 
 	/*
 
