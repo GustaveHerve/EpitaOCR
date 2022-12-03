@@ -206,10 +206,10 @@ void plotLine(SDL_Surface *surf, Line *line, Uint32 color)
     double cosA = cos(theta);
 	float xtmp = cosA * rho;
 	float ytmp = sinA * rho;
-	int x0 = (xtmp + rows * (-1 * sinA));
-	int y0 = (ytmp + rows * (cosA));
-	int x1 = (xtmp - rows * (-1 * sinA));
-	int y1 = (ytmp - rows * (cosA));
+	int x0 = (xtmp + rows * cols * (-1 * sinA));
+	int y0 = (ytmp + rows * cols * (cosA));
+	int x1 = (xtmp - rows * cols * (-1 * sinA));
+	int y1 = (ytmp - rows * cols * (cosA));
 
 	int dx = abs(x1 - x0);
 	int sx = x0 < x1 ? 1 : -1;

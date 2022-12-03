@@ -58,12 +58,12 @@ int main(int argc, char** argv)
 	//blur(test, 5);
     IMG_SavePNG(test, "temp/guas.png");
 
-	width = width - 18;
-	height = height - 18; 
+	width = width;
+	height = height; 
 	SDL_Surface* blurfix = SDL_CreateRGBSurface(0, width, 
 												height, 32, 0, 0, 0, 0);
  	blurfix = SDL_ConvertSurfaceFormat(blurfix, SDL_PIXELFORMAT_RGB888, 0);
-	SDL_Rect blurfixrect = { 9, 9, width, height };
+	SDL_Rect blurfixrect = { 0, 0, width, height };
 	SDL_BlitSurface(test, &blurfixrect, blurfix, NULL);
 	test = blurfix;
 
@@ -92,6 +92,9 @@ int main(int argc, char** argv)
 
 	SDL_Surface *blob = blob_detection(test);
     IMG_SavePNG(blob, "temp/blob.png");
+
+	erose(blob, 5);
+    IMG_SavePNG(blob, "temp/erose.png");
 
 	//dilate(dilsur, 5);
 
