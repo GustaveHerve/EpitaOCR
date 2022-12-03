@@ -157,7 +157,6 @@ double* get_cofactor(double* mat, double* res, int p, int q, int dim)
 			if(row != p && col != q)
 			{
                             res[j*dim+i++] = mat[row*dim+col];
-                            //res[i*dim+j++] = mat[row*dim+col];
                             if(j == dim-1)
 			    {
 		    		j = 0;
@@ -169,52 +168,9 @@ double* get_cofactor(double* mat, double* res, int p, int q, int dim)
 	return res;
 }
 
-/*
-int get_determinant(double* mat, int dim)
+double get_determinant(double* mat, int dim)
 {
-    double *tmp = calloc(dim*dim, sizeof(double));
-    int sign = 1;
-    int det = 0;
-    if (dim == 1)
-        return mat[0];
-    else
-    {
-        det = 0;
-        for(int cols = 0; cols < dim; cols++)
-        {
-           int m = 0;
-           int n = 0;
-           for(int i = 0; i < dim; i++)
-           {
-                for(int j = 0; j < dim; j++)
-                {
-                  tmp[j*dim+i] = 0;
-                  if( i != 0 && j != cols)
-                  {
-                    tmp[m*dim+n] = mat[j*dim+i];
-                    if(n < (dim-2))
-                        n++;
-                    else
-                    {
-                        n = 0;
-                        m++;
-                    }
-                  }
-                }
-            }
-            det = det + sign * (mat[cols] * get_determinant(tmp, dim-1)); 
-            sign = -1*sign;
-        }
-    }
-    free(tmp);
-    return det;
-}
-*/
-
-
-int get_determinant(double* mat, int dim)
-{
-	int det = 0;
+	double det = 0;
 	if(dim == 1)
 	{
 		return mat[0];
@@ -255,15 +211,16 @@ double* get_adjoint(double* mat, double* adjoint, int dim)
 }
 
 
-double* inverseMat(double* mat, double* inverse, int dim)
+double* inverseMat(double* mat, int dim)
 {
-    int det = get_determinant(mat, dim);
+    double* inverse = malloc(sizeof(double)*dim*dim);
+    double det = get_determinant(mat, dim);
    
-    printf("det = %d\n", det);
+    printf("det = %lf\n", det);
 
     if(det == 0)
     {
-        printf("Can't inverse singular matrix..");
+        printf("Can't inverse singular matrix..\n");
         return inverse; 
     }
 
