@@ -483,7 +483,7 @@ int flood_fill(Uint8* total, Uint8* copy, TupleShort *size, TupleShort seed)
 		//North
 		if (e.y - 1 >= 0)
 		{
-			if (copy[c - size->x] >= 250)
+			if (copy[c - size->x] == 255)
 			{
 				TupleShort tp = { e.x, e.y - 1 };
 				stack_push(s, tp);
@@ -493,7 +493,7 @@ int flood_fill(Uint8* total, Uint8* copy, TupleShort *size, TupleShort seed)
 		//South
 		if (e.y + 1 < size->y)
 		{
-			if (copy[c + size->x] >= 250)
+			if (copy[c + size->x] == 255)
 			{
 				TupleShort tp = { e.x, e.y + 1 };
 				stack_push(s, tp);
@@ -503,7 +503,7 @@ int flood_fill(Uint8* total, Uint8* copy, TupleShort *size, TupleShort seed)
 		//West
 		if (e.x - 1 >= 0)
 		{
-			if (copy[c-1]  >= 250)
+			if (copy[c-1] == 255)
 			{
 				TupleShort tp = { e.x - 1, e.y };
 				stack_push(s, tp);
@@ -513,7 +513,7 @@ int flood_fill(Uint8* total, Uint8* copy, TupleShort *size, TupleShort seed)
 		//East
 		if (e.x + 1 < size->x)
 		{
-			if (copy[c+1] >= 250)
+			if (copy[c+1] == 255)
 			{
 				TupleShort tp = { e.x + 1, e.y };
 				stack_push(s, tp);
@@ -579,5 +579,8 @@ SDL_Surface *blob_detection(SDL_Surface *img)
  	resimg = SDL_ConvertSurfaceFormat(resimg, SDL_PIXELFORMAT_RGB888, 0);
 	retrieveblob(resblob, &size);
 	binarr_to_surf(resblob, resimg, n);
+	free(totalarr);
+	free(resblob);
+	free(original);
 	return resimg; 
 }
