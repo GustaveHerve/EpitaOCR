@@ -3,6 +3,5 @@ main: Test.c funcs.c
 
 clean:
 	rm -f main
-	rm -f Brain
 	rm -f grid_00
 
