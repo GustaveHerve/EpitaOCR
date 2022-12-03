@@ -465,7 +465,7 @@ Segment *get_grid_seg(Segment* xseg, Segment* yseg, TupleInt lens)
 	return grid;
 }
 
-int flood_fill(Uint8* total, Uint8* copy, TupleInt *size, TupleInt seed)
+int flood_fill(Uint8* total, Uint8* copy, TupleShort *size, TupleShort seed)
 {
 	Stack *s = stack_init(s);
 	Uint8 grey = 120;
@@ -473,7 +473,7 @@ int flood_fill(Uint8* total, Uint8* copy, TupleInt *size, TupleInt seed)
 	stack_push(s, seed);
 	while (!stack_isempty(s))
 	{
-		TupleInt e = { 0, 0 };
+		TupleShort e = { 0, 0 };
 		stack_pop(s, &e);
 		res++;
 		size_t c = e.y * size->x + e.x;
@@ -485,7 +485,7 @@ int flood_fill(Uint8* total, Uint8* copy, TupleInt *size, TupleInt seed)
 		{
 			if (copy[c - size->x] >= 250)
 			{
-				TupleInt tp = { e.x, e.y - 1 };
+				TupleShort tp = { e.x, e.y - 1 };
 				stack_push(s, tp);
 			}
 		}
@@ -495,7 +495,7 @@ int flood_fill(Uint8* total, Uint8* copy, TupleInt *size, TupleInt seed)
 		{
 			if (copy[c + size->x] >= 250)
 			{
-				TupleInt tp = { e.x, e.y + 1 };
+				TupleShort tp = { e.x, e.y + 1 };
 				stack_push(s, tp);
 			}
 		}
@@ -505,7 +505,7 @@ int flood_fill(Uint8* total, Uint8* copy, TupleInt *size, TupleInt seed)
 		{
 			if (copy[c-1]  >= 250)
 			{
-				TupleInt tp = { e.x - 1, e.y };
+				TupleShort tp = { e.x - 1, e.y };
 				stack_push(s, tp);
 			}
 		}
@@ -515,7 +515,7 @@ int flood_fill(Uint8* total, Uint8* copy, TupleInt *size, TupleInt seed)
 		{
 			if (copy[c+1] >= 250)
 			{
-				TupleInt tp = { e.x + 1, e.y };
+				TupleShort tp = { e.x + 1, e.y };
 				stack_push(s, tp);
 			}
 		}
@@ -524,7 +524,7 @@ int flood_fill(Uint8* total, Uint8* copy, TupleInt *size, TupleInt seed)
 	return res;
 }
 
-void retrieveblob(Uint8 *blobimg, TupleInt *size)
+void retrieveblob(Uint8 *blobimg, TupleShort *size)
 {
 	for (size_t i = 0; i < size->y; i++)
 	{
@@ -550,7 +550,7 @@ SDL_Surface *blob_detection(SDL_Surface *img)
 
 	Uint8 *resblob = malloc(sizeof(Uint8) * n);
 
-	TupleInt size = { img->w, img->h };
+	TupleShort size = { img->w, img->h };
 	int max = 0;
 	for (int i = 0; i < size.y; i++)
 	{
@@ -562,7 +562,7 @@ SDL_Surface *blob_detection(SDL_Surface *img)
 				Uint8 *copy = malloc(sizeof(Uint8) * n);
 				binarraycpy(original, copy, n);
 
-				TupleInt start = { j, i };
+				TupleShort start = { j, i };
 				int tmp = flood_fill(totalarr, copy, &size, start);
 				if (tmp > max)
 				{

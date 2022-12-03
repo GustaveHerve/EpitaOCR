@@ -21,6 +21,11 @@ typedef struct TupleInt{
 	int y;
 } TupleInt;
 
+typedef struct TupleShort{
+	short x;
+	short y;
+} TupleShort;
+
 typedef struct Stack_Tint{
 	int maxsize;
 	TupleInt* arr;
@@ -40,14 +45,14 @@ int get_biggest_bin(int* hough, int maxr, int maxtheta);
 typedef struct Stack{
 	int size;
 	int capacity;
-	TupleInt *data;
+	TupleShort *data;
 } Stack;
 
 Stack *stack_init();
 int stack_isempty(Stack* s);
 void stack_free(Stack* s);
 void stack_doublesize(Stack *s);
-void stack_push(Stack *s, TupleInt x);
-int stack_pop(Stack *s, TupleInt *x);
+void stack_push(Stack *s, TupleShort x);
+int stack_pop(Stack *s, TupleShort *x);
 
 #endif

@@ -173,7 +173,7 @@ Stack *stack_init()
 	Stack *s = malloc(sizeof(Stack));
 	s->size = 0;
 	s->capacity = 1;
-	s->data = malloc(sizeof(TupleInt));
+	s->data = malloc(sizeof(TupleShort));
 	return s;
 }
 
@@ -194,12 +194,12 @@ void stack_free(Stack* s)
 void stack_doublesize(Stack *s)
 {
 	s->capacity *= 2;
-	s->data = realloc(s->data, sizeof(TupleInt) * s->capacity);
+	s->data = realloc(s->data, sizeof(TupleShort) * s->capacity);
 	if (s->data == NULL)
 		errx(1, "Not enough memory for stack");
 }
 
-void stack_push(Stack *s, TupleInt x)
+void stack_push(Stack *s, TupleShort x)
 {
 	s->size++;
 	if (s->size > s->capacity)
@@ -207,7 +207,7 @@ void stack_push(Stack *s, TupleInt x)
 	s->data[s->size-1] = x;
 }
 
-int stack_pop(Stack *s, TupleInt *x)
+int stack_pop(Stack *s, TupleShort *x)
 {
 	if (stack_isempty(s))
 		return 0;
