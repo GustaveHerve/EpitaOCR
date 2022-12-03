@@ -36,5 +36,6 @@ int is_square(Square *sq, float tolerance);
 int square_len(Square *sq);
 void plotLine(SDL_Surface *surf, Line *line, Uint32 color);
 void drawred(SDL_Surface *surf, Line *line);
+void draw_square(SDL_Surface *surf, Square *sq);
 
 #endif
