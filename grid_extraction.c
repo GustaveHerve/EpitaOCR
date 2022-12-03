@@ -127,9 +127,7 @@ void extract_cells(Square *sq, SDL_Surface *image, char* path)
 			SDL_Rect rect = { x0, y0, avgx, avgy };
 
 			SDL_BlitSurface(image, &rect, temp, NULL);
-			IMG_SavePNG(temp, "temp/zzcc.png");
 			SDL_BlitScaled(temp, NULL, crop, NULL);
-			IMG_SavePNG(temp, "temp/beforeextract.png");
 
 			char *ext = ".png";
 			char *pathres = calloc(50 ,sizeof(char));
