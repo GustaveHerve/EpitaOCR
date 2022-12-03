@@ -63,7 +63,7 @@ void gauss_blur(SDL_Surface* img, int size, double sigma)
 	gauss_ker(size, sigma, ker);
 	blur_convolution(img, ker, size, size, b);
 	apply_convolution_int(img, b, (size_t) img->h, (size_t) img->w);
-
+	free(b);
 }
 
 void blur(SDL_Surface* image, int kersize)

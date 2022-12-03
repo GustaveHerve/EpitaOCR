@@ -307,6 +307,7 @@ Square get_blobs(Line* lines, int len, int width, int height)
 											reorganize_square(&grid);
 										}
 									}
+									free(res);
 								}
 							}
 						}
