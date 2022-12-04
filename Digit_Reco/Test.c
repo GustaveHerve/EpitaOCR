@@ -2,17 +2,15 @@
 #include "new_ai.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
+//#include <math.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
-#include "include/image_loading.h"
-#include "include/pixel.h"
+//#include "include/image_loading.h"
+//#include "include/pixel.h"
 #include <dirent.h>
+#include <string.h>
 
 // define the number of each type of nodes
-#define nInputs 784
-#define nOutputs 10
-#define nHiddenNodes 20
 #define filename "Brain"
 #define savefile "grid_00"
 
@@ -437,7 +435,6 @@ int main(int argc, char **argv)
         FILE * fp;
         int arr[82];
         int i = 0;
-        fp = fopen(savefile, "w"); 
         if (d)
         {
             while ((dir = readdir(d)) != NULL)
@@ -454,8 +451,8 @@ int main(int argc, char **argv)
                     //Train(2,s);
                 }
             }
-
             int tmp = 0;
+            fp = fopen(savefile, "w");
             for (int i = 1; i < 10;i++)
             {
                 int g = tmp;
@@ -476,7 +473,6 @@ int main(int argc, char **argv)
 
                 tmp++;
             }
-
             closedir(d);
             fclose(fp);
         }

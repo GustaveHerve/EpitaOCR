@@ -12,7 +12,7 @@
 // define the number of each type of nodes
 #define nInputs 784
 #define nOutputs 10
-#define nHiddenNodes 175
+#define nHiddenNodes 15
 #define filename "Brain"
 #define IMAGES 295
 #define STRING 30
@@ -86,7 +86,7 @@ void InputValues(char* file, double **hWeights,
  }
  else
  { // If there is no "Brain" file that means that it's the first time that
-        // the NN if being launched, therefore we input random values.
+ // the NN if being launched, therefore we input random values.
 
      for (int i = 0; i < nInputs; i++)
          for (int j = 0; j < nHiddenNodes; j++)
@@ -160,7 +160,7 @@ void fill(char **arr, DIR *d, struct dirent *dir, char *name)
     char* fn = (char*)malloc(25 * sizeof(char));
     while ((dir = readdir(d)) != NULL && i < IMAGES)
     {
-        if (strstr(dir->d_name, "png") != NULL)
+        if (strstr(dir->d_name, "png") != NULL || strstr(dir->d_name, "jpeg"))
         {
             strcpy( fn, name);
             char* s = strcat(fn,dir->d_name);
@@ -176,16 +176,26 @@ int ai(int argc, char *argv, char **im)
 {
     /*
     printf("%s\n",im[0]);
-    printf("%s\n",im[1]);
-    printf("%s\n",im[2]);
-    printf("%s\n",im[3]);
-    printf("%s\n",im[4]);
-    printf("%s\n",im[5]);
-    printf("%s\n",im[6]);
-    printf("%s\n",im[7]);
-    printf("%s\n",im[8]);
-    printf("%s\n",im[9]);
+    //printf("Test1\n");
+    //printf("%s\n",im[1]);
+    printf("Test2\n");
+    //printf("%s\n",im[2]);
+     printf("Test3\n");
+    //printf("%s\n",im[3]);
+     printf("Test4\n");
+    //printf("%s\n",im[4]);
+     printf("Test5\n");
+    //printf("%s\n",im[5]);
+     printf("Test6\n");
+    //printf("%s\n",im[6]);
+     printf("Test7\n");
+    //printf("%s\n",im[7]);
+     printf("Test8\n");
+    //printf("%s\n",im[8]);
+     printf("Test9\n");
+    //printf("%s\n",im[9]);
     */
+
     if (argc > 2)
     {
         fprintf(stderr, "To many arguments \n");
@@ -199,7 +209,7 @@ int ai(int argc, char *argv, char **im)
     double* hBias = (double*)malloc(nHiddenNodes * sizeof(double));
     double* oBias = (double*)malloc(nOutputs * sizeof(double));
 
-    int numberOfTimes = 40;
+    int numberOfTimes = 5;
     if (argc)
         numberOfTimes = 1;
 
@@ -271,6 +281,7 @@ int ai(int argc, char *argv, char **im)
      {
         image = load_image(argv);
         parcours_pixel(image,trainInput[0]);
+        SDL_FreeSurface(image);
         //for (int i = 0; i < nInputs; i++)
             //printf("%lf",trainInput[0][i]);
      }
@@ -281,24 +292,43 @@ int ai(int argc, char *argv, char **im)
      //for (int i = 0; i < nInputs; i++)
          //printf("%lf",trainInput[0][i]);  
      parcours_pixel(image,trainInput[0]);
+     SDL_FreeSurface(image);
+
      image = load_image(im[1]);
      parcours_pixel(image,trainInput[1]);
+     SDL_FreeSurface(image);
+
      image = load_image(im[2]);
      parcours_pixel(image,trainInput[2]);
+     SDL_FreeSurface(image);
+
      image = load_image(im[3]);
      parcours_pixel(image,trainInput[3]);
+    SDL_FreeSurface(image);
+
      image = load_image(im[4]);
      parcours_pixel(image,trainInput[4]);
+     SDL_FreeSurface(image);
      image = load_image(im[5]);
      parcours_pixel(image,trainInput[5]);
+     SDL_FreeSurface(image);
+
      image = load_image(im[6]);
      parcours_pixel(image,trainInput[6]);
+     SDL_FreeSurface(image);
+
      image = load_image(im[7]);
      parcours_pixel(image,trainInput[7]);
+     SDL_FreeSurface(image);
+
      image = load_image(im[8]);
      parcours_pixel(image,trainInput[8]);
+     SDL_FreeSurface(image);
+
      image = load_image(im[9]);
      parcours_pixel(image,trainInput[9]);
+     SDL_FreeSurface(image);
+
     }
 
     InputValues(filename, hWeights, oWeights, oBias, hBias, hLayer, oLayer);
@@ -423,7 +453,6 @@ int ai(int argc, char *argv, char **im)
 
     for (int i = 0; i < nInputs;i++)
         free(hWeights[i]);
-
     free(hWeights);
     for (int i = 0; i < trainSets;i++)
         free(trainInput[i]);
@@ -442,6 +471,19 @@ int ai(int argc, char *argv, char **im)
 
 }
 
+static int myCompare(const void* a, const void* b)
+{
+    // setting up rules for comparison
+    return strcmp(*(const char**)a, *(const char**)b);
+}
+
+void sort(char* arr[], int n)
+{
+    // calling qsort function to sort the array
+    // with the help of Comparator
+    qsort(arr, n, sizeof(char*), myCompare);
+}
+
 int Call()
 {
     char** arr0 = (char**)malloc(IMAGES * sizeof(char*));
@@ -451,65 +493,94 @@ int Call()
     struct dirent *dir;
     d = opendir("training_data/0/");
     fill(arr0,d,dir,"training_data/0/");
+    int n = sizeof(arr0) / sizeof(arr0[0]);
+    sort(arr0, n);
 
     char** arr1 = (char**)malloc(IMAGES * sizeof(char*));
     for (int i = 0; i < IMAGES; i++)
         arr1[i] = (char*)malloc(STRING * sizeof(char));
     d = opendir("training_data/1/");
     fill(arr1,d,dir,"training_data/1/");
+    n = sizeof(arr1) / sizeof(arr1[0]);
+    sort(arr1, n);
+
 
     char** arr3 = (char**)malloc(IMAGES * sizeof(char*));
     for (int i = 0; i < IMAGES; i++)
         arr3[i] = (char*)malloc(STRING * sizeof(char));
     d = opendir("training_data/3/");
     fill(arr3,d,dir,"training_data/3/");
+    n = sizeof(arr3) / sizeof(arr3[0]);
+    sort(arr3, n);
+
 
     char** arr2 = (char**)malloc(IMAGES * sizeof(char*));
     for (int i = 0; i < IMAGES; i++)
         arr2[i] = (char*)malloc(STRING * sizeof(char));
     d = opendir("training_data/2/");
     fill(arr2,d,dir,"training_data/2/");
+    n = sizeof(arr2) / sizeof(arr2[0]);
+    sort(arr2, n);
+
 
     char** arr4 = (char**)malloc(IMAGES * sizeof(char*));
     for (int i = 0; i < IMAGES; i++)
         arr4[i] = (char*)malloc(STRING * sizeof(char));
     d = opendir("training_data/4/");
     fill(arr4,d,dir,"training_data/4/");
+    n = sizeof(arr4) / sizeof(arr4[0]);
+    sort(arr4, n);
+
 
     char** arr5 = (char**)malloc(IMAGES * sizeof(char*));
     for (int i = 0; i < IMAGES; i++)
         arr5[i] = (char*)malloc(STRING * sizeof(char));
     d = opendir("training_data/5/");
     fill(arr5,d,dir,"training_data/5/");
+    n = sizeof(arr5) / sizeof(arr5[0]);
+    sort(arr5, n);
+
 
     char** arr6 = (char**)malloc(IMAGES * sizeof(char*));
     for (int i = 0; i < IMAGES; i++)
         arr6[i] = (char*)malloc(STRING * sizeof(char));
     d = opendir("training_data/6/");
     fill(arr6,d,dir,"training_data/6/");
+    n = sizeof(arr6) / sizeof(arr6[0]);
+    sort(arr6, n);
+
 
     char** arr7 = (char**)malloc(IMAGES * sizeof(char*));
     for (int i = 0; i < IMAGES; i++)
         arr7[i] = (char*)malloc(STRING * sizeof(char));
     d = opendir("training_data/7/");
     fill(arr7,d,dir,"training_data/7/");
+    n = sizeof(arr7) / sizeof(arr7[0]);
+    sort(arr7, n);
+
 
     char** arr8 = (char**)malloc(IMAGES * sizeof(char*));
     for (int i = 0; i < IMAGES; i++)
         arr8[i] = (char*)malloc(STRING * sizeof(char));
     d = opendir("training_data/8/");
     fill(arr8,d,dir,"training_data/8/");
+    n = sizeof(arr8) / sizeof(arr8[0]);
+    sort(arr8, n);
+
 
     char** arr9 = (char**)malloc(IMAGES * sizeof(char*));
     for (int i = 0; i < IMAGES; i++)
         arr9[i] = (char*)malloc(STRING * sizeof(char));
     d = opendir("training_data/9/");
     fill(arr9,d,dir,"training_data/9/");
+    n = sizeof(arr9) / sizeof(arr9[0]);
+    sort(arr9, n);
+
 
     char** res = (char**)malloc(10 * sizeof(char*));
     for (int i = 0; i < 10; i++)
         res[i] = (char*)malloc(STRING * sizeof(char));
-    for (int i = 0; i < 118; i++)
+    for (int i = 0; i < IMAGES; i++)
     {
         strcpy(res[0],arr0[i]);
         strcpy(res[1],arr1[i]);
@@ -522,6 +593,7 @@ int Call()
         strcpy(res[8],arr8[i]);
         strcpy(res[9],arr9[i]);
         ai(1,NULL,res);
+        printf("iteration : %d\n",i);
     }
 
     for (int i = 0; i < IMAGES;i++)
@@ -547,6 +619,7 @@ int Call()
     free(arr7);
     free(arr8);
     free(arr9);
+    return 0;
 }
 
 
