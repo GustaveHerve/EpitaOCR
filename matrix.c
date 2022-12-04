@@ -214,8 +214,6 @@ double* inverseMat(double* mat, int dim)
     double* inverse = malloc(sizeof(double)*dim*dim);
     double det = get_determinant(mat, dim);
    
-    printf("det = %lf\n", det);
-
     if(det == 0)
     {
         printf("Can't inverse singular matrix..\n");

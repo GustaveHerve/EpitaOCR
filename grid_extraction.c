@@ -290,16 +290,36 @@ void clean_cell(SDL_Surface *img)
 	get_binarray(img, arr);
 
 	TupleShort seed = { 0, 0 };
-	int success = find_digit(arr, img->w, 5, &seed);
+	int tolerance = 5 * img->h / 28;
+	int success = find_digit(arr, img->w, tolerance, &seed);
 	if (success)
 	{
 		DigitInfo *d = cell_fill(arr, img->h, seed);
+		int xlen = d->xmax - d->xmin;
+		int ylen = d->ymax - d->ymin;
+		if ((float)xlen * (float)ylen / (float)size < 0.03)
+		{
+			Uint32 color = SDL_MapRGB(img->format, 255, 255, 255);
+			SDL_FillRect(img, NULL, color);
+		}
+		else
+		{
+			restore_digit(arr, size);
+
+			binarr_to_surf(arr, img, size);
+			SDL_Surface *norm = normalize_digit(img, d);
+			invert(norm);
+			*img = *norm;
+
+		}
+		/*
 		restore_digit(arr, size);
 
 		binarr_to_surf(arr, img, size);
 		SDL_Surface *norm = normalize_digit(img, d);
 		invert(norm);
 		*img = *norm;
+		*/
 	}
 	else
 	{
@@ -352,8 +372,8 @@ void extract_cells(Square *sq, SDL_Surface *image, char* path)
 			SDL_Rect rect = { x0, y0, len, len };
 
 			SDL_BlitSurface(image, &rect, temp, NULL);
-			clean_cell(temp);
             IMG_SavePNG(temp, "temp/provider.png");
+			clean_cell(temp);
 			SDL_BlitScaled(temp, NULL, crop, NULL);
             IMG_SavePNG(crop, "temp/trueprovider.png");
 

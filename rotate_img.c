@@ -154,11 +154,8 @@ double* get_hMatrix(int* old, int* new)
     return hmatrix; 
 }
 
-Square homographic_Transform(SDL_Surface *img, Square corners)
+SDL_Surface *homographic_Transform(SDL_Surface *img, Square corners)
 {
-    //here are the coordinates that the function will return
-    int x1p, y1p, x2p, y2p, x3p, y3p, x4p, y4p;
-
     //below are the coordinates of the grid given in arguments
     int x1 = corners.NW.x;
     int y1 = corners.NW.y;
@@ -202,27 +199,6 @@ Square homographic_Transform(SDL_Surface *img, Square corners)
             int new_x = newCos[0]/newCos[2];
             int new_y = newCos[1]/newCos[2];
             
-            if(x == x1 && y == y1)
-            {    
-                x1p = new_x;
-                y1p = new_y;
-            }
-            else if(x == x2 && y == y2)
-            {    
-                x2p = new_x;
-                y2p = new_y;
-            }
-            else if(x == x3 && y == y3)
-            {    
-                x3p = new_x;
-                y3p = new_y;
-            }
-            else if(x == x4 && y == y4)
-            {    
-                x4p = new_x;
-                y4p = new_y;
-            }
-
             Uint32 old_pixel = oldpixels[(new_y * (int)img->w + new_x)];
             pixels[y * (int)w +x] = old_pixel;
        }
@@ -230,13 +206,7 @@ Square homographic_Transform(SDL_Surface *img, Square corners)
    
     free(hmatrix);
     free(newCos);
-    IMG_SavePNG(new_img, "homographic_image.png");
+    //IMG_SavePNG(new_img, "homographic_image.png");
 
-    TupleInt p1 = {x1p, y1p};
-    TupleInt p2 = {x2p, y2p};
-    TupleInt p3 = {x3p, y3p};
-    TupleInt p4 = {x4p, y4p};
-    Square new_corners = {p1, p4, p2, p3};
-    
-    return new_corners; 
+    return new_img; 
 }
