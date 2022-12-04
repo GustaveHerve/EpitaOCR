@@ -103,9 +103,9 @@ int find_digit(Uint8* arr, int size, int tolerance, TupleShort *s)
 	}
 
 	TupleShort p1 = center;
-	TupleShort p2 = center;  
-	TupleShort p3 = center;  
-	TupleShort p4 = center;  
+	TupleShort p2 = center;
+	TupleShort p3 = center;
+	TupleShort p4 = center;
 	while (acc < tolerance && !found)
 	{
 		if (!found && p1.y - 1 >= 0)
@@ -248,35 +248,40 @@ SDL_Surface *normalize_digit(SDL_Surface *cell, DigitInfo *d)
 	int xc = (int)d->xmin;
 	int yc = (int)d->ymin;
 	SDL_Rect rect = { xc, yc, xlen, ylen };
+    IMG_SavePNG(cell,"temp/baseimage.png");
 
-	SDL_Surface *crop_tmp = 
-				SDL_CreateRGBSurface(0, xlen, ylen, 32, 0, 0, 0, 0);
-    SDL_Surface *crop = 
+	SDL_Surface *crop_tmp =
+			SDL_CreateRGBSurface(0, xlen, ylen, 32, 0, 0, 0, 0);
+    SDL_Surface *crop =
 				SDL_ConvertSurfaceFormat(crop_tmp, SDL_PIXELFORMAT_RGB888, 0);
 	SDL_FreeSurface(crop_tmp);
 
 	SDL_BlitSurface(cell, &rect, crop, NULL);
+    IMG_SavePNG(crop,"temp/beforeerose.png");
+    IMG_SavePNG(crop,"temp/aftererose.png");
 
 	float coeff = (float)28 / ylen;
 	xlen *= coeff;
 	ylen = 28;
-	SDL_Surface *stretch_tmp = 
+	SDL_Surface *stretch_tmp =
 				SDL_CreateRGBSurface(0, xlen, ylen, 32, 0, 0, 0, 0);
-    SDL_Surface *stretch = 
-				SDL_ConvertSurfaceFormat(crop_tmp, SDL_PIXELFORMAT_RGB888, 0);
+    SDL_Surface *stretch =
+				SDL_ConvertSurfaceFormat(stretch_tmp, SDL_PIXELFORMAT_RGB888, 0);
 	SDL_FreeSurface(stretch_tmp);
 
 	SDL_BlitScaled(crop, NULL, stretch, NULL);
+    IMG_SavePNG(stretch, "temp/afterstretch.png");
 
 	int x0 = 28/2 - xlen/2;
 	SDL_Rect rect2 = { x0, 0, xlen, ylen };
 
 	SDL_Surface *res = SDL_CreateRGBSurface(0, 28, 28, 32, 0, 0, 0, 0);
 	SDL_BlitSurface(stretch, NULL, res, &rect2);
+    IMG_SavePNG(res, "temp/res.png");
 	SDL_FreeSurface(stretch);
 
 	return res;
-} 
+}
 
 void clean_cell(SDL_Surface *img)
 {
@@ -293,7 +298,6 @@ void clean_cell(SDL_Surface *img)
 
 		binarr_to_surf(arr, img, size);
 		SDL_Surface *norm = normalize_digit(img, d);
-		//erose(norm, 3);
 		invert(norm);
 		*img = *norm;
 	}
@@ -310,6 +314,11 @@ void extract_cells(Square *sq, SDL_Surface *image, char* path)
 {
 	int avgy = ((sq->SW.y - sq->NW.y) + (sq->SE.y - sq->NE.y)) / 2 / 9;
 	int avgx = ((sq->NE.x - sq->NW.x) + (sq->SE.x - sq->SW.x)) / 2 / 9;
+    int len = 0;
+    if (avgy > avgx)
+        len = avgy;
+    else
+        len = avgx;
 	int counter = 0;
 	int x0 = sq->NW.x;
 	int y0 = sq->NW.y;
@@ -330,21 +339,23 @@ void extract_cells(Square *sq, SDL_Surface *image, char* path)
 			}
 			name[1] = (counter % 10) + '0';
 
-			SDL_Surface* crop_s = 
+			SDL_Surface* crop_s =
 				SDL_CreateRGBSurface(0, 28, 28, 32, 0, 0, 0, 0);
-			SDL_Surface* temp_s = 
-				SDL_CreateRGBSurface(0, avgx, avgy, 32, 0, 0, 0, 0);
-    		SDL_Surface* crop = 
+			SDL_Surface* temp_s =
+				SDL_CreateRGBSurface(0, len, len, 32, 0, 0, 0, 0);
+    		SDL_Surface* crop =
 				SDL_ConvertSurfaceFormat(crop_s, SDL_PIXELFORMAT_RGB888, 0);
-    		SDL_Surface* temp = 
+    		SDL_Surface* temp =
 				SDL_ConvertSurfaceFormat(temp_s, SDL_PIXELFORMAT_RGB888, 0);
 			SDL_FreeSurface(crop_s);
 			SDL_FreeSurface(temp_s);
-			SDL_Rect rect = { x0, y0, avgx, avgy };
+			SDL_Rect rect = { x0, y0, len, len };
 
 			SDL_BlitSurface(image, &rect, temp, NULL);
+			clean_cell(temp);
+            IMG_SavePNG(temp, "temp/provider.png");
 			SDL_BlitScaled(temp, NULL, crop, NULL);
-			clean_cell(crop);
+            IMG_SavePNG(crop, "temp/trueprovider.png");
 
 			char *ext = ".png";
 			char *pathres = calloc(50 ,sizeof(char));

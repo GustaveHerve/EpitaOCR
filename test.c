@@ -107,8 +107,11 @@ int main(int argc, char** argv)
 	draw_square(original, &blobtest);
 	IMG_SavePNG(original, "temp/grid_detection.png");
 
+	erose(test, 3);
+    otsu(original);
+    invert(original);
 	IMG_SavePNG(test, "temp/beforeextract.png");
-	extract_cells(&blobtest, test, "temp/cells/");
+	extract_cells(&blobtest, original, "temp/cells/");
 
     SDL_FreeSurface(test);
     SDL_FreeSurface(original);
