@@ -4,6 +4,8 @@
 #include "geometry.h"
 #include <SDL2/SDL.h>
 
+
+
 int get_squares(Line *x, Line *y, Square *res);
 Square *get_squares_seg(Segment *grid);
 

@@ -23,6 +23,14 @@ typedef struct Square
 	TupleInt SE;
 } Square;
 
+typedef struct DigitInfo
+{
+	short xmin;
+	short xmax;
+	short ymin;
+	short ymax;
+
+} DigitInfo;
 
 int polar_intersection(TupleInt *res, Line line1, Line line2);
 int line_intersect(TupleInt *res, Line line1, Line line2,

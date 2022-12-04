@@ -160,8 +160,11 @@ int find_digit(Uint8* arr, int size, int tolerance, TupleShort *s)
 	return 1;
 }
 
-void cell_fill(Uint8* arr, int size, TupleShort seed)
+DigitInfo *cell_fill(Uint8* arr, int size, TupleShort seed)
 {
+	DigitInfo *digit = malloc(sizeof(DigitInfo));
+	digit->xmin = seed.x, digit->xmax = seed.x;
+	digit->ymin = seed.y, digit->ymax = seed.y;
 	Stack *s = stack_init(s);
 	Uint8 grey = 120;
 	stack_push(s, seed);
@@ -169,6 +172,17 @@ void cell_fill(Uint8* arr, int size, TupleShort seed)
 	{
 		TupleShort e = { 0, 0 };
 		stack_pop(s, &e);
+
+		if (e.y < digit->ymin)
+			digit->ymin = e.y;
+		else if (e.y > digit->ymax)
+			digit->ymax = e.y;
+
+		if (e.x < digit->xmin)
+			digit->xmin = e.x;
+		else if (e.x > digit->xmax)
+			digit->xmax = e.x;
+
 		size_t c = e.y * size + e.x;
 		arr[c] = grey;
 
@@ -213,6 +227,7 @@ void cell_fill(Uint8* arr, int size, TupleShort seed)
 		}
 	}
 	stack_free(s);
+	return digit;
 }
 
 void restore_digit(Uint8 *arr, int len)
@@ -226,6 +241,43 @@ void restore_digit(Uint8 *arr, int len)
 	}
 }
 
+SDL_Surface *normalize_digit(SDL_Surface *cell, DigitInfo *d)
+{
+	int xlen = d->xmax - d->xmin;
+	int ylen = d->ymax - d->ymin;
+	int xc = (int)d->xmin;
+	int yc = (int)d->ymin;
+	SDL_Rect rect = { xc, yc, xlen, ylen };
+
+	SDL_Surface *crop_tmp = 
+				SDL_CreateRGBSurface(0, xlen, ylen, 32, 0, 0, 0, 0);
+    SDL_Surface *crop = 
+				SDL_ConvertSurfaceFormat(crop_tmp, SDL_PIXELFORMAT_RGB888, 0);
+	SDL_FreeSurface(crop_tmp);
+
+	SDL_BlitSurface(cell, &rect, crop, NULL);
+
+	float coeff = (float)28 / ylen;
+	xlen *= coeff;
+	ylen = 28;
+	SDL_Surface *stretch_tmp = 
+				SDL_CreateRGBSurface(0, xlen, ylen, 32, 0, 0, 0, 0);
+    SDL_Surface *stretch = 
+				SDL_ConvertSurfaceFormat(crop_tmp, SDL_PIXELFORMAT_RGB888, 0);
+	SDL_FreeSurface(stretch_tmp);
+
+	SDL_BlitScaled(crop, NULL, stretch, NULL);
+
+	int x0 = 28/2 - xlen/2;
+	SDL_Rect rect2 = { x0, 0, xlen, ylen };
+
+	SDL_Surface *res = SDL_CreateRGBSurface(0, 28, 28, 32, 0, 0, 0, 0);
+	SDL_BlitSurface(stretch, NULL, res, &rect2);
+	SDL_FreeSurface(stretch);
+
+	return res;
+} 
+
 void clean_cell(SDL_Surface *img)
 {
 	int size = img->w * img->h;
@@ -236,16 +288,19 @@ void clean_cell(SDL_Surface *img)
 	int success = find_digit(arr, img->w, 5, &seed);
 	if (success)
 	{
-		cell_fill(arr, img->h, seed);
+		DigitInfo *d = cell_fill(arr, img->h, seed);
 		restore_digit(arr, size);
 
 		binarr_to_surf(arr, img, size);
+		SDL_Surface *norm = normalize_digit(img, d);
+		//erose(norm, 3);
+		invert(norm);
+		*img = *norm;
 	}
 	else
 	{
-		Uint8 *empty = calloc(size, sizeof(Uint8));
-		binarr_to_surf(empty, img, size);
-		free(empty);
+		Uint32 color = SDL_MapRGB(img->format, 255, 255, 255);
+		SDL_FillRect(img, NULL, color);
 	}
 
 	free(arr);
