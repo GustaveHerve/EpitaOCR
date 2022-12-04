@@ -155,7 +155,7 @@
                     <property name="receives-default">True</property>
                     <property name="use-stock">True</property>
                     <property name="image-position">right</property>
-                    <signal name="clicked" handler="changeS" after="yes" swapped="no"/>
+                    <signal name="clicked" handler="changeS" swapped="no"/>
                     <signal name="clicked" handler="onLast" swapped="no"/>
                   </object>
                   <packing>
@@ -171,7 +171,7 @@
                     <property name="receives-default">True</property>
                     <property name="use-stock">True</property>
                     <property name="image-position">right</property>
-                    <signal name="clicked" handler="changeS" after="yes" swapped="no"/>
+                    <signal name="clicked" handler="changeS" swapped="no"/>
                     <signal name="clicked" handler="onForward" swapped="no"/>
                   </object>
                   <packing>
@@ -186,7 +186,7 @@
                     <property name="can-focus">True</property>
                     <property name="receives-default">True</property>
                     <property name="use-stock">True</property>
-                    <signal name="clicked" handler="changeS" after="yes" swapped="no"/>
+                    <signal name="clicked" handler="changeS" swapped="no"/>
                     <signal name="clicked" handler="onRewind" swapped="no"/>
                   </object>
                   <packing>
@@ -201,7 +201,7 @@
                     <property name="can-focus">True</property>
                     <property name="receives-default">True</property>
                     <property name="use-stock">True</property>
-                    <signal name="clicked" handler="changeS" after="yes" swapped="no"/>
+                    <signal name="clicked" handler="changeS" swapped="no"/>
                     <signal name="clicked" handler="onFirst" swapped="no"/>
                   </object>
                   <packing>

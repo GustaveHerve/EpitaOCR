@@ -29,6 +29,10 @@ button {
 	color: whitesmoke;
 }
 
+button:hover {
+	background-color: #343745;
+}
+
 .titlelabel {
 	font-family: arial;
 	font-size: 20px;

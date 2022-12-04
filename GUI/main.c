@@ -7,6 +7,8 @@
 #include "../include/matrix.h"
 #include "../include/pixel.h"
 #include "../include/image_loading.h"
+#include "../include/image_processing.h"
+#include "../include/thresholding.h"
 
 // Global Declarations : 
 GtkWidget *window = NULL;
@@ -23,8 +25,8 @@ GtkAdjustment *adju = NULL;
 GtkScale *rotscale = NULL;
 bool im1 = TRUE;
 bool im2 = FALSE;
-//GtkAllocation *allocation = NULL;
 GdkPixbuf *pixImage = NULL;
+int step = 0;
 
 /////////////////////////////
 
@@ -74,7 +76,6 @@ int main(int argc, char *argv [])
 	window = GTK_WIDGET(gtk_builder_get_object (builder, "mainwindow"));
 	impButton = GTK_WIDGET(gtk_builder_get_object(builder,"impButton"));
 	image = GTK_WIDGET(gtk_builder_get_object(builder,"image"));
-	//image = gtk_image_new_from_file ("myfile.png");
 	fixedImg = GTK_WIDGET(gtk_builder_get_object(builder, "fixedImg"));
 	infoLabel = GTK_LABEL(gtk_builder_get_object(builder,"infoLabel"));
 	delButton = GTK_WIDGET(gtk_builder_get_object(builder, "delButton"));
@@ -90,15 +91,6 @@ int main(int argc, char *argv [])
 	/* Displaying the Main Window */
 	gtk_widget_show(window);
 	image2 = NULL;
-/*    GtkAllocation* allocation = NULL;
-	gtk_widget_get_allocation(fixedImg,allocation);
-	GError** error = NULL;
-*/    
-/*    int widx = gtk_widget_get_allocated_width(GTK_WIDGET(fixedImg));
-	int widy = gtk_widget_get_allocated_height(GTK_WIDGET(fixedImg));
-	GdkPixbuf* src = gdk_pixbuf_new_from_file("img/image.png",&error);
-	GdkPixbuf *pixImage = gdk_pixbuf_scale_simple(src,widx,widy,GDK_INTERP_BILINEAR);
-*/ 
 
 	printf("Launched !\n");
  
@@ -160,6 +152,7 @@ void on_delButton_clicked()
 {
 	if(im2)
 	{
+		step = 0;
 		im1 = TRUE;
 		im2 = FALSE;
 		if(gtk_range_get_value(GTK_RANGE(rotscale)) != 0)
@@ -213,8 +206,6 @@ void mResize()
 
 		GdkPixbuf* test = gdk_pixbuf_new_from_file_at_scale("image_rotated.png",widx,widy,TRUE,&error);
 
-		// GdkPixbuf* src = gdk_pixbuf_new_from_file("image_rotated.png",&error);
-		// GdkPixbuf *pixImage = gdk_pixbuf_scale_simple(src,widx,widy,GDK_INTERP_BILINEAR);
 		image2 = gtk_image_new_from_pixbuf(test); 
 		gtk_widget_show(image2);
 
@@ -233,9 +224,6 @@ void mResize()
 
 
 		rotate_img90(img,value);
-		// image2 = gtk_image_new_from_file("image_rotated.png");
-		//gtk_container_add(GTK_CONTAINER(fixedImg),image2);
-		//gtk_widget_show(image2);
 		// rotateImg("img/image.png",value);
 		//image2 = gtk_image_new_from_file("image_rotated.png");
 
@@ -246,7 +234,6 @@ void mResize()
 		gtk_widget_show(image2);
 
 		gtk_container_add(GTK_CONTAINER(fixedImg),image2);
-		// gtk_box_pack_start(GTK_BOX(fixedImg),image2,FALSE,TRUE,0);
 	}
 	//gtk_widget_hide(image);
 	else
@@ -254,7 +241,8 @@ void mResize()
 		printf("Waht're u doin her\n");
 		im1 = FALSE;
 		im2 = TRUE;
-		gtk_widget_destroy(image);
+		gtk_widget_hide(image);
+		gtk_container_remove(GTK_CONTAINER(fixedImg),image);
 		// rotate_img90(img,value);
 		rotateImg("img/image.png",value);
 		//image2 = gtk_image_new_from_file("image_rotated.png");
@@ -265,8 +253,98 @@ void mResize()
 		image2 = gtk_image_new_from_pixbuf(test); 
 		gtk_widget_show(image2);
 
-		// gtk_container_add(GTK_CONTAINER(fixedImg),image2);
-		gtk_box_pack_start(GTK_BOX(fixedImg),image2,FALSE,TRUE,0);
+		gtk_container_add(GTK_CONTAINER(fixedImg),image2);
+		//gtk_box_pack_start(GTK_BOX(fixedImg),image2,FALSE,TRUE,0);
 	}
 	gtk_label_set_text(infoLabel,"Rotation Successful");
+}
+
+
+void onFirst() // First button clicked
+{
+	step = 0;
+}
+
+void onRewind() // Rewind Button Clicked
+{
+	if(step > 0)
+		step--;
+	else
+	{
+		step = 0;
+		gtk_label_set_text(infoLabel,"You are already at the first step");
+	}
+}
+
+void onForward() // Forward Button Clicked
+{
+	if(step < 9)
+		step++;
+	else
+	{
+		step = 9;	
+		gtk_label_set_text(infoLabel,"You are already at the first step");
+	}
+
+}
+
+void onLast() // Last Button Clicked
+{
+	step = 9; //Last step
+}
+
+
+void changeS() // Will take the steps, and then change the images
+{
+	// Size of the Image Window
+	int widx = gtk_widget_get_allocated_width(fixedImg);
+	int widy = gtk_widget_get_allocated_height(fixedImg);
+
+	// SDL Surface for Func Calls
+	SDL_Surface *img = NULL;
+
+	GdkPixbuf* pixImg = NULL;
+
+	printf("Current step is step n%d\n", step);
+	switch(step)
+	{
+		case 0:
+			gtk_widget_hide(image2);
+			gtk_label_set_text(infoLabel,"[0] Raw Image");
+			gtk_container_remove(GTK_CONTAINER(fixedImg),image2);
+			GdkPixbuf* pixImg = gdk_pixbuf_new_from_file_at_scale("img/image.png",widx,widy,TRUE,NULL);
+			image2 = gtk_image_new_from_pixbuf(pixImg); 
+			gtk_widget_show(image2);
+			gtk_container_add(GTK_CONTAINER(fixedImg),image2);
+			break;
+
+		case 1:
+			gtk_widget_hide(image2);
+			gtk_label_set_text(infoLabel,"[1] Applying Greyscale...");
+			gtk_container_remove(GTK_CONTAINER(fixedImg),image2);
+			img = load_image("img/image.png");
+			greyscale(img);
+			IMG_SavePNG(img,"grayscale.png");
+			pixImg = gdk_pixbuf_new_from_file_at_scale("grayscale.png",widx,widy,TRUE,NULL);
+			image2 = gtk_image_new_from_pixbuf(pixImg); 
+			gtk_widget_show(image2);
+			gtk_container_add(GTK_CONTAINER(fixedImg),image2);
+			break;
+
+		case 2:
+			gtk_widget_hide(image2);
+			gtk_label_set_text(infoLabel,"[2] Applying Threshold...");
+			gtk_container_remove(GTK_CONTAINER(fixedImg),image2);
+			img = load_image("img/image.png");
+			adaptive_gaussthresholding(img,11,2);
+			IMG_SavePNG(img,"gThresholding.png");
+			pixImg = gdk_pixbuf_new_from_file_at_scale("gThresholding.png",widx,widy,TRUE,NULL);
+			image2 = gtk_image_new_from_pixbuf(pixImg); 
+			gtk_widget_show(image2);
+			gtk_container_add(GTK_CONTAINER(fixedImg),image2);
+			break;
+
+		default:
+			printf("Default Case\n");
+	}
 }
