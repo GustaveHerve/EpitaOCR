@@ -21,48 +21,33 @@
 int main(int argc, char** argv)
 {
     init_sdl();
-	if (argc < 2 || argc > 3)
-		errx(2, "Wrong arguments\nUsage: ./binary filepath -option");
-
-	int verbose = 0;
-
-	if (argc == 3)
-	{
-		if (strcmp(argv[2], "-v") == 0)
-			verbose = 1;
-		else
-			errx(2, "Wrong arguments\nUsage: ./binary filepath -option");
-	}
 
 	SDL_Surface* test = load_image(argv[1]);
     SDL_Surface* original = load_image(argv[1]);
 
+	/*
+	if (test->h > 800)
+	{
+		float coeff = 800 / test->h;
+		int nw = test->w * coeff;
+		SDL_Surface *tmp = SDL_CreateRGBSurface(0, nw, 800, 32, 0, 0, 0, 0);
+		SDL_Surface *tmp_c = SDL_ConvertSurfaceFormat(tmp, SDL_PIXELFORMAT_RGB888, 0);
+		SDL_FreeSurface(tmp);
+		SDL_BlitScaled(test, NULL, tmp_c, NULL);
+		test = SDL_CreateRGBSurface(0, nw, 800, 32, 0, 0, 0, 0);
+		SDL_BlitSurface(tmp_c, NULL, test, NULL);
+	}
+	*/
+
     unsigned int width = test->w;
 	unsigned int height = test->h;
 
-    
 	greyscale(test);
 
-	//dilate(test, 3);
-	//erose(test, 5);
-	gauss_blur(test, 9, 2.5);
-	//blur(test, 5);
-    IMG_SavePNG(test, "temp/guas.png");
+	gauss_blur(test, 11, 2.5);
 
 	width = width;
 	height = height; 
-
-    IMG_SavePNG(test, "temp/blur.png");
-
-	//Convert surface to greyscale
-	if (verbose)
-    	printf("Converting to greyscale..\n");
-
-	if (verbose)
-    	printf("Applying blur...\n");
-
-	if (verbose)
-    	printf("Thresholding...\n");
 
 	//canny(test);
 	adaptive_gaussthresholding(test, 11, 2);
@@ -74,9 +59,6 @@ int main(int argc, char** argv)
 
     IMG_SavePNG(test, "temp/dilate.png");
 
-	if (verbose)
-    	printf("Dilating and closing...\n");
-
 	SDL_Surface *blob = blob_detection(test);
     IMG_SavePNG(blob, "temp/blob.png");
 
@@ -86,35 +68,48 @@ int main(int argc, char** argv)
 	//dilate(dilsur, 5);
 
     int rows = sqrt(height * height + width * width);
-
 	int angle_precision = 360;
-
     int *hough = calloc(angle_precision * rows, sizeof(int));
-
-	if (verbose)
-    	printf("Detecting lines with Hough Transform...\n");
-
 	hough_lines(blob, angle_precision, 1, hough);
-	int hough_threshold = get_biggest_bin(hough, rows, angle_precision) * 0.5;
+
+	int hough_threshold = get_biggest_bin(hough, rows, angle_precision) * 0.7;
 	Line *lines = calloc(angle_precision * rows, sizeof(Line));
 	int line_nb = hough_filter(hough, rows, angle_precision, hough_threshold, lines);
+	free(hough);
 
 	for (int i = 0; i < line_nb; i++)
 		drawred(blob, &lines[i]);
 	IMG_SavePNG(blob, "temp/lines.png");
 
 	Square blobtest = get_blobs(lines, line_nb, (int)width, (int)height);
-	draw_square(original, &blobtest);
-	IMG_SavePNG(original, "temp/grid_detection.png");
+	free(lines);
 
+	//draw_square(original, &blobtest);
+	//IMG_SavePNG(original, "temp/grid_detection.png");
+
+	//erose(test, 3);
 	erose(test, 3);
-    otsu(original);
-    invert(original);
-	IMG_SavePNG(test, "temp/beforeextract.png");
-	extract_cells(&blobtest, original, "temp/cells/");
+	SDL_Surface *homo = homographic_Transform(test, blobtest);
+	IMG_SavePNG(homo, "temp/homo.png");
+
+	//gauss_blur(homo, 11, 2.5);
+	//adaptive_gaussthresholding(homo, 11, 3);
+	IMG_SavePNG(homo, "temp/otsu.png");
+	//closing(homo, 3);
+	Square homorect;
+	TupleInt a = { 0, 0 };
+	TupleInt b = { homo->w - 1, 0 };
+	TupleInt c = { homo->w - 1, homo->h - 1 };
+	TupleInt d = { 0, homo->h - 1 };
+	homorect.NW = a;
+	homorect.NE = b;
+	homorect.SE = c;
+	homorect.SW = d;
+	extract_cells(&homorect, homo, "temp/cells/");
 
     SDL_FreeSurface(test);
     SDL_FreeSurface(original);
+    SDL_FreeSurface(homo);
     SDL_Quit();
 
 }
