@@ -69,7 +69,8 @@ int main(int argc, char** argv)
     IMG_SavePNG(test, "temp/canny.png");
 
 	dilate(test, 3);
-	closing(test, 3);
+	//erose(test, 3);
+	//closing(test, 3);
 
     IMG_SavePNG(test, "temp/dilate.png");
 
@@ -79,7 +80,7 @@ int main(int argc, char** argv)
 	SDL_Surface *blob = blob_detection(test);
     IMG_SavePNG(blob, "temp/blob.png");
 
-	erose(blob, 5);
+	erose(blob, 3);
     IMG_SavePNG(blob, "temp/erose.png");
 
 	//dilate(dilsur, 5);
