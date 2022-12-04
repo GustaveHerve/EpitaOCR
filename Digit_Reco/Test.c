@@ -442,7 +442,7 @@ int main(int argc, char **argv)
         {
             while ((dir = readdir(d)) != NULL)
             {
-                if (strstr(dir->d_name, "png") != NULL)
+                if (strstr(dir->d_name, "png") != NULL || strstr(dir->d_name, "jpeg"))
                 {
                     char fn[25];
                     strcpy( fn, argv[1] );

@@ -209,6 +209,7 @@ int ai(int argc, char *argv, char **im)
     int trainSets = 10;
     if (argc)
         trainSets = 1;
+    
 
     //double* memory =
         //(double*)malloc((numberOfTimes*trainSets) * sizeof(double));
@@ -270,11 +271,15 @@ int ai(int argc, char *argv, char **im)
      {
         image = load_image(argv);
         parcours_pixel(image,trainInput[0]);
+        //for (int i = 0; i < nInputs; i++)
+            //printf("%lf",trainInput[0][i]);
      }
 
      else
      {
      image = load_image(im[0]);
+     //for (int i = 0; i < nInputs; i++)
+         //printf("%lf",trainInput[0][i]);  
      parcours_pixel(image,trainInput[0]);
      image = load_image(im[1]);
      parcours_pixel(image,trainInput[1]);
