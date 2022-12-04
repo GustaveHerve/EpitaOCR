@@ -47,10 +47,9 @@ void parcours_pixel(SDL_Surface* image, double trainInput[])
             SDL_GetRGB(pixels[i*width + j], image->format, &val, &val, &val);
             //New val from a 0-255 int to a 0-1 int
             if (val == 255)
-                val = 0;
-            else
                 val = 1;
-
+            else
+                val = 0;
             trainInput[acc] = val;
             acc++;
 

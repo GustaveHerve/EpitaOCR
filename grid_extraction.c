@@ -90,97 +90,278 @@ Square *get_squares_seg(Segment *grid)
 
 }
 
-void save_squares_seg(Square *sq, SDL_Surface *image, char* path)
+int find_digit(Uint8* arr, int size, int tolerance, TupleShort *s)
 {
-	int avg = avg_size(sq, 81);
-
-	for (int i = 0; i < 81; i++)
+	TupleShort center = { size/2, size/2 };
+	int acc = 0;
+	int found = 0;
+	int c = center.y * size + center.x;
+	if (arr[c] == 255)
 	{
-		char *name = malloc(3 * sizeof(char));
-        name[2] = 0;
-		if (i < 10)
-			name[0] = '0';
-		else
+		*s = center;
+		return 1;
+	}
+
+	TupleShort p1 = center;
+	TupleShort p2 = center;  
+	TupleShort p3 = center;  
+	TupleShort p4 = center;  
+	while (acc < tolerance && !found)
+	{
+		if (!found && p1.y - 1 >= 0)
 		{
-			int temp = i / 10;
-			name[0] = temp + '0';
+			p1.y--;
+			if (arr[p1.y*size + p1.x] == 255)
+			{
+				found = 1;
+				s->x = p1.x;
+				s->y = p1.y;
+			}
 		}
-	    name[1] = (i % 10) + '0';
-		//int w = sq[i].NE.x - sq[i].NW.x;
-		//int h = sq[i].SW.y - sq[i].NW.y;
-		int w = avg;
-		int h = avg;
 
-		SDL_Surface* crop = SDL_CreateRGBSurface(0, 28, 28, 32, 0, 0, 0, 0);
-		SDL_Surface* temp = SDL_CreateRGBSurface(0, avg, avg, 32, 0, 0, 0, 0);
-		SDL_Rect rect;
-		rect.x = sq[i].NW.x;
-		rect.y = sq[i].NW.y;
-		rect.w = w;
-		rect.h = h;
+		if (!found && p2.y + 1 < size)
+		{
+			p2.y++;
+			if (arr[p2.y*size + p2.x] == 255)
+			{
+				found = 1;
+				s->x = p2.x;
+				s->y = p2.y;
+			}
+		}
 
-		SDL_BlitSurface(image, &rect, temp, NULL);
+		if (!found && p3.x + 1 < size)
+		{
+			p3.x++;
+			if (arr[p3.y*size + p3.x] == 255)
+			{
+				found = 1;
+				s->x = p3.x;
+				s->y = p3.y;
+			}
+		}
 
-		SDL_BlitScaled(temp, NULL, crop, NULL);
-		char *ext = ".png";
-		char *pathres = calloc(50 ,sizeof(char));
-		strcat(pathres, path);
-		strcat(pathres, name);
-		strcat(pathres, ext);
-    	IMG_SavePNG(crop, pathres);
+		if (!found && p4.x - 1 >= 0)
+		{
+			p4.x--;
+			if (arr[p4.y*size + p4.x] == 255)
+			{
+				found = 1;
+				s->x = p4.x;
+				s->y = p4.y;
+			}
+		}
 
-        SDL_FreeSurface(crop);
-        SDL_FreeSurface(temp);
-        free(name);
+		acc++;
+	}
+
+	if (!found)
+		return 0;
+	return 1;
+}
+
+DigitInfo *cell_fill(Uint8* arr, int size, TupleShort seed)
+{
+	DigitInfo *digit = malloc(sizeof(DigitInfo));
+	digit->xmin = seed.x, digit->xmax = seed.x;
+	digit->ymin = seed.y, digit->ymax = seed.y;
+	Stack *s = stack_init(s);
+	Uint8 grey = 120;
+	stack_push(s, seed);
+	while (!stack_isempty(s))
+	{
+		TupleShort e = { 0, 0 };
+		stack_pop(s, &e);
+
+		if (e.y < digit->ymin)
+			digit->ymin = e.y;
+		else if (e.y > digit->ymax)
+			digit->ymax = e.y;
+
+		if (e.x < digit->xmin)
+			digit->xmin = e.x;
+		else if (e.x > digit->xmax)
+			digit->xmax = e.x;
+
+		size_t c = e.y * size + e.x;
+		arr[c] = grey;
+
+		//North
+		if (e.y - 1 >= 0)
+		{
+			if (arr[c - size] == 255)
+			{
+				TupleShort tp = { e.x, e.y - 1 };
+				stack_push(s, tp);
+			}
+		}
+
+		//South
+		if (e.y + 1 < size)
+		{
+			if (arr[c + size] == 255)
+			{
+				TupleShort tp = { e.x, e.y + 1 };
+				stack_push(s, tp);
+			}
+		}
+
+		//West
+		if (e.x - 1 >= 0)
+		{
+			if (arr[c-1] == 255)
+			{
+				TupleShort tp = { e.x - 1, e.y };
+				stack_push(s, tp);
+			}
+		}
+
+		//East
+		if (e.x + 1 < size)
+		{
+			if (arr[c+1] == 255)
+			{
+				TupleShort tp = { e.x + 1, e.y };
+				stack_push(s, tp);
+			}
+		}
+	}
+	stack_free(s);
+	return digit;
+}
+
+void restore_digit(Uint8 *arr, int len)
+{
+	for (size_t i = 0; i < len; i++)
+	{
+		if (arr[i] == 120)
+			arr[i] = 255;
+		else
+			arr[i] = 0;
 	}
 }
 
-void save_squares(Square *sq, int len, SDL_Surface *image)
+SDL_Surface *normalize_digit(SDL_Surface *cell, DigitInfo *d)
 {
-	int avg = avg_size(sq, len);
+	int xlen = d->xmax - d->xmin;
+	int ylen = d->ymax - d->ymin;
+	int xc = (int)d->xmin;
+	int yc = (int)d->ymin;
+	SDL_Rect rect = { xc, yc, xlen, ylen };
 
-	for (int i = 0; i < len; i++){
+	SDL_Surface *crop_tmp = 
+				SDL_CreateRGBSurface(0, xlen, ylen, 32, 0, 0, 0, 0);
+    SDL_Surface *crop = 
+				SDL_ConvertSurfaceFormat(crop_tmp, SDL_PIXELFORMAT_RGB888, 0);
+	SDL_FreeSurface(crop_tmp);
 
-		char *name = malloc(3 * sizeof(char));
-		if (i < 10)
-			name[0] = '0';
-		else
+	SDL_BlitSurface(cell, &rect, crop, NULL);
+
+	float coeff = (float)28 / ylen;
+	xlen *= coeff;
+	ylen = 28;
+	SDL_Surface *stretch_tmp = 
+				SDL_CreateRGBSurface(0, xlen, ylen, 32, 0, 0, 0, 0);
+    SDL_Surface *stretch = 
+				SDL_ConvertSurfaceFormat(crop_tmp, SDL_PIXELFORMAT_RGB888, 0);
+	SDL_FreeSurface(stretch_tmp);
+
+	SDL_BlitScaled(crop, NULL, stretch, NULL);
+
+	int x0 = 28/2 - xlen/2;
+	SDL_Rect rect2 = { x0, 0, xlen, ylen };
+
+	SDL_Surface *res = SDL_CreateRGBSurface(0, 28, 28, 32, 0, 0, 0, 0);
+	SDL_BlitSurface(stretch, NULL, res, &rect2);
+	SDL_FreeSurface(stretch);
+
+	return res;
+} 
+
+void clean_cell(SDL_Surface *img)
+{
+	int size = img->w * img->h;
+	Uint8 *arr = malloc(size * sizeof(Uint8));
+	get_binarray(img, arr);
+
+	TupleShort seed = { 0, 0 };
+	int success = find_digit(arr, img->w, 5, &seed);
+	if (success)
+	{
+		DigitInfo *d = cell_fill(arr, img->h, seed);
+		restore_digit(arr, size);
+
+		binarr_to_surf(arr, img, size);
+		SDL_Surface *norm = normalize_digit(img, d);
+		//erose(norm, 3);
+		invert(norm);
+		*img = *norm;
+	}
+	else
+	{
+		Uint32 color = SDL_MapRGB(img->format, 255, 255, 255);
+		SDL_FillRect(img, NULL, color);
+	}
+
+	free(arr);
+}
+
+void extract_cells(Square *sq, SDL_Surface *image, char* path)
+{
+	int avgy = ((sq->SW.y - sq->NW.y) + (sq->SE.y - sq->NE.y)) / 2 / 9;
+	int avgx = ((sq->NE.x - sq->NW.x) + (sq->SE.x - sq->SW.x)) / 2 / 9;
+	int counter = 0;
+	int x0 = sq->NW.x;
+	int y0 = sq->NW.y;
+
+	for (int i = 0; i < 9; i++)
+	{
+		x0 = sq->NW.x;
+		for (int j = 0; j < 9; j++)
 		{
-			int temp = i / 10;
-			name[0] = temp + '0';
+			char *name = malloc(3 * sizeof(char));
+			name[2] = 0;
+			if (counter < 10)
+				name[0] = '0';
+			else
+			{
+				int temp = counter / 10;
+				name[0] = temp + '0';
+			}
+			name[1] = (counter % 10) + '0';
+
+			SDL_Surface* crop_s = 
+				SDL_CreateRGBSurface(0, 28, 28, 32, 0, 0, 0, 0);
+			SDL_Surface* temp_s = 
+				SDL_CreateRGBSurface(0, avgx, avgy, 32, 0, 0, 0, 0);
+    		SDL_Surface* crop = 
+				SDL_ConvertSurfaceFormat(crop_s, SDL_PIXELFORMAT_RGB888, 0);
+    		SDL_Surface* temp = 
+				SDL_ConvertSurfaceFormat(temp_s, SDL_PIXELFORMAT_RGB888, 0);
+			SDL_FreeSurface(crop_s);
+			SDL_FreeSurface(temp_s);
+			SDL_Rect rect = { x0, y0, avgx, avgy };
+
+			SDL_BlitSurface(image, &rect, temp, NULL);
+			SDL_BlitScaled(temp, NULL, crop, NULL);
+			clean_cell(crop);
+
+			char *ext = ".png";
+			char *pathres = calloc(50 ,sizeof(char));
+			strcat(pathres, path);
+			strcat(pathres, name);
+			strcat(pathres, ext);
+			IMG_SavePNG(crop, pathres);
+
+			SDL_FreeSurface(crop);
+			SDL_FreeSurface(temp);
+			free(pathres);
+			free(name);
+
+			x0 += avgx;
+			counter++;
 		}
 
-		char *second = malloc(2 * sizeof(char));
-	    second[0] = (i % 10) + '0';
-		strcat(name, second);
-
-		//int w = sq[i].NE.x - sq[i].NW.x;
-		//int h = sq[i].SW.y - sq[i].NW.y;
-		int w = avg;
-		int h = avg;
-
-		SDL_Surface* crop = SDL_CreateRGBSurface(0, 28, 28, 32, 0, 0, 0, 0);
-		SDL_Surface* temp = SDL_CreateRGBSurface(0, avg, avg, 32, 0, 0, 0, 0);
-		SDL_Rect rect;
-		rect.x = sq[i].NW.x;
-		rect.y = sq[i].NW.y;
-		rect.w = w;
-		rect.h = h;
-		
-		SDL_BlitSurface(image, &rect, temp, NULL);
-		//dilate(temp, 3);
-
-		SDL_BlitScaled(temp, NULL, crop, NULL);
-		otsu(crop);
-		char *path1 = "/Users/gustave/Documents/c/grid/";
-		char *ext = ".png";
-		char *path = calloc(50, sizeof(char));
-		strcat(path, path1);
-		strcat(path, name);
-		strcat(path, ext);
-    	IMG_SavePNG(crop, path);
-
-		SDL_FreeSurface(crop);
-		SDL_FreeSurface(temp);
+		y0 += avgy;
 	}
 }

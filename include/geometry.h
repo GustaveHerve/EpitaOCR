@@ -23,6 +23,14 @@ typedef struct Square
 	TupleInt SE;
 } Square;
 
+typedef struct DigitInfo
+{
+	short xmin;
+	short xmax;
+	short ymin;
+	short ymax;
+
+} DigitInfo;
 
 int polar_intersection(TupleInt *res, Line line1, Line line2);
 int line_intersect(TupleInt *res, Line line1, Line line2,
@@ -34,5 +42,8 @@ int intersect(Segment s1, Segment s2);
 void reorganize_square(Square *sq);
 int is_square(Square *sq, float tolerance);
 int square_len(Square *sq);
+void plotLine(SDL_Surface *surf, Line *line, Uint32 color);
+void drawred(SDL_Surface *surf, Line *line);
+void draw_square(SDL_Surface *surf, Square *sq);
 
 #endif

@@ -98,6 +98,41 @@ void nhsuppr(int input[], int x, int y, int xlen, int ylen, TupleInt *size)
 	}
 }
 
+void  biggernh(int input[], int i, int j, int rows, int cols)
+{
+	int curr = input[i*cols + j];
+	int c = 0;
+	int found = 1;
+	while (found)
+	{
+		found = 0;
+		if (j+1 < cols)
+		{
+			c = i * cols + j+1;
+			if (input[c] > curr)
+			{
+				input[i * cols + j] = 0;
+				j++;
+				curr = input[c];
+				found = 1;
+			}
+
+		}
+
+		if (j-1 >= 0)
+		{
+			c = i * cols + j-1;
+			if (input[c] > curr)
+			{
+				input[i * cols + j] = 0;
+				j--;
+				curr = input[c];
+				found = 1;
+			}
+		}
+	}
+}
+
 int hough_filter(int input[], int rows, int cols, int threshold, Line res[])
 {
 	int acc = 0;
@@ -106,11 +141,13 @@ int hough_filter(int input[], int rows, int cols, int threshold, Line res[])
 	{
 		for (int j = 0; j < cols; j++)
 		{
-			if (input[i * cols + j] >= threshold){
+			//biggernh(input, i, j, rows, cols);
+			if (input[i * cols + j] >= threshold)
+			{
 				Line new = {i,j};
 				res[acc] = new;
 				acc++;
-				nhsuppr(input, j, i, 10, 50, &size);
+				nhsuppr(input, j, i, 30, 90, &size);
 			}
 		}
 	}
@@ -278,17 +315,19 @@ Square get_blobs(Line* lines, int len, int width, int height)
 					{
 						for (int l = 0; l < len; l++)
 						{
-							if (lines[k].theta == lines[l].theta || l == j || l == i)
+							if (lines[k].theta == lines[l].theta || l == j 
+									|| l == i)
 			   					continue;
 
 							TupleInt pt3 = {0,0};
-							condition = line_intersect(&pt3, lines[k], lines[l],
-						   	width, height);
+							condition = line_intersect(&pt3, lines[k], 
+									lines[l], width, height);
 
 							if (condition)
 							{
 								TupleInt pt4 = {0,0};
-								if (line_intersect(&pt4, lines[i], lines[l], width, height))
+								if (line_intersect(&pt4, lines[i], lines[l], 
+											width, height))
 								{
 									Square *res = malloc(sizeof(Square));
 									res->NW = pt1;
@@ -296,7 +335,7 @@ Square get_blobs(Line* lines, int len, int width, int height)
 									res->SW = pt4;
 									res->SE = pt3;
 
-									int squaretest = is_square(res, 0.04);
+									int squaretest = is_square(res, 0.1);
 									if (squaretest)
 									{
 										int tmp = square_len(res);
@@ -307,6 +346,7 @@ Square get_blobs(Line* lines, int len, int width, int height)
 											reorganize_square(&grid);
 										}
 									}
+									free(res);
 								}
 							}
 						}
@@ -463,4 +503,124 @@ Segment *get_grid_seg(Segment* xseg, Segment* yseg, TupleInt lens)
 	}
 
 	return grid;
+}
+
+int flood_fill(Uint8* total, Uint8* copy, TupleShort *size, TupleShort seed)
+{
+	Stack *s = stack_init(s);
+	Uint8 grey = 120;
+	int res = 0;
+	stack_push(s, seed);
+	while (!stack_isempty(s))
+	{
+		TupleShort e = { 0, 0 };
+		stack_pop(s, &e);
+		res++;
+		size_t c = e.y * size->x + e.x;
+		total[c] = grey;
+		copy[c] = grey;
+
+		//North
+		if (e.y - 1 >= 0)
+		{
+			if (copy[c - size->x] == 255)
+			{
+				TupleShort tp = { e.x, e.y - 1 };
+				stack_push(s, tp);
+			}
+		}
+
+		//South
+		if (e.y + 1 < size->y)
+		{
+			if (copy[c + size->x] == 255)
+			{
+				TupleShort tp = { e.x, e.y + 1 };
+				stack_push(s, tp);
+			}
+		}
+
+		//West
+		if (e.x - 1 >= 0)
+		{
+			if (copy[c-1] == 255)
+			{
+				TupleShort tp = { e.x - 1, e.y };
+				stack_push(s, tp);
+			}
+		}
+
+		//East
+		if (e.x + 1 < size->x)
+		{
+			if (copy[c+1] == 255)
+			{
+				TupleShort tp = { e.x + 1, e.y };
+				stack_push(s, tp);
+			}
+		}
+	}
+	stack_free(s);
+	return res;
+}
+
+void retrieveblob(Uint8 *blobimg, TupleShort *size)
+{
+	for (size_t i = 0; i < size->y; i++)
+	{
+		for (size_t j = 0; j < size->x; j++)
+		{
+			int c = i * size->x + j;
+			if (blobimg[c] != 120)
+				blobimg[c] = 0;
+			else
+				blobimg[c] = 255;
+		}
+	}
+}
+
+SDL_Surface *blob_detection(SDL_Surface *img)
+{
+	int n = img->h * img->w;
+	Uint8 *original = malloc(sizeof(Uint8) * n);
+	get_binarray(img, original);
+
+	Uint8 *totalarr = malloc(sizeof(Uint8) * n);
+	binarraycpy(original, totalarr, n);
+
+	Uint8 *resblob = malloc(sizeof(Uint8) * n);
+
+	TupleShort size = { img->w, img->h };
+	int max = 0;
+	for (int i = 0; i < size.y; i++)
+	{
+		for (int j = 0; j < size.x; j++)
+		{
+			int c = i * size.y + j;
+			if (totalarr[c] >= 250)
+			{
+				Uint8 *copy = malloc(sizeof(Uint8) * n);
+				binarraycpy(original, copy, n);
+
+				TupleShort start = { j, i };
+				int tmp = flood_fill(totalarr, copy, &size, start);
+				if (tmp > max)
+				{
+					binarraycpy(copy, resblob, n);
+					max = tmp;
+				}
+				free(copy);
+			}
+		}
+	}
+
+	SDL_Surface *resimg = SDL_CreateRGBSurface(0, img->w, 
+												img->h, 32, 0, 0, 0, 0);
+ 	resimg = SDL_ConvertSurfaceFormat(resimg, SDL_PIXELFORMAT_RGB888, 0);
+	retrieveblob(resblob, &size);
+	binarr_to_surf(resblob, resimg, n);
+	free(totalarr);
+	free(resblob);
+	free(original);
+	return resimg; 
 }

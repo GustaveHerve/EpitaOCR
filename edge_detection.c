@@ -178,7 +178,7 @@ void double_thresholding(int *edges, size_t rows, size_t cols,
 		}
 	}
 
-	hysteresis(edges, rows, cols, s);
+	//hysteresis(edges, rows, cols, s);
 
 }
 

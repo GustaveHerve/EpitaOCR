@@ -437,12 +437,12 @@ int main(int argc, char **argv)
         FILE * fp;
         int arr[82];
         int i = 0;
-        fp = fopen(savefile, "w+"); 
+        fp = fopen(savefile, "w"); 
         if (d)
         {
             while ((dir = readdir(d)) != NULL)
             {
-                if (strstr(dir->d_name, "png") != NULL)
+                if (strstr(dir->d_name, "png") != NULL || strstr(dir->d_name, "jpeg"))
                 {
                     char fn[25];
                     strcpy( fn, argv[1] );

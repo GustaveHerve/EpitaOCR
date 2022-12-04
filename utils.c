@@ -77,6 +77,7 @@ int get_biggest_bin(int* hough, int maxr, int maxtheta)
 	return max;
 }
 
+
 float array_sum(float arr[], int begin, int end)
 {
 	float res = 0;
@@ -100,8 +101,10 @@ int array_min_index(float arr[], size_t len)
 	return (int) min;
 }
 
-//STACK
-
+//////////////////
+//TupleInt STACK
+/////////////////
+///
 Stack_Tint* newStack_Tint(int size)
 {
 	Stack_Tint* res = malloc(sizeof(Stack_Tint));	
@@ -159,4 +162,56 @@ TupleInt minY4(TupleInt A, TupleInt B, TupleInt C, TupleInt D)
 	if (temp.y <= D.y)
 		return temp;
 	return D;
+}
+
+///////////////////
+//STACK
+//////////////////
+
+Stack *stack_init()
+{
+	Stack *s = malloc(sizeof(Stack));
+	s->size = 0;
+	s->capacity = 1;
+	s->data = malloc(sizeof(TupleShort));
+	return s;
+}
+
+int stack_isempty(Stack* s)
+{
+	if (s->size == 0)
+		return 1;
+	return 0;
+
+}
+
+void stack_free(Stack* s)
+{
+	free(s->data);
+	free(s);
+}
+
+void stack_doublesize(Stack *s)
+{
+	s->capacity *= 2;
+	s->data = realloc(s->data, sizeof(TupleShort) * s->capacity);
+	if (s->data == NULL)
+		errx(1, "Not enough memory for stack");
+}
+
+void stack_push(Stack *s, TupleShort x)
+{
+	s->size++;
+	if (s->size > s->capacity)
+		stack_doublesize(s);
+	s->data[s->size-1] = x;
+}
+
+int stack_pop(Stack *s, TupleShort *x)
+{
+	if (stack_isempty(s))
+		return 0;
+	*x = s->data[s->size-1];
+	s->size--;
+	return 1;
 }

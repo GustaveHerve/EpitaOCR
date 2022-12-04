@@ -59,7 +59,7 @@ void reorganize_square(Square *sq)
 	{
 		TupleInt *t = miny2;
 		miny2 = miny1;
-		miny1 = miny2;
+		miny1 = t;
 	}
 
 	for (int i = 2; i < 4; i++)
@@ -192,6 +192,123 @@ void draw_line(SDL_Surface *surf, Line *line)
 	}
 
 	SDL_UnlockSurface(surf);
+}
+
+void plotLine(SDL_Surface *surf, Line *line, Uint32 color)
+{
+	int rho = line->rho;
+	float theta = line->theta * M_PI / 180;
+	int rows = surf->h;
+	int cols = surf->w;
+	Uint32 *pixels = surf->pixels;
+
+	double sinA = sin(theta);
+    double cosA = cos(theta);
+	float xtmp = cosA * rho;
+	float ytmp = sinA * rho;
+	int x0 = (xtmp + rows * cols * (-1 * sinA));
+	int y0 = (ytmp + rows * cols * (cosA));
+	int x1 = (xtmp - rows * cols * (-1 * sinA));
+	int y1 = (ytmp - rows * cols * (cosA));
+
+	int dx = abs(x1 - x0);
+	int sx = x0 < x1 ? 1 : -1;
+	int dy = -abs(y1 - y0);
+	int sy = y0 < y1 ? 1 : -1;
+	int error = dx + dy;
+
+	while (1)
+	{
+		if (x0 >= 0 && x0 < cols && y0 >= 0 && y0 < rows)
+			pixels[y0 * cols + x0] = color;
+		if (x0 == x1 && y0 == y1)
+			break;
+		int e2 = 2 * error;
+		if (e2 >= dy)
+		{
+			if (x0 == x1)
+				break;
+			error = error + dy;
+			x0 = x0 + sx;
+		}
+		if (e2 <= dx)
+		{
+			if (y0 == y1)
+				break;
+			error = error + dx;
+			y0 = y0 + sy;
+		}
+	}
+}
+
+void drawred(SDL_Surface *surf, Line *line)
+{
+	Uint32 red = SDL_MapRGB(surf->format, 255, 0, 0);
+	plotLine(surf, line, red);
+}
+
+void plotSegment(SDL_Surface *surf, TupleInt p0, TupleInt p1, Uint32 color) 
+{
+	int rows = surf->h;
+	int cols = surf->w;
+	Uint32 *pixels = surf->pixels;
+
+	int x0 = p0.x;
+	int x1 = p1.x;
+	int y0 = p0.y;
+	int y1 = p1.y;
+
+	int dx = abs(x1 - x0);
+	int sx = x0 < x1 ? 1 : -1;
+	int dy = -abs(y1 - y0);
+	int sy = y0 < y1 ? 1 : -1;
+	int error = dx + dy;
+
+	while (1)
+	{
+		int c = y0 * cols + x0;
+		if (x0 >= 0 && x0 < cols && y0 >= 0 && y0 < rows)
+			pixels[c] = color;
+		if (x0+1 >= 0 && x0+1 < cols && y0 >= 0 && y0 < rows)
+			pixels[c+1] = color;
+		if (x0-1 >= 0 && x0-1 < cols && y0 >= 0 && y0 < rows)
+			pixels[c-1] = color;
+		if (x0 >= 0 && x0 < cols && y0+1 >= 0 && y0+1 < rows)
+			pixels[c + cols] = color;
+		if (x0 >= 0 && x0 < cols && y0-1 >= 0 && y0-1 < rows)
+			pixels[c - cols] = color;
+
+		if (x0 == x1 && y0 == y1)
+			break;
+		int e2 = 2 * error;
+		if (e2 >= dy)
+		{
+			if (x0 == x1)
+				break;
+			error = error + dy;
+			x0 = x0 + sx;
+		}
+		if (e2 <= dx)
+		{
+			if (y0 == y1)
+				break;
+			error = error + dx;
+			y0 = y0 + sy;
+		}
+	}
+}
+
+void draw_square(SDL_Surface *surf, Square *sq)
+{
+	Uint32 color = SDL_MapRGB(surf->format, 0, 0, 255);
+	TupleInt NW = sq->NW;
+	TupleInt NE = sq->NE;
+	TupleInt SE = sq->SE;
+	TupleInt SW = sq->SW;
+	plotSegment(surf, NW, NE, color);
+	plotSegment(surf, NE, SE, color);
+	plotSegment(surf, SE, SW, color);
+	plotSegment(surf, SW, NW, color);
 }
 
 Segment get_segment(SDL_Surface *image, Line *line)
