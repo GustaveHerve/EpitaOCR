@@ -23,73 +23,6 @@ int avg_size(Square *sq, int len)
 	return sum / len;
 }
 
-int get_squares(Line *x, Line *y, Square *res)
-{
-	int len = 0;
-	for (int i = 0; i < 9; i++)
-	{
-		for (int j = 0; j < 9; j++)
-		{
-			Square sq;
-			TupleInt pt;
-
-			polar_intersection(&pt, x[i], y[j]);
-			sq.NW = pt;
-			polar_intersection(&pt, x[i], y[j+1]);
-			sq.NE = pt;
-			polar_intersection(&pt, x[i+1], y[j]);
-			sq.SW = pt;
-			polar_intersection(&pt, x[i+1], y[j+1]);
-			sq.SE = pt;
-
-			res[len] = sq;
-			len++;
-        }
-	}
-
-	return len;
-}
-
-Square *get_squares_seg(Segment *grid)
-{
-	Square *res = calloc(81, sizeof(Square));
-	int index = 0;
-	int xdis = grid[0].pt2.x - grid[0].pt1.x;
-	int ydis = grid[10].pt2.y - grid[10].pt1.y;
-	int xoffset = xdis / 9;
-	int yoffset = ydis / 9;
-
-	int start_x = grid[0].pt1.x;
-	int start_y = grid[10].pt1.y;
-
-	int posx = start_x;
-	int posy = start_y;
-
-	for (int i = 0; i < 9; i++)
-	{
-
-		posx = start_x;
-		for (int j = 0; j < 9; j++)
-		{
-
-			TupleInt NW = {posx, posy};
-			TupleInt SW = {posx, posy + yoffset};
-			TupleInt NE = {posx + xoffset, posy};
-			TupleInt SE = {posx + xoffset, posy + yoffset};
-
-			Square s = { NW, SW, NE, SE };
-			res[index] = s;
-			index++;
-
-			posx += xoffset;
-		}
-		posy += yoffset;
-	}
-
-	return res;
-
-}
-
 int find_digit(Uint8* arr, int size, int tolerance, TupleShort *s)
 {
 	TupleShort center = { size/2, size/2 };
@@ -290,14 +223,16 @@ void clean_cell(SDL_Surface *img)
 	get_binarray(img, arr);
 
 	TupleShort seed = { 0, 0 };
-	int tolerance = 5 * img->h / 28;
+	int tolerance = 6 * img->h / 28;
 	int success = find_digit(arr, img->w, tolerance, &seed);
 	if (success)
 	{
 		DigitInfo *d = cell_fill(arr, img->h, seed);
 		int xlen = d->xmax - d->xmin;
 		int ylen = d->ymax - d->ymin;
-		if ((float)xlen * (float)ylen / (float)size < 0.03)
+		if ((float)xlen * (float)ylen / (float)size < 0.03 
+				&& (float)xlen / (float)xlen < 0.1 
+				&& (float)ylen / (float)ylen < 0.1)
 		{
 			Uint32 color = SDL_MapRGB(img->format, 255, 255, 255);
 			SDL_FillRect(img, NULL, color);
@@ -372,6 +307,10 @@ void extract_cells(Square *sq, SDL_Surface *image, char* path)
 			SDL_Rect rect = { x0, y0, len, len };
 
 			SDL_BlitSurface(image, &rect, temp, NULL);
+            IMG_SavePNG(temp, "temp/provider.png");
+			gauss_blur(temp, 17, -1);
+			adaptive_gaussthresholding(temp, 15, 6);
+			closing(temp, 5);
             IMG_SavePNG(temp, "temp/provider.png");
 			clean_cell(temp);
 			SDL_BlitScaled(temp, NULL, crop, NULL);

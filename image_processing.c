@@ -34,7 +34,7 @@ void greyscale(SDL_Surface *image)
 
 void gauss_ker(int size, double sigma, double ker[])
 {
-	double r, s = 2.0 * sigma * sigma;
+	double r = 0, s = 2.0 * sigma * sigma;
 	double sum;
 
 	int beg = size/2;
@@ -59,11 +59,15 @@ void gauss_ker(int size, double sigma, double ker[])
 void gauss_blur(SDL_Surface* img, int size, double sigma)
 {
     int *b = malloc(sizeof(int) * img->w * img->h);
+	if (sigma == -1)
+		sigma = 0.3 * ((size-1) * 0.5 - 1) + 0.8;
+
 	double *ker = calloc(size*size, sizeof(double));
 	gauss_ker(size, sigma, ker);
 	blur_convolution(img, ker, size, size, b);
 	apply_convolution_int(img, b, (size_t) img->h, (size_t) img->w);
 	free(b);
+	free(ker);
 }
 
 void blur(SDL_Surface* image, int kersize)

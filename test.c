@@ -22,38 +22,59 @@ int main(int argc, char** argv)
 {
     init_sdl();
 
-	SDL_Surface* test = load_image(argv[1]);
     SDL_Surface* original = load_image(argv[1]);
-
+    SDL_Surface* test = load_image(argv[1]);
 	/*
-	if (test->h > 800)
+
+	if (beforeresize->h > 800)
 	{
-		float coeff = 800 / test->h;
-		int nw = test->w * coeff;
+		float coeff = (float)800 / beforeresize->h;
+		int nw = beforeresize->w * coeff;
 		SDL_Surface *tmp = SDL_CreateRGBSurface(0, nw, 800, 32, 0, 0, 0, 0);
 		SDL_Surface *tmp_c = SDL_ConvertSurfaceFormat(tmp, SDL_PIXELFORMAT_RGB888, 0);
 		SDL_FreeSurface(tmp);
-		SDL_BlitScaled(test, NULL, tmp_c, NULL);
-		test = SDL_CreateRGBSurface(0, nw, 800, 32, 0, 0, 0, 0);
-		SDL_BlitSurface(tmp_c, NULL, test, NULL);
+		SDL_BlitScaled(beforeresize, NULL, tmp_c, NULL);
+		original = SDL_CreateRGBSurface(0, nw, 800, 32, 0, 0, 0, 0);
+		SDL_BlitSurface(tmp_c, NULL, original, NULL);
+   		IMG_SavePNG(original, "temp/afterresize.png");
 	}
+
+	SDL_Surface *test_tmp = SDL_CreateRGBSurface(0, original->h, original->w, 32, 0, 0, 0, 0);
+	SDL_Surface *test = SDL_ConvertSurfaceFormat(test_tmp, SDL_PIXELFORMAT_RGB888, 0);
+	SDL_BlitSurface(original, NULL, test, NULL);
+	SDL_FreeSurface(test_tmp);
+	//SDL_Surface* test = load_image(argv[1]);
 	*/
 
     unsigned int width = test->w;
 	unsigned int height = test->h;
 
 	greyscale(test);
+	opening(test, 7);
 
-	gauss_blur(test, 11, 2.5);
+	gauss_blur(test, 17, -1);
 
+    IMG_SavePNG(test, "temp/blur.png");
 	width = width;
 	height = height; 
 
 	//canny(test);
-	adaptive_gaussthresholding(test, 11, 2);
+	adaptive_gaussthresholding(test, 13, 3);
     IMG_SavePNG(test, "temp/canny.png");
+	
+	/*
 
-	dilate(test, 3);
+	SDL_Surface *morph_tmp =
+			SDL_CreateRGBSurface(0, test->w, test->h, 32, 0, 0, 0, 0);
+    SDL_Surface *morph =
+				SDL_ConvertSurfaceFormat(morph_tmp, SDL_PIXELFORMAT_RGB888, 0);
+	SDL_FreeSurface(morph_tmp);
+
+	SDL_BlitSurface(test, NULL, morph, NULL);
+	*/
+
+	//dilate(test, 3);
+	closing(test, 5);
 	//erose(test, 3);
 	//closing(test, 3);
 
@@ -88,12 +109,12 @@ int main(int argc, char** argv)
 	//IMG_SavePNG(original, "temp/grid_detection.png");
 
 	//erose(test, 3);
-	erose(test, 3);
-	SDL_Surface *homo = homographic_Transform(test, blobtest);
+	SDL_Surface *homo = homographic_Transform(original, blobtest);
 	IMG_SavePNG(homo, "temp/homo.png");
+	//greyscale(homo);
+	//gauss_blur(homo, 25, -1);
+	//adaptive_gaussthresholding(homo, 7, 2);
 
-	//gauss_blur(homo, 11, 2.5);
-	//adaptive_gaussthresholding(homo, 11, 3);
 	IMG_SavePNG(homo, "temp/otsu.png");
 	//closing(homo, 3);
 	Square homorect;
