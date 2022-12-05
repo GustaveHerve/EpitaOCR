@@ -35,14 +35,29 @@ int main (int argc, char* argv[])
     
     init_sdl();
     SDL_Surface *img = load_image(argv[1]);
+    
+
     TupleInt p1 = {630,178};
     TupleInt p2 = {1368,695};
     TupleInt p3 = {850,1436};
     TupleInt p4 = {109,918};  //coos of the corners of image 5 grid.
 
+    TupleInt p1_2 = {337, 208};
+    TupleInt p2_2 = {1162, 208};
+    TupleInt p3_2 = {1162, 1032};
+    TupleInt p4_2 = {337, 1032};
+
+    TupleInt p1_sd = {82, 104};
+    TupleInt p2_sd = {405, 88};
+    TupleInt p3_sd = {439, 392};
+    TupleInt p4_sd = {52, 405};
+
+
     Square corners = {p1,p4,p2,p3};
+    Square corners_2 = {p1_2, p4_2, p2_2, p3_2};
+    Square corners_sd = {p1_sd, p4_sd, p2_sd, p3_sd};
     
-    homographic_Transform(img, corners);
+    homographic_Transform(img, corners_sd);
     SDL_FreeSurface(img);
 
     open_img_window("homographic_image.png");
