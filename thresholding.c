@@ -162,7 +162,9 @@ void adaptive_thresholding(SDL_Surface *image, int size, int c)
 void adaptive_gaussthresholding_c(SDL_Surface *image, int size, int *r, int c)
 {
 	double *ker = calloc(size*size, sizeof(double));
-	gauss_ker(size, 1.5, ker);
+	double sigma = 0.3 * ((size-1) * 0.5 - 1) + 0.8;
+
+	gauss_ker(size, sigma, ker);
 
 	SDL_LockSurface(image);
 	Uint32 *pixels = image->pixels;
@@ -213,6 +215,7 @@ void adaptive_gaussthresholding(SDL_Surface *image, int size, int c)
 	int *r = calloc(image->w * image->h, sizeof(int));
 	adaptive_gaussthresholding_c(image, size, r, c);
 	apply_convolution_int(image, r, image->h, image->w);
+	free(r);
 }
 
 
