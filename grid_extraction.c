@@ -309,7 +309,7 @@ void extract_cells(Square *sq, SDL_Surface *image, char* path)
 			SDL_BlitSurface(image, &rect, temp, NULL);
             IMG_SavePNG(temp, "temp/provider.png");
 			gauss_blur(temp, 17, -1);
-			adaptive_gaussthresholding(temp, 15, 4);
+			adaptive_gaussthresholding(temp, 15, 6);
 			closing(temp, 5);
             IMG_SavePNG(temp, "temp/provider.png");
 			clean_cell(temp);
