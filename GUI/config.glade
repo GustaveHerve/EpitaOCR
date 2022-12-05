@@ -246,7 +246,7 @@
             <property name="visible">True</property>
             <property name="can-focus">False</property>
             <property name="title" translatable="yes">Sudoku OCR</property>
-            <property name="subtitle" translatable="yes">path</property>
+            <property name="subtitle" translatable="yes">$path$</property>
             <child>
               <object class="GtkFileChooserButton" id="chooser">
                 <property name="visible">True</property>

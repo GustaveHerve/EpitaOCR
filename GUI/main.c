@@ -18,6 +18,13 @@
 #include "../include/image_loading.h"
 #include "../include/image_processing.h"
 #include "../include/thresholding.h"
+#include "../include/utils.h"
+#include "../include/morph.h"
+#include "../include/geometry.h"
+#include "../include/edge_detection.h"
+#include "../include/grid_detection.h"
+#include "../include/grid_extraction.h"
+#include "../include/display.h"
 
 // Global Declarations : 
 GtkWidget *window = NULL;
@@ -38,6 +45,7 @@ GdkPixbuf *pixImage = NULL;
 int step = 0;
 GtkFileChooserButton *chooser = NULL;
 gchar* path = NULL;
+Square blobtest;
 
 /////////////////////////////
 
@@ -143,8 +151,9 @@ void on_impButton_clicked()
 				gtk_widget_destroy(image);
 				//image2 = gtk_image_new_from_file("img/image.png");
 
-				GdkPixbuf* src = gdk_pixbuf_new_from_file(path,&error);
-				GdkPixbuf *pixImage = gdk_pixbuf_scale_simple(src,widx,widy,GDK_INTERP_BILINEAR);
+				// GdkPixbuf* src = gdk_pixbuf_new_from_file(path,&error);
+				// GdkPixbuf *pixImage = gdk_pixbuf_scale_simple(src,widx,widy,GDK_INTERP_BILINEAR);
+				GdkPixbuf *pixImage = gdk_pixbuf_new_from_file_at_scale(path,widx,widy,TRUE,NULL);
 				image2 = gtk_image_new_from_pixbuf(pixImage); 
 
 				gtk_container_add(GTK_CONTAINER(fixedImg),image2);
@@ -155,8 +164,11 @@ void on_impButton_clicked()
 			else
 			{
 				im2 = TRUE;
-				GdkPixbuf* src = gdk_pixbuf_new_from_file(path,&error);
-				GdkPixbuf *pixImage = gdk_pixbuf_scale_simple(src,widx,widy,GDK_INTERP_BILINEAR);
+				// GdkPixbuf* src = gdk_pixbuf_new_from_file(path,&error);
+				// GdkPixbuf *pixImage = gdk_pixbuf_scale_simple(src,widx,widy,GDK_INTERP_BILINEAR);
+
+				GdkPixbuf *pixImage = gdk_pixbuf_new_from_file_at_scale(path,widx,widy,TRUE,NULL);
+
 				image2 = gtk_image_new_from_pixbuf(pixImage); 
 				
 				gtk_container_add(GTK_CONTAINER(fixedImg),image2);
@@ -224,7 +236,7 @@ void mResize()
 		// rotateImg("img/image.png",value);
 		// image2 = gtk_image_new_from_file("image_rotated.png");
 
-		GdkPixbuf* test = gdk_pixbuf_new_from_file_at_scale("image_rotated.png",widx,widy,TRUE,&error);
+		GdkPixbuf* test = gdk_pixbuf_new_from_file_at_scale("image_rotated.png",widx,widy,TRUE,NULL);
 
 		image2 = gtk_image_new_from_pixbuf(test); 
 		gtk_widget_show(image2);
@@ -247,7 +259,7 @@ void mResize()
 		// rotateImg("img/image.png",value);
 		//image2 = gtk_image_new_from_file("image_rotated.png");
 
-		GdkPixbuf* test = gdk_pixbuf_new_from_file_at_scale("image_rotated.png",widx,widy,TRUE,&error);
+		GdkPixbuf* test = gdk_pixbuf_new_from_file_at_scale("image_rotated.png",widx,widy,TRUE,NULL);
 		// GdkPixbuf* src = gdk_pixbuf_new_from_file("image_rotated.png",&error);
 		// GdkPixbuf *pixImage = gdk_pixbuf_scale_simple(src,widx,widy,GDK_INTERP_BILINEAR);
 		image2 = gtk_image_new_from_pixbuf(test); 
@@ -319,8 +331,10 @@ void changeS() // Will take the steps, and then change the images
 	int widx = gtk_widget_get_allocated_width(fixedImg);
 	int widy = gtk_widget_get_allocated_height(fixedImg);
 
+
 	// SDL Surface for Func Calls
 	SDL_Surface *img = NULL;
+
 
 	GdkPixbuf* pixImg = NULL;
 	if (!im2)
@@ -348,8 +362,8 @@ void changeS() // Will take the steps, and then change the images
 			gtk_container_remove(GTK_CONTAINER(fixedImg),image2);
 			img = load_image(path);
 			greyscale(img);
-			IMG_SavePNG(img,"grayscale.png");
-			pixImg = gdk_pixbuf_new_from_file_at_scale("grayscale.png",widx,widy,TRUE,NULL);
+			IMG_SavePNG(img,"temp/grayscale.png");
+			pixImg = gdk_pixbuf_new_from_file_at_scale("temp/grayscale.png",widx,widy,TRUE,NULL);
 			image2 = gtk_image_new_from_pixbuf(pixImg); 
 			gtk_widget_show(image2);
 			gtk_container_add(GTK_CONTAINER(fixedImg),image2);
@@ -357,16 +371,118 @@ void changeS() // Will take the steps, and then change the images
 
 		case 2:
 			gtk_widget_hide(image2);
-			gtk_label_set_text(infoLabel,"[2] Applying Threshold...");
+			gtk_label_set_text(infoLabel,"[2] Applying Gaussian Blur...");
 			gtk_container_remove(GTK_CONTAINER(fixedImg),image2);
-			img = load_image(path);
-			adaptive_gaussthresholding(img,11,2);
-			IMG_SavePNG(img,"gThresholding.png");
-			pixImg = gdk_pixbuf_new_from_file_at_scale("gThresholding.png",widx,widy,TRUE,NULL);
+			img = load_image("temp/grayscale.png");
+			gauss_blur(img,11,2.5);
+			IMG_SavePNG(img,"temp/blur.png");
+			pixImg = gdk_pixbuf_new_from_file_at_scale("temp/blur.png",widx,widy,TRUE,NULL);
 			image2 = gtk_image_new_from_pixbuf(pixImg); 
 			gtk_widget_show(image2);
 			gtk_container_add(GTK_CONTAINER(fixedImg),image2);
 			break;
+
+		case 3:
+			gtk_widget_hide(image2);
+			gtk_label_set_text(infoLabel,"[3] Applying Threshold...");
+			gtk_container_remove(GTK_CONTAINER(fixedImg),image2);
+			img = load_image("temp/blur.png");
+			adaptive_gaussthresholding(img,11,2);
+			IMG_SavePNG(img,"temp/canny.png");
+			pixImg = gdk_pixbuf_new_from_file_at_scale("temp/canny.png",widx,widy,TRUE,NULL);
+			image2 = gtk_image_new_from_pixbuf(pixImg); 
+			gtk_widget_show(image2);
+			gtk_container_add(GTK_CONTAINER(fixedImg),image2);
+			break;
+
+		case 4:
+			gtk_widget_hide(image2);
+			gtk_label_set_text(infoLabel,"[4] Applying Dilatation...");
+			gtk_container_remove(GTK_CONTAINER(fixedImg),image2);
+			img = load_image("temp/canny.png");
+			dilate(img,3);
+			IMG_SavePNG(img,"temp/dilate.png");
+			pixImg = gdk_pixbuf_new_from_file_at_scale("temp/dilate.png",widx,widy,TRUE,NULL);
+			image2 = gtk_image_new_from_pixbuf(pixImg); 
+			gtk_widget_show(image2);
+			gtk_container_add(GTK_CONTAINER(fixedImg),image2);
+			break;
+
+		case 5:
+			gtk_widget_hide(image2);
+			gtk_label_set_text(infoLabel,"[5] Applying Blob Detection...");
+			gtk_container_remove(GTK_CONTAINER(fixedImg),image2);
+			img = load_image("temp/dilate.png");
+			SDL_Surface *blob = blob_detection(img);
+			IMG_SavePNG(blob,"temp/blob.png");
+			pixImg = gdk_pixbuf_new_from_file_at_scale("temp/blob.png",widx,widy,TRUE,NULL);
+			image2 = gtk_image_new_from_pixbuf(pixImg); 
+			gtk_widget_show(image2);
+			gtk_container_add(GTK_CONTAINER(fixedImg),image2);
+			break;
+
+		case 6:
+			gtk_widget_hide(image2);
+			gtk_label_set_text(infoLabel,"[6] Applying Erosion...");
+			gtk_container_remove(GTK_CONTAINER(fixedImg),image2);
+			img = load_image("temp/blob.png");
+			erose(img,3);
+			IMG_SavePNG(img,"temp/erose.png");
+			pixImg = gdk_pixbuf_new_from_file_at_scale("temp/erose.png",widx,widy,TRUE,NULL);
+			image2 = gtk_image_new_from_pixbuf(pixImg); 
+			gtk_widget_show(image2);
+			gtk_container_add(GTK_CONTAINER(fixedImg),image2);
+			break;
+
+		case 7:
+			gtk_widget_hide(image2);
+			gtk_container_remove(GTK_CONTAINER(fixedImg),image2);
+			img = load_image("temp/blob.png");
+
+		    unsigned int width = img->w;
+			unsigned int height = img->h;	
+
+			// Hough:
+		    int rows = sqrt(height * height + width * width);
+			int angle_precision = 360;
+		    int *hough = calloc(angle_precision * rows, sizeof(int));
+			hough_lines(img, angle_precision, 1, hough);
+
+			int hough_threshold = get_biggest_bin(hough, rows, angle_precision) * 0.7;
+			Line *lines = calloc(angle_precision * rows, sizeof(Line));
+			int line_nb = hough_filter(hough, rows, angle_precision, hough_threshold, lines);
+			free(hough);
+
+			// Draw Lines 
+			for (int i = 0; i < line_nb; i++)
+				drawred(img, &lines[i]);
+
+			IMG_SavePNG(img,"temp/lines.png");
+
+			blobtest = get_blobs(lines, line_nb, (int)width, (int)height);
+	
+	
+			pixImg = gdk_pixbuf_new_from_file_at_scale("temp/lines.png",widx,widy,TRUE,NULL);
+			image2 = gtk_image_new_from_pixbuf(pixImg); 
+			gtk_widget_show(image2);
+			gtk_container_add(GTK_CONTAINER(fixedImg),image2);
+			gtk_label_set_text(infoLabel,"[7] Applying Hough...");
+			break;
+
+		case 8:
+			gtk_widget_hide(image2);
+			gtk_container_remove(GTK_CONTAINER(fixedImg),image2);
+			img = load_image("temp/lines.png");
+			erose(img,3);
+			SDL_Surface *homoT = homographic_Transform(img,blobtest);
+			IMG_SavePNG(homoT,"temp/homoT.png");
+			pixImg = gdk_pixbuf_new_from_file_at_scale("temp/homoT.png",widx,widy,TRUE,NULL);
+			image2 = gtk_image_new_from_pixbuf(pixImg); 
+			gtk_widget_show(image2);
+			gtk_container_add(GTK_CONTAINER(fixedImg),image2);
+			gtk_label_set_text(infoLabel,"[8] Applying Homographic Transform...");
+			break;
+
 
 		default:
 			printf("Default Case\n");
