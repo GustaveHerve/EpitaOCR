@@ -12,11 +12,18 @@ void Output(long arr[SIZE][SIZE])
 	FILE * fp;
 	fp = fopen ("grid.result", "w+");
 
-     for (int i = 0; i < SIZE; i++)
+     for (int i = 1; i < SIZE+1; i++)
      {
          for (int j = 0; j < SIZE; j++)
-             fprintf(fp, "%ld %s",arr[i][j], " ");
+         {
+             if (j % 3 == 0 && j != 0)
+                 fprintf(fp,"%s"," ");
+             fprintf(fp, "%ld",arr[i-1][j]); 
+         }
+         if (i % 3 == 0 && i != 0 && i != SIZE)
+            fprintf(fp, "%s","\n");
          fprintf(fp, "%s","\n");
+
      }
      fclose(fp);
 }
