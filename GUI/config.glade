@@ -32,19 +32,6 @@
             <property name="row-homogeneous">True</property>
             <property name="column-homogeneous">True</property>
             <child>
-              <object class="GtkButton" id="impButton">
-                <property name="label" translatable="yes">Import</property>
-                <property name="visible">True</property>
-                <property name="can-focus">True</property>
-                <property name="receives-default">True</property>
-                <signal name="clicked" handler="on_impButton_clicked" swapped="no"/>
-              </object>
-              <packing>
-                <property name="left-attach">0</property>
-                <property name="top-attach">0</property>
-              </packing>
-            </child>
-            <child>
               <object class="GtkButton" id="delButton">
                 <property name="label" translatable="yes">Delete</property>
                 <property name="visible">True</property>
@@ -54,6 +41,19 @@
               </object>
               <packing>
                 <property name="left-attach">1</property>
+                <property name="top-attach">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="impButton">
+                <property name="label" translatable="yes">Import</property>
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">True</property>
+                <signal name="clicked" handler="on_impButton_clicked" swapped="no"/>
+              </object>
+              <packing>
+                <property name="left-attach">0</property>
                 <property name="top-attach">0</property>
               </packing>
             </child>
@@ -242,38 +242,19 @@
           </packing>
         </child>
         <child>
-          <object class="GtkBox">
+          <object class="GtkHeaderBar" id="header">
             <property name="visible">True</property>
             <property name="can-focus">False</property>
+            <property name="title" translatable="yes">Sudoku OCR</property>
+            <property name="subtitle" translatable="yes">path</property>
             <child>
-              <object class="GtkImage">
+              <object class="GtkFileChooserButton" id="chooser">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="stock">gtk-missing-image</property>
-                <style>
-                  <class name="titlelogo"/>
-                </style>
+                <property name="local-only">False</property>
+                <property name="title" translatable="yes">Choose your Picture</property>
+                <signal name="file-set" handler="onChooser" swapped="no"/>
               </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">0</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkLabel">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="label" translatable="yes">4D Generates</property>
-                <style>
-                  <class name="titlelabel"/>
-                </style>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">1</property>
-              </packing>
             </child>
           </object>
           <packing>

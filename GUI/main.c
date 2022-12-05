@@ -1,3 +1,12 @@
+// TODO
+// Put a file explorer thing
+// Finish the steps
+// Header with css
+// Brush my teeths
+// Go to the toilets
+// Change generated image path
+
+
 #include <gtk/gtk.h>
 #include <stdbool.h>
 #include <SDL2/SDL.h>
@@ -27,6 +36,8 @@ bool im1 = TRUE;
 bool im2 = FALSE;
 GdkPixbuf *pixImage = NULL;
 int step = 0;
+GtkFileChooserButton *chooser = NULL;
+gchar* path = NULL;
 
 /////////////////////////////
 
@@ -81,6 +92,7 @@ int main(int argc, char *argv [])
 	delButton = GTK_WIDGET(gtk_builder_get_object(builder, "delButton"));
 	adju = GTK_ADJUSTMENT(gtk_builder_get_object(builder, "adjustment"));
 	rotscale = GTK_SCALE(gtk_builder_get_object(builder,"resizement"));
+	chooser = GTK_FILE_CHOOSER_BUTTON(gtk_builder_get_object(builder,"chooser"));
 	  
  
 	/* signal "destroy" for the window to close */
@@ -99,50 +111,58 @@ int main(int argc, char *argv [])
 	return 0;
 }
 
+
+void onChooser() 
+{
+	path = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(chooser));
+}
+
+
 // impButton Triggered
 void on_impButton_clicked()
 {
-	int widx = gtk_widget_get_allocated_width(fixedImg);
-	int widy = gtk_widget_get_allocated_height(fixedImg);
-  	if (im2)
-  	{
-			gtk_label_set_text(infoLabel, "[Error 403] Image already loaded!");  
-  	}
-  	else
-  	{
-		if(im2)
-			gtk_label_set_text(infoLabel,"Image already imported");
+	if(path == NULL)
+	{
+		gtk_label_set_text(infoLabel,"[Error] You must select an image");
+	}
+	else
+	{
+		int widx = gtk_widget_get_allocated_width(fixedImg);
+		int widy = gtk_widget_get_allocated_height(fixedImg);
+	  	if (im2)
+	  	{
+				gtk_label_set_text(infoLabel, "[Warning] Image already imported");  
+	  	}
+	  	else
+	  	{
+			if(im1)
+			{
+				gtk_widget_hide(image);
+				im1 = FALSE;
+				im2 = TRUE;
+				gtk_widget_destroy(image);
+				//image2 = gtk_image_new_from_file("img/image.png");
 
-		else if(im1)
-		{
-			gtk_widget_hide(image);
-			im1 = FALSE;
-			im2 = TRUE;
-			gtk_widget_destroy(image);
-			//image2 = gtk_image_new_from_file("img/image.png");
+				GdkPixbuf* src = gdk_pixbuf_new_from_file(path,&error);
+				GdkPixbuf *pixImage = gdk_pixbuf_scale_simple(src,widx,widy,GDK_INTERP_BILINEAR);
+				image2 = gtk_image_new_from_pixbuf(pixImage); 
 
-			GdkPixbuf* src = gdk_pixbuf_new_from_file("img/image.png",&error);
-			GdkPixbuf *pixImage = gdk_pixbuf_scale_simple(src,widx,widy,GDK_INTERP_BILINEAR);
-			image2 = gtk_image_new_from_pixbuf(pixImage); 
+				gtk_container_add(GTK_CONTAINER(fixedImg),image2);
 
-			gtk_container_add(GTK_CONTAINER(fixedImg),image2);
-
-			gtk_widget_show(image2);
-			//gtk_fixed_move(GTK_FIXED(fixedImg),image2, 175, 10);
-			gtk_label_set_text(infoLabel,"Image Imported.");
-		}
-		else
-		{
-			im2 = TRUE;
-	/*        image2 = gtk_image_new_from_file("img/image.png");*/
-			GdkPixbuf* src = gdk_pixbuf_new_from_file("img/image.png",&error);
-			GdkPixbuf *pixImage = gdk_pixbuf_scale_simple(src,widx,widy,GDK_INTERP_BILINEAR);
-			image2 = gtk_image_new_from_pixbuf(pixImage); 
-			
-			gtk_container_add(GTK_CONTAINER(fixedImg),image2);
-			gtk_widget_show(image2);
-			//gtk_fixed_move(GTK_FIXED(fixedImg),image2, 175, 10);
-			gtk_label_set_text(infoLabel,"Image Imported.");
+				gtk_widget_show(image2);
+				gtk_label_set_text(infoLabel,"[Action] Image Imported.");
+			}
+			else
+			{
+				im2 = TRUE;
+				GdkPixbuf* src = gdk_pixbuf_new_from_file(path,&error);
+				GdkPixbuf *pixImage = gdk_pixbuf_scale_simple(src,widx,widy,GDK_INTERP_BILINEAR);
+				image2 = gtk_image_new_from_pixbuf(pixImage); 
+				
+				gtk_container_add(GTK_CONTAINER(fixedImg),image2);
+				gtk_widget_show(image2);
+				gtk_label_set_text(infoLabel,"[Action] Image Imported.");
+			}
 		}
   	}
 }
@@ -169,7 +189,7 @@ void on_delButton_clicked()
 		image = gtk_image_new_from_file("img/no-image.png");
 		gtk_container_add(GTK_CONTAINER(fixedImg),image);
 		gtk_widget_show(image);
-		gtk_label_set_text(infoLabel,"Image successfully deleted!");
+		gtk_label_set_text(infoLabel,"[Action] Image successfully deleted!");
 		
 	}
 	else if (im1)
@@ -192,7 +212,7 @@ void mResize()
 	int widx = gtk_widget_get_allocated_width(fixedImg);
 	int widy = gtk_widget_get_allocated_height(fixedImg);
 	gdouble value = gtk_range_get_value(GTK_RANGE(rotscale));
-	SDL_Surface *img = load_image("img/image.png");
+	SDL_Surface *img = load_image(path);
 	if(im1)
 	{
 		im1 = FALSE;
@@ -200,7 +220,7 @@ void mResize()
 		// gtk_widget_destroy(image);
 		gtk_widget_hide(image);
 		gtk_container_remove(GTK_CONTAINER(fixedImg),image);
-		rotate_img90(img,value);
+		rotate_img(img,value);
 		// rotateImg("img/image.png",value);
 		// image2 = gtk_image_new_from_file("image_rotated.png");
 
@@ -223,7 +243,7 @@ void mResize()
 
 
 
-		rotate_img90(img,value);
+		rotate_img(img,value);
 		// rotateImg("img/image.png",value);
 		//image2 = gtk_image_new_from_file("image_rotated.png");
 
@@ -238,13 +258,12 @@ void mResize()
 	//gtk_widget_hide(image);
 	else
 	{
-		printf("Waht're u doin her\n");
 		im1 = FALSE;
 		im2 = TRUE;
 		gtk_widget_hide(image);
 		gtk_container_remove(GTK_CONTAINER(fixedImg),image);
 		// rotate_img90(img,value);
-		rotateImg("img/image.png",value);
+		rotateImg(path,value);
 		//image2 = gtk_image_new_from_file("image_rotated.png");
 
 		GdkPixbuf* test = gdk_pixbuf_new_from_file_at_scale("image_rotated.png",widx,widy,TRUE,&error);
@@ -256,7 +275,7 @@ void mResize()
 		gtk_container_add(GTK_CONTAINER(fixedImg),image2);
 		//gtk_box_pack_start(GTK_BOX(fixedImg),image2,FALSE,TRUE,0);
 	}
-	gtk_label_set_text(infoLabel,"Rotation Successful");
+	gtk_label_set_text(infoLabel,"[Action] Rotation Successful");
 }
 
 
@@ -272,7 +291,7 @@ void onRewind() // Rewind Button Clicked
 	else
 	{
 		step = 0;
-		gtk_label_set_text(infoLabel,"You are already at the first step");
+		gtk_label_set_text(infoLabel,"[Warning] You are already at the first step");
 	}
 }
 
@@ -283,7 +302,7 @@ void onForward() // Forward Button Clicked
 	else
 	{
 		step = 9;	
-		gtk_label_set_text(infoLabel,"You are already at the first step");
+		gtk_label_set_text(infoLabel,"[Warning] You are already at the last step");
 	}
 
 }
@@ -304,6 +323,11 @@ void changeS() // Will take the steps, and then change the images
 	SDL_Surface *img = NULL;
 
 	GdkPixbuf* pixImg = NULL;
+	if (!im2)
+	{
+		gtk_label_set_text(infoLabel,"[Error] You must import an image first.");
+		return;
+	}
 
 	printf("Current step is step n%d\n", step);
 	switch(step)
@@ -312,7 +336,7 @@ void changeS() // Will take the steps, and then change the images
 			gtk_widget_hide(image2);
 			gtk_label_set_text(infoLabel,"[0] Raw Image");
 			gtk_container_remove(GTK_CONTAINER(fixedImg),image2);
-			GdkPixbuf* pixImg = gdk_pixbuf_new_from_file_at_scale("img/image.png",widx,widy,TRUE,NULL);
+			GdkPixbuf* pixImg = gdk_pixbuf_new_from_file_at_scale(path,widx,widy,TRUE,NULL);
 			image2 = gtk_image_new_from_pixbuf(pixImg); 
 			gtk_widget_show(image2);
 			gtk_container_add(GTK_CONTAINER(fixedImg),image2);
@@ -322,7 +346,7 @@ void changeS() // Will take the steps, and then change the images
 			gtk_widget_hide(image2);
 			gtk_label_set_text(infoLabel,"[1] Applying Greyscale...");
 			gtk_container_remove(GTK_CONTAINER(fixedImg),image2);
-			img = load_image("img/image.png");
+			img = load_image(path);
 			greyscale(img);
 			IMG_SavePNG(img,"grayscale.png");
 			pixImg = gdk_pixbuf_new_from_file_at_scale("grayscale.png",widx,widy,TRUE,NULL);
@@ -335,7 +359,7 @@ void changeS() // Will take the steps, and then change the images
 			gtk_widget_hide(image2);
 			gtk_label_set_text(infoLabel,"[2] Applying Threshold...");
 			gtk_container_remove(GTK_CONTAINER(fixedImg),image2);
-			img = load_image("img/image.png");
+			img = load_image(path);
 			adaptive_gaussthresholding(img,11,2);
 			IMG_SavePNG(img,"gThresholding.png");
 			pixImg = gdk_pixbuf_new_from_file_at_scale("gThresholding.png",widx,widy,TRUE,NULL);

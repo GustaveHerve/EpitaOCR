@@ -1,45 +1,40 @@
 .main_window {
-	background-color: #282a36;
+  background-color: #282a36;
 }
 
 .imageframe {
-	border-radius: 20px;
+  border-radius: 20px;
 }
 
 window button {
-	background-color: #44475a;
+  background-color: #44475a;
 }
 
 window scale {
-	color:#bd93f9;
+  color: #bd93f9;
 }
 
-.infolabel{
-	color: whitesmoke;
-	font-family: "source sans pro", "arial";
-	font-size: 18px;
+.infolabel {
+  color: whitesmoke;
+  font-family: "source sans pro", "arial";
+  font-size: 18px;
 }
 
 button {
-	font-family: "jetbrains mono", "source sans pro", "arial";
-	font-size: 15px;
-	font-weight: normal;
-	border-radius: 2px;
-	border-color: black;
-	color: whitesmoke;
+  font-family: "jetbrains mono", "source sans pro", "arial";
+  font-size: 15px;
+  font-weight: normal;
+  border-radius: 2px;
+  border-color: black;
+  color: whitesmoke;
 }
 
 button:hover {
-	background-color: #343745;
+  background-color: #343745;
 }
 
 .titlelabel {
-	font-family: arial;
-	font-size: 20px;
-	color: whitesmoke;
+  font-family: arial;
+  font-size: 20px;
+  color: whitesmoke;
 }
-
-.titlelogo {
-}
- 
-
