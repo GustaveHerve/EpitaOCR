@@ -32,7 +32,7 @@ int NumberOfPixels(SDL_Surface* image){
     return width * height;
 }
 
-void parcours_pixel(SDL_Surface* image, double trainInput[])
+void parcours_pixel(SDL_Surface* image, double *trainInput)
 {
     unsigned int width = image->w;
     unsigned int height = image->h;
@@ -44,13 +44,17 @@ void parcours_pixel(SDL_Surface* image, double trainInput[])
             //Pixel intensity
             Uint8 val = 0;
             //Get pixel intensity and store it in val
+            //printf("pixel is intensity : %d\n",pixels[i*width + j]);
             SDL_GetRGB(pixels[i*width + j], image->format, &val, &val, &val);
             //New val from a 0-255 int to a 0-1 int
-            if (val == 255)
-                val = 1;
+            //printf("val : %d\n",val);
+            double res = 0.0f;
+            if (val != 0)
+                res = 0.0f;
             else
-                val = 0;
-            trainInput[acc] = val;
+                res = 1.0f;
+            trainInput[acc] = res;
+            //printf("%d\n",acc);   
             acc++;
 
         }
