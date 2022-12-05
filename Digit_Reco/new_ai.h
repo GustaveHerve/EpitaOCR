@@ -6,7 +6,7 @@
 #define NEW_AI_H
 
 void Call();
-int ai(int argc, char *argv);
+int ai(int argc, char *argv, char *im);
 
 
 #endif

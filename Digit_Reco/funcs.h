@@ -13,7 +13,7 @@ void PrintValues(int rows, int cols, double mat[rows][cols], char * name);
 double Precision(int num, double memo[num]);
 int transform(double val);
 int NumberOfPixels(SDL_Surface* image);
-void parcours_pixel(SDL_Surface* image, double trainInput[]);
+void parcours_pixel(SDL_Surface* image, double *trainInput);
 int GetMax(int size, double arr[size]);
 
 #endif

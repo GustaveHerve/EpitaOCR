@@ -433,25 +433,26 @@ int main(int argc, char **argv)
         struct dirent *dir;
         d = opendir(argv[1]);
         FILE * fp;
-        int arr[82];
+        int* arr = (int*)malloc(100 * sizeof(int));
         int i = 0;
         if (d)
         {
             while ((dir = readdir(d)) != NULL)
             {
-                if (strstr(dir->d_name, "png") != NULL || strstr(dir->d_name, "jpeg"))
+                if (strstr(dir->d_name, "png") != NULL || strstr(dir->d_name, "jpeg") != NULL)
                 {
-                    char fn[25];
+                    char fn[100];
                     strcpy( fn, argv[1] );
                     char* s = strcat(fn,dir->d_name);
                     printf("%s \n", s);
-                    arr[i] = ai(2,s);
+                    arr[i] = ai(2,s,NULL);
                     i++;
                     //fprintf(fp, "%d\n", ai(2,s));
                     //Train(2,s);
                 }
             }
             int tmp = 0;
+            closedir(d);
             fp = fopen(savefile, "w");
             for (int i = 1; i < 10;i++)
             {
@@ -473,8 +474,8 @@ int main(int argc, char **argv)
 
                 tmp++;
             }
-            closedir(d);
             fclose(fp);
+            free(arr);
         }
     }
 
