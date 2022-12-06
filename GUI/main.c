@@ -686,13 +686,13 @@ void changeS() // Will take the steps, and then change the images
 			gtk_label_set_text(infoLabel,"[11] Sudoku Solved!");
 			break;
 		case 12:
-			if (access("../bin/.temp/grid_solved.png", F_OK) != 0)	
+			if (access("grid_solved.png", F_OK) != 0)	
 			{
 				display_grid("grid_00","grid.result");
 			}
 			gtk_widget_hide(image2);
 			gtk_container_remove(GTK_CONTAINER(fixedImg) , image2);
-			pixImg = gdk_pixbuf_new_from_file_at_scale("../bin/.temp/grid_solved.png",widx,widy,TRUE,NULL);
+			pixImg = gdk_pixbuf_new_from_file_at_scale("grid_solved.png",widx,widy,TRUE,NULL);
 			image2 = gtk_image_new_from_pixbuf(pixImg);
 			gtk_widget_show(image2);
 			gtk_container_add(GTK_CONTAINER(fixedImg),image2);

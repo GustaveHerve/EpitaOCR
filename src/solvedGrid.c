@@ -178,7 +178,7 @@ void display_grid(char* unsolved, char* solved)
 
     }
     
-    IMG_SavePNG(grid, ".temp/grid_solved.png");
+    IMG_SavePNG(grid, "grid_solved.png");
     SDL_FreeSurface(grid);
     IMG_Quit();
     SDL_Quit();
