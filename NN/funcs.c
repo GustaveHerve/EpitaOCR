@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
-#include "../include/image_loading.h"
+#include "image_loading.h"
 #include "../include/pixel.h"
 
 
