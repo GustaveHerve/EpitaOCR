@@ -10,7 +10,7 @@
 
 #define savefile "grid_00"              
 
-int NeuralNetwork(int argc, char **argv)
+int NeuralNetwork(int argc, char *argv)
 {
     
     /* If no arguments, then we train */
@@ -24,7 +24,7 @@ int NeuralNetwork(int argc, char **argv)
     {
         DIR *d;
         struct dirent *dir;
-        d = opendir(argv[1]);
+        d = opendir(argv);
         FILE * fp;
         int* arr = (int*)malloc(81 * sizeof(int));
         int i = 0;      
@@ -36,7 +36,7 @@ int NeuralNetwork(int argc, char **argv)
                         strstr(dir->d_name, "jpeg") != NULL)
                 {
                     char fn[100];
-                    strcpy( fn, argv[1] );
+                    strcpy( fn, argv );
                     char* s = strcat(fn,dir->d_name);
                     arr[i] = ai(2,s,NULL);
                     i++;
