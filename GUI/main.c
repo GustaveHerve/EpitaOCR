@@ -87,11 +87,11 @@ int main(int argc, char *argv [])
  
 		/* Chargement du fichier test.glade. */
 	builder = gtk_builder_new_from_file("config.glade");
-	sty = gtk_css_provider_new();
+	/*sty = gtk_css_provider_new();
 	gtk_css_provider_load_from_path(sty,"style.css",&error);
 	gtk_style_context_add_provider_for_screen(gdk_screen_get_default(),
                                GTK_STYLE_PROVIDER(sty),
-                               GTK_STYLE_PROVIDER_PRIORITY_USER); 
+                               GTK_STYLE_PROVIDER_PRIORITY_USER); */
 
 	  /* Getting pointers for the different Items */
 	window = GTK_WIDGET(gtk_builder_get_object (builder, "mainwindow"));
@@ -324,11 +324,19 @@ void onForward() // Forward Button Clicked
 		gtk_label_set_text(infoLabel,"[Warning] You are already at the last step");
 	}
 
+	char applying[50] = "";
+	sprintf(applying,"%s%d%s","[Action] Applying step ", step, "...");
+	gtk_label_set_text(infoLabel,applying);
+
 }
 
 void onLast() // Last Button Clicked
 {
 	step = 9; //Last step
+	
+	char applying[50] = "";
+	sprintf(applying,"%s%d%s","[Action] Applying step ", step, "...");
+	gtk_label_set_text(infoLabel,applying);
 }
 
 
@@ -337,7 +345,6 @@ void changeS() // Will take the steps, and then change the images
 	// Size of the Image Window
 	int widx = gtk_widget_get_allocated_width(fixedImg);
 	int widy = gtk_widget_get_allocated_height(fixedImg);
-
 
 	// SDL Surface for Func Calls
 	SDL_Surface *img = NULL;
@@ -420,11 +427,11 @@ void changeS() // Will take the steps, and then change the images
 
 		case 3:
 			gtk_label_set_text(infoLabel,"[3] Applying Threshold...");
-			if (access("temp/canny.png", F_OK) == 0)	
+			if (access("temp/thresh.png", F_OK) == 0)	
 			{
 				gtk_widget_hide(image2);
 				gtk_container_remove(GTK_CONTAINER(fixedImg) , image2);
-				pixImg = gdk_pixbuf_new_from_file_at_scale("temp/canny.png",widx,widy,TRUE,NULL);
+				pixImg = gdk_pixbuf_new_from_file_at_scale("temp/thresh.png",widx,widy,TRUE,NULL);
 				image2 = gtk_image_new_from_pixbuf(pixImg);
 				gtk_widget_show(image2);
 				gtk_container_add(GTK_CONTAINER(fixedImg),image2);
@@ -436,8 +443,8 @@ void changeS() // Will take the steps, and then change the images
 				gtk_container_remove(GTK_CONTAINER(fixedImg),image2);
 				img = load_image("temp/blur.png");
 				adaptive_gaussthresholding(img,11,2);
-				IMG_SavePNG(img,"temp/canny.png");
-				pixImg = gdk_pixbuf_new_from_file_at_scale("temp/canny.png",widx,widy,TRUE,NULL);
+				IMG_SavePNG(img,"temp/thresh.png");
+				pixImg = gdk_pixbuf_new_from_file_at_scale("temp/thresh.png",widx,widy,TRUE,NULL);
 				image2 = gtk_image_new_from_pixbuf(pixImg); 
 				gtk_widget_show(image2);
 				gtk_container_add(GTK_CONTAINER(fixedImg),image2);
@@ -461,7 +468,7 @@ void changeS() // Will take the steps, and then change the images
 			{
 				gtk_widget_hide(image2);
 				gtk_container_remove(GTK_CONTAINER(fixedImg),image2);
-				img = load_image("temp/canny.png");
+				img = load_image("temp/thresh.png");
 				dilate(img,3);
 				IMG_SavePNG(img,"temp/dilate.png");
 				pixImg = gdk_pixbuf_new_from_file_at_scale("temp/dilate.png",widx,widy,TRUE,NULL);
