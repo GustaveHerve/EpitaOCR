@@ -1,5 +1,5 @@
 CC= gcc
-CPPFLAGS= -Iinclude
+CPPFLAGS= -Iinclude -INN -ISolver
 CFLAGS= -Wall -Wextra 
 LDFLAGS= -lSDL2 -lSDL2_image -lm 
 
