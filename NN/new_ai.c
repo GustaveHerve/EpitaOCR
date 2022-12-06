@@ -4,8 +4,8 @@
 #include <math.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
-#include "include/image_loading.h"
-#include "include/pixel.h"
+#include "../include/image_loading.h"
+#include "../include/pixel.h"
 #include <dirent.h>
 
 
@@ -167,7 +167,7 @@ void fill(char **arr, DIR *d, struct dirent *dir, char *name)
         {
             strcpy( fn, name);
             char* s = strcat(fn,dir->d_name);
-            //printf("%s\n",s);
+            printf("%s\n",s);
             strcpy(arr[i],s);
             i++;
         }
@@ -394,15 +394,13 @@ int ai(int argc, char *argv, char **im)
             Result = GetMax(nOutputs, oLayer);
             memory[memo_val] = (Result == i); //modify
             memo_val++;
-            
-            /*
+            /*           
             if (!argc)
 			    printf("Input : %d  Output: %d \n",
                     i,Result);
-            */
-            if (argc)
+            else
                 printf("Image is a %d \n", Result);
-            
+            */
 
 			// Backprop => Update the weights in function of the errors
             if (!argc)

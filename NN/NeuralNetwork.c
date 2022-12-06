@@ -1,5 +1,6 @@
 #include "funcs.h"
 #include "new_ai.h"
+#include "../include/NeuralNetwork.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <SDL2/SDL.h>
@@ -7,24 +8,9 @@
 #include <dirent.h>
 #include <string.h>
 
-#define savefile "grid_00"
+#define savefile "grid_00"              
 
-/*
-static int myCompare(const void* a, const void* b)                              
-{                                                                               
-    // setting up rules for comparison                                          
-    return strcmp(*(const char**)a, *(const char**)b);                          
-}                                                                               
-                                                                                 
-void sort(char* arr[], int n)                                                   
-{                                                                               
-    // calling qsort function to sort the array                                 
-    // with the help of Comparator                                              
-    qsort(arr, n, sizeof(arr[0]), myCompare);                                    
-} 
-*/
-
-int main(int argc, char **argv)
+int NeuralNetwork(int argc, char **argv)
 {
     
     /* If no arguments, then we train */
@@ -41,7 +27,7 @@ int main(int argc, char **argv)
         d = opendir(argv[1]);
         FILE * fp;
         int* arr = (int*)malloc(81 * sizeof(int));
-        int i = 0;
+        int i = 0;      
         if (d)
         {
             while ((dir = readdir(d)) != NULL)
@@ -52,14 +38,10 @@ int main(int argc, char **argv)
                     char fn[100];
                     strcpy( fn, argv[1] );
                     char* s = strcat(fn,dir->d_name);
-                    printf("%s \n", s);
                     arr[i] = ai(2,s,NULL);
                     i++;
-                    //fprintf(fp, "%d\n", ai(2,s));
-                    //Train(2,s);
                 }
             }
-
 
             /* Write the result in grid_00 file */
 
