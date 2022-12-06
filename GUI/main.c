@@ -363,7 +363,7 @@ void changeS() // Will take the steps, and then change the images
 		return;
 	}
 
-	//printf("Current step is step n%d\n", step);
+	printf("Current step is step n%d\n", step);
 	switch(step)
 	{
 		case 0:
@@ -678,7 +678,7 @@ void changeS() // Will take the steps, and then change the images
 
 		case 11:
 			gtk_label_set_text(infoLabel,"[11] Solving the Sudoku...");
-			 if (access("../Solver/grid.result", F_OK) != 0)	
+			 if (access("grid.result", F_OK) != 0)	
 			 {
 				Solver(2,"grid_00");
 				printf("UwU\n");
@@ -686,17 +686,18 @@ void changeS() // Will take the steps, and then change the images
 			gtk_label_set_text(infoLabel,"[11] Sudoku Solved!");
 			break;
 		case 12:
-			if (access("../Solver/grid.result", F_OK) != 0)	
+			if (access("../bin/.temp/grid_solved.png", F_OK) != 0)	
 			{
-				display_grid("grid_00","../Solver/grid.result");
+				display_grid("grid_00","grid.result");
 			}
 			gtk_widget_hide(image2);
 			gtk_container_remove(GTK_CONTAINER(fixedImg) , image2);
-			pixImg = gdk_pixbuf_new_from_file_at_scale("../bin/.temp/grid_result.png",widx,widy,TRUE,NULL);
+			pixImg = gdk_pixbuf_new_from_file_at_scale("../bin/.temp/grid_solved.png",widx,widy,TRUE,NULL);
 			image2 = gtk_image_new_from_pixbuf(pixImg);
 			gtk_widget_show(image2);
 			gtk_container_add(GTK_CONTAINER(fixedImg),image2);
 			gtk_label_set_text(infoLabel,"[12] Final Grid Constructed!");
+			break;
 
 		default:
 			printf("Default Case\n");
