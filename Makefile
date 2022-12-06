@@ -7,6 +7,8 @@ SRC_DIR= src
 OBJ_DIR= obj
 BIN_DIR= bin
 
+TEMP_DIR= ${BIN_DIR}/.temp/cells
+
 SRC= $(wildcard ${SRC_DIR}/*.c)
 _OBJT = ${SRC:.c=.o}
 _OBJ = ${notdir ${_OBJT}}
@@ -20,7 +22,7 @@ ${EXE}: ${BIN_DIR} ${OBJ}
 	${CC} ${CPPFLAGS} ${OBJ} -o ${EXE} ${LDFLAGS}
 
 ${BIN_DIR}:
-	mkdir -p ${BIN_DIR}
+	mkdir -p ${TEMP_DIR}
 
 ${OBJ}:	${OBJ_DIR}
 	${CC} ${CFLAGS} ${CPPFLAGS} -c ${SRC}
