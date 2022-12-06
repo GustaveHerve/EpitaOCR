@@ -1,6 +1,6 @@
-#include "../funcs.h"
-#include "../new_ai.h"
-#include "../include/NeuralNetwork.h"
+#include "funcs.h"
+#include "new_ai.h"
+#include "NeuralNetwork.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <SDL2/SDL.h>

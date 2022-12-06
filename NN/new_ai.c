@@ -1,11 +1,11 @@
-#include "../include/funcs.h"
+#include "funcs.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
-#include "../include/image_loading.h"
-#include "../include/pixel.h"
+#include "image_loading.h"
+#include "pixel.h"
 #include <dirent.h>
 
 
