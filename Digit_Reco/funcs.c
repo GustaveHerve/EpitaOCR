@@ -49,6 +49,11 @@ void parcours_pixel(SDL_Surface* image, double *trainInput)
             //New val from a 0-255 int to a 0-1 int
             //printf("val : %d\n",val);
             double res = 0.0f;
+            if (val < 100)
+            {
+                res = 1.0f;
+                val = 0.0f;
+            }
             if (val != 0)
                 res = 0.0f;
             else
