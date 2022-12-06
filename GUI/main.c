@@ -681,7 +681,6 @@ void changeS() // Will take the steps, and then change the images
 			 if (access("grid.result", F_OK) != 0)	
 			 {
 				Solver(2,"grid_00");
-				printf("UwU\n");
 			 }
 			gtk_label_set_text(infoLabel,"[11] Sudoku Solved!");
 			break;
