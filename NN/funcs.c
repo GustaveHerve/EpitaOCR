@@ -1,11 +1,11 @@
-#include "funcs.h"
+#include "../include/funcs.h"
 #include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include "image_loading.h"
-#include "pixel.h"
+#include "../include/pixel.h"
 
 
 double sigmoid(double x) // Sigmoid function used for the improvement bt part.
