@@ -394,12 +394,13 @@ int ai(int argc, char *argv, char **im)
             Result = GetMax(nOutputs, oLayer);
             memory[memo_val] = (Result == i); //modify
             memo_val++;
-
+            
             if (!argc)
 			    printf("Input : %d  Output: %d \n",
                     i,Result);
             else
                 printf("Image is a %d \n", Result);
+            
 
 			// Backprop => Update the weights in function of the errors
             if (!argc)
@@ -489,6 +490,7 @@ int ai(int argc, char *argv, char **im)
 
 }
 
+/*
 static int myCompare(const void* a, const void* b)
 {
     // setting up rules for comparison
@@ -501,6 +503,7 @@ void sort(char* arr[], int n)
     // with the help of Comparator
     qsort(arr, n, sizeof(char*), myCompare);
 }
+*/
 
 int Call()
 {
