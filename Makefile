@@ -1,7 +1,7 @@
 CC= gcc
 CPPFLAGS= -Iinclude
-CFLAGS= -Wall -Wextra
-LDFLAGS= -lSDL2 -lSDL2_image -lm 
+CFLAGS= -Wall -Wextra -fsanitize=address
+LDFLAGS= -lSDL2 -lSDL2_image -lm -fsanitize=address
 
 SRC_DIR= src
 OBJ_DIR= obj

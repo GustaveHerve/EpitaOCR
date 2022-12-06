@@ -60,7 +60,7 @@ void gauss_ker1D(int size, double sigma, double x[], double y[])
 void gauss_ker(int size, double sigma, double ker[])
 {
 	double r = 0, s = 2.0 * sigma * sigma;
-	double sum;
+	double sum = 0;
 
 	int beg = size/2;
 	for (int x = -beg; x <= beg; x++)

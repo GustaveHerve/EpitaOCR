@@ -63,7 +63,7 @@ void display_grid(char* unsolved, char* solved)
                 {    
                     digit= load_image("templates/black/8.png");
                 }
-                else if(chn == '9')
+                else
                 {    
                     digit= load_image("templates/black/9.png");
                 }
@@ -105,7 +105,7 @@ void display_grid(char* unsolved, char* solved)
             }
             else if(chn == '.')
             {
-                SDL_Surface *digit;
+                SDL_Surface *digit = NULL;
                 if(chs == '1')
                 {    
                     digit= load_image("templates/red/1.png");
@@ -138,7 +138,7 @@ void display_grid(char* unsolved, char* solved)
                 {    
                     digit= load_image("templates/red/8.png");
                 }
-                else if(chs == '9')
+                else
                 {    
                     digit= load_image("templates/red/9.png");
                 }

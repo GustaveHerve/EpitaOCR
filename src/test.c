@@ -20,6 +20,9 @@
 
 int main(int argc, char** argv)
 {
+	if (argc <= 1)
+		errx(1, "Must pass a file as argument");
+
     init_sdl();
 
     SDL_Surface* original = load_image(argv[1]);
@@ -54,13 +57,11 @@ int main(int argc, char** argv)
 
 	gauss_blur(test, 17, -1);
 
-    IMG_SavePNG(test, "temp/blur.png");
-	width = width;
-	height = height; 
+    IMG_SavePNG(test, ".temp/blur.png");
 
 	//canny(test);
 	adaptive_gaussthresholding(test, 13, 3);
-    IMG_SavePNG(test, "temp/canny.png");
+    IMG_SavePNG(test, ".temp/canny.png");
 	
 	/*
 
@@ -78,13 +79,13 @@ int main(int argc, char** argv)
 	//erose(test, 3);
 	//closing(test, 3);
 
-    IMG_SavePNG(test, "temp/dilate.png");
+    IMG_SavePNG(test, ".temp/dilate.png");
 
 	SDL_Surface *blob = blob_detection(test);
-    IMG_SavePNG(blob, "temp/blob.png");
+    IMG_SavePNG(blob, ".temp/blob.png");
 
 	erose(blob, 3);
-    IMG_SavePNG(blob, "temp/erose.png");
+    IMG_SavePNG(blob, ".temp/erose.png");
 
 	//dilate(dilsur, 5);
 
@@ -100,7 +101,7 @@ int main(int argc, char** argv)
 
 	for (int i = 0; i < line_nb; i++)
 		drawred(blob, &lines[i]);
-	IMG_SavePNG(blob, "temp/lines.png");
+	IMG_SavePNG(blob, ".temp/lines.png");
 
 	Square blobtest = get_blobs(lines, line_nb, (int)width, (int)height);
 	free(lines);
@@ -110,12 +111,12 @@ int main(int argc, char** argv)
 
 	//erose(test, 3);
 	SDL_Surface *homo = homographic_Transform(original, blobtest);
-	IMG_SavePNG(homo, "temp/homo.png");
+	IMG_SavePNG(homo, ".temp/homo.png");
 	//greyscale(homo);
 	//gauss_blur(homo, 25, -1);
 	//adaptive_gaussthresholding(homo, 7, 2);
 
-	IMG_SavePNG(homo, "temp/otsu.png");
+	IMG_SavePNG(homo, ".temp/otsu.png");
 	//closing(homo, 3);
 	Square homorect;
 	TupleInt a = { 0, 0 };
@@ -126,7 +127,7 @@ int main(int argc, char** argv)
 	homorect.NE = b;
 	homorect.SE = c;
 	homorect.SW = d;
-	extract_cells(&homorect, homo, "temp/cells/");
+	extract_cells(&homorect, homo, ".temp/cells/");
 
     SDL_FreeSurface(test);
     SDL_FreeSurface(original);

@@ -29,8 +29,8 @@ void rotate_img(SDL_Surface *img, double angle)
     //coordinates of the center of the initial img
     double x0 = ((width+1)/2)-1;   
 
-    double cosinus = cos(angle);   
-    double sinus = sin(angle);
+    //double cosinus = cos(angle);   
+    //double sinus = sin(angle);
     double tangent = tan(angle/2);
 
     double nwidth = Abs(width*cos(angle)) +Abs(height*sin(angle))+1;  

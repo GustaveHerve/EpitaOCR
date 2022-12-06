@@ -98,7 +98,8 @@ DigitInfo *cell_fill(Uint8* arr, int size, TupleShort seed)
 	DigitInfo *digit = malloc(sizeof(DigitInfo));
 	digit->xmin = seed.x, digit->xmax = seed.x;
 	digit->ymin = seed.y, digit->ymax = seed.y;
-	Stack *s = stack_init(s);
+	Stack *s = NULL;
+	s = stack_init(s);
 	Uint8 grey = 120;
 	stack_push(s, seed);
 	while (!stack_isempty(s))
@@ -165,7 +166,7 @@ DigitInfo *cell_fill(Uint8* arr, int size, TupleShort seed)
 
 void restore_digit(Uint8 *arr, int len)
 {
-	for (size_t i = 0; i < len; i++)
+	for (int i = 0; i < len; i++)
 	{
 		if (arr[i] == 120)
 			arr[i] = 255;
@@ -181,7 +182,6 @@ SDL_Surface *normalize_digit(SDL_Surface *cell, DigitInfo *d)
 	int xc = (int)d->xmin;
 	int yc = (int)d->ymin;
 	SDL_Rect rect = { xc, yc, xlen, ylen };
-    IMG_SavePNG(cell,"temp/baseimage.png");
 
 	SDL_Surface *crop_tmp =
 			SDL_CreateRGBSurface(0, xlen, ylen, 32, 0, 0, 0, 0);
@@ -190,8 +190,6 @@ SDL_Surface *normalize_digit(SDL_Surface *cell, DigitInfo *d)
 	SDL_FreeSurface(crop_tmp);
 
 	SDL_BlitSurface(cell, &rect, crop, NULL);
-    IMG_SavePNG(crop,"temp/beforeerose.png");
-    IMG_SavePNG(crop,"temp/aftererose.png");
 
 	float coeff = (float)28 / ylen;
 	xlen *= coeff;
@@ -203,14 +201,12 @@ SDL_Surface *normalize_digit(SDL_Surface *cell, DigitInfo *d)
 	SDL_FreeSurface(stretch_tmp);
 
 	SDL_BlitScaled(crop, NULL, stretch, NULL);
-    IMG_SavePNG(stretch, "temp/afterstretch.png");
 
 	int x0 = 28/2 - xlen/2;
 	SDL_Rect rect2 = { x0, 0, xlen, ylen };
 
 	SDL_Surface *res = SDL_CreateRGBSurface(0, 28, 28, 32, 0, 0, 0, 0);
 	SDL_BlitSurface(stretch, NULL, res, &rect2);
-    IMG_SavePNG(res, "temp/res.png");
 	SDL_FreeSurface(stretch);
 
 	return res;
@@ -307,14 +303,11 @@ void extract_cells(Square *sq, SDL_Surface *image, char* path)
 			SDL_Rect rect = { x0, y0, len, len };
 
 			SDL_BlitSurface(image, &rect, temp, NULL);
-            IMG_SavePNG(temp, "temp/provider.png");
 			gauss_blur(temp, 17, -1);
 			adaptive_gaussthresholding(temp, 15, 6);
 			closing(temp, 5);
-            IMG_SavePNG(temp, "temp/provider.png");
 			clean_cell(temp);
 			SDL_BlitScaled(temp, NULL, crop, NULL);
-            IMG_SavePNG(crop, "temp/trueprovider.png");
 
 			char *ext = ".png";
 			char *pathres = calloc(50 ,sizeof(char));

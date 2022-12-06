@@ -98,6 +98,7 @@ void nhsuppr(int input[], int x, int y, int xlen, int ylen, TupleInt *size)
 	}
 }
 
+/*
 void  biggernh(int input[], int i, int j, int rows, int cols)
 {
 	int curr = input[i*cols + j];
@@ -133,6 +134,7 @@ void  biggernh(int input[], int i, int j, int rows, int cols)
 	}
 }
 
+*/
 int hough_filter(int input[], int rows, int cols, int threshold, Line res[])
 {
 	int acc = 0;
@@ -290,7 +292,7 @@ int average_weight(Line* lines, int len, int *hough)
 
 Square get_blobs(Line* lines, int len, int width, int height)
 {
-	Square grid = { 0, 0, 0, 0 };
+	Square grid = { {0,0}, {0,0}, {0,0}, {0,0} };
 	int maxlen = 0;
 	for (int i = 0; i < len; i++)
 	{
@@ -358,156 +360,11 @@ Square get_blobs(Line* lines, int len, int width, int height)
 	return grid;
 }
 
-int get_grid_linesold(Line* lines, int len, int* dis, int tolerance, 
-		Line* res, int *hough)
-{
-	int begin = 0;
-	int end = 0;
-
-	for (int i = 1; i < len -1 && end - begin+1 < 10; i++)
-	{
-		int delta = dis[i] - dis[i-1];
-		if (delta < 0)
-			delta = -delta;
-		if (delta <= tolerance)
-			end++;
-
-		else
-		{
-			begin = i;
-			i++;
-			end = i;
-		}
-
-	}
-
-	if (res == NULL)
-		errx(2, "get_grid_lines: failed allocating memory");
-	int index = 0;
-	for (int i = begin; i <= end; i++)
-	{
-		res[index] = lines[i];
-		index++;
-	}
-	res[index] = lines[end+1];
-	index++;
-
-	return index;
-
-}
-
-int get_grid_lines(Line* lines, int len, int* dis, Line* res, int *hough)
-{
-	int begin = 0;
-	int end = 1;
-
-	for (int i = 1; i < len -1 && end - begin + 1 < 10; i++)
-	{
-		float dis_dev = 0;
-		if (dis[i-1] > dis[i])
-			dis_dev = 1 - (float)dis[i] / (float)dis[i-1];
-		else
-			dis_dev = 1 - (float)dis[i-1] / (float)dis[i];
-		if (dis_dev < 0.3)
-		{
-			float line_dev = 0;
-			int c1 = 360 * lines[i].rho + (int)lines[i].theta;
-			int c2 = 360 * lines[i-1].rho + (int)lines[i-1].theta;
-			int val1 = hough[c1];
-			int val2 = hough[c2];
-			if (val1 > val2)
-				line_dev = 1 - (float)val2/(float)val1;
-			else
-				line_dev = 1 - (float)val1/(float)val2;
-			if (line_dev < 0.3)
-				end++;
-			
-			else
-			{
-				begin = i;
-				end = i;
-			}
-
-		}
-		else
-		{
-			begin = i;
-			end = i;
-		}
-
-
-	}
-
-	if (res == NULL)
-		errx(2, "get_grid_lines: failed allocating memory");
-	int index = 0;
-	while (end - begin + 1 > 10)
-		end--;
-	for (int i = begin; i <= end; i++)
-	{
-		res[index] = lines[i];
-		index++;
-	}
-	
-	return index;
-
-}
-
-int get_grid(Line* lines, int len, Line* res, int *hough)
-{
-	if (len < 2)
-		return 0;
-	int* gX = malloc(sizeof(int) * (len-1));
-	line_distances(lines, len, gX);
-	int n = get_grid_linesold(lines, len, gX, 13, res, hough);
-	free(gX);
-	return n;
-
-}
-
-int get_intersection_count(Segment s, Segment* segments, int len)
-{
-	int res = 0;
-	for (int i = 0; i < len; i++)
-	{
-		if (intersect(s, segments[i]))
-				res++;
-	}
-
-	return res;
-}
-
-Segment *get_grid_seg(Segment* xseg, Segment* yseg, TupleInt lens)
-{
-	Segment *grid = calloc(20, sizeof(Segment));
-
-	int count = 0;
-	for (int i = 0; i < lens.x && count < 10; i++)
-	{
-		int inter = get_intersection_count(xseg[i], yseg, lens.y);
-		if (inter == 10)
-		{
-			grid[count] = xseg[i];
-			count++;
-		}
-	}
-
-	for (int i = 0; i < lens.y && count < 20; i++)
-	{
-		int inter = get_intersection_count(yseg[i], xseg, lens.x);
-		if (inter == 10)
-		{
-			grid[count] = yseg[i];
-			count++;
-		}
-	}
-
-	return grid;
-}
 
 int flood_fill(Uint8* total, Uint8* copy, TupleShort *size, TupleShort seed)
 {
-	Stack *s = stack_init(s);
+	Stack *s = NULL;
+	s = stack_init(s);
 	Uint8 grey = 120;
 	int res = 0;
 	stack_push(s, seed);
@@ -566,9 +423,9 @@ int flood_fill(Uint8* total, Uint8* copy, TupleShort *size, TupleShort seed)
 
 void retrieveblob(Uint8 *blobimg, TupleShort *size)
 {
-	for (size_t i = 0; i < size->y; i++)
+	for (short i = 0; i < size->y; i++)
 	{
-		for (size_t j = 0; j < size->x; j++)
+		for (short j = 0; j < size->x; j++)
 		{
 			int c = i * size->x + j;
 			if (blobimg[c] != 120)
