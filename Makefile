@@ -1,33 +1,34 @@
-CC=gcc
-CLAGS= -Wall -Wextra -Werrors
+CC= gcc
+CPPFLAGS= -Iinclude
+CFLAGS= -Wall -Wextra
 LDFLAGS= -lSDL2 -lSDL2_image -lm 
 
-SRC= matrix.c test.c image_processing.c geometry.c utils.c image_loading.c pixel.c edge_detection.c grid_detection.c morph.c thresholding.c grid_extraction.c display.c rotate_img.c
-OBJ= ${SRC:.c=.o}
-EXEC = debug
+SRC_DIR= src
+OBJ_DIR= obj
+BIN_DIR= bin
 
-ROTSRC= sdaile.c image_loading.c rotate_img.c pixel.c main.c matrix.c
-ROTATE = rotation
+SRC= $(wildcard ${SRC_DIR}/*.c)
+_OBJT = ${SRC:.c=.o}
+_OBJ = ${notdir ${_OBJT}}
+OBJ= $(patsubst ${SRC_DIR}/%.c, ${OBJ_DIR}/%.o, ${SRC})
+EXE= ${BIN_DIR}/sudoku
 
-${EXEC}: ${OBJ}
-	${CC} ${CFLAGS} $^ -o $@ ${LDFLAGS}
+.PHONY: all
+all: ${EXE} 
 
-${ROTATE}: ${OBJ}
-	${CC} ${CFLAGS} ${ROTSRC} -o $@ ${LDFLAGS}
+${EXE}: ${BIN_DIR} ${OBJ}
+	${CC} ${CPPFLAGS} ${OBJ} -o ${EXE} ${LDFLAGS}
 
-all: ${EXEC}
+${BIN_DIR}:
+	mkdir -p ${BIN_DIR}
 
-cleanbin:
-	rm ${OBJ}
+${OBJ}:	${OBJ_DIR}
+	${CC} ${CFLAGS} ${CPPFLAGS} -c ${SRC}
+	mv ${_OBJ} ${OBJ_DIR}
 
-bin: ${EXEC} cleanbin
-
-rotation: ${ROTATE}
+${OBJ_DIR}:
+	mkdir -p ${OBJ_DIR}
 
 clean:
-	rm ${OBJ}
-	rm ${EXEC}
-
-cleanrot:
-	rm ${OBJ}
-	rm ${ROTATE}
+	rm -rf ${OBJ_DIR}
+	rm -rf ${BIN_DIR}

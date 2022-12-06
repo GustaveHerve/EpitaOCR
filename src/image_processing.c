@@ -3,11 +3,11 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <math.h>
-#include "include/pixel.h"
-#include "include/utils.h"
-#include "include/geometry.h"
-#include "include/matrix.h"
-#include "include/image_processing.h"
+#include "pixel.h"
+#include "utils.h"
+#include "geometry.h"
+#include "matrix.h"
+#include "image_processing.h"
 
 void greyscale(SDL_Surface *image)
 {
@@ -32,7 +32,8 @@ void greyscale(SDL_Surface *image)
 	}
 }
 
-void gauss_ker(int size, double sigma, double ker[])
+/*
+void gauss_ker1D(int size, double sigma, double x[], double y[])
 {
 	double r = 0, s = 2.0 * sigma * sigma;
 	double sum;
@@ -44,6 +45,30 @@ void gauss_ker(int size, double sigma, double ker[])
 		{
 			r = sqrt(x * x + y * y);
 			ker[(x+beg) * size + y + beg] = (exp(-(r * r) / s)) / (M_PI * s);
+			sum += ker[(x+beg) * size + y + beg];
+		}
+	}
+
+	for (int i = 0; i < size; i++)
+	{
+		for (int j = 0; j < size; j++)
+			ker[i*size + j] /= sum;
+	}
+
+}
+*/
+void gauss_ker(int size, double sigma, double ker[])
+{
+	double r = 0, s = 2.0 * sigma * sigma;
+	double sum;
+
+	int beg = size/2;
+	for (int x = -beg; x <= beg; x++)
+	{
+		for (int y = -beg; y <= beg; y++)
+		{
+			r = x * x + y * y;
+			ker[(x+beg) * size + y + beg] = (exp(-(r) / s)) / (M_PI * s);
 			sum += ker[(x+beg) * size + y + beg];
 		}
 	}

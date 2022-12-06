@@ -3,9 +3,9 @@
 #include <SDL2/SDL_image.h>
 #include <math.h>
 #include <err.h>
-#include "include/pixel.h"
-#include "include/utils.h"
-#include "include/geometry.h"
+#include "pixel.h"
+#include "utils.h"
+#include "geometry.h"
 
 //HOUGH TRANSFORM RELATED METHODS
 void hough_init(int res[], int rows, int cols)

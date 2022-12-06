@@ -3,16 +3,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <err.h>
-#include "include/pixel.h"
-#include "include/edge_detection.h"
-#include "include/image_processing.h"
-#include "include/image_loading.h"
-#include "include/matrix.h"
-#include "include/utils.h"
-#include "include/geometry.h"
-#include "include/grid_detection.h"
-#include "include/morph.h"
-#include "include/thresholding.h"
+#include "pixel.h"
+#include "edge_detection.h"
+#include "image_processing.h"
+#include "image_loading.h"
+#include "matrix.h"
+#include "utils.h"
+#include "geometry.h"
+#include "grid_detection.h"
+#include "morph.h"
+#include "thresholding.h"
 #include <string.h>
 
 int avg_size(Square *sq, int len)

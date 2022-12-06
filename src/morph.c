@@ -1,7 +1,7 @@
 #include <stdlib.h>
-#include "include/utils.h"
-#include "include/pixel.h"
-#include "include/image_processing.h"
+#include "utils.h"
+#include "pixel.h"
+#include "image_processing.h"
 
 void dilate_c(SDL_Surface *image, int kersize, int r[])
 {

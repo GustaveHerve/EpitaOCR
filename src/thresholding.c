@@ -3,11 +3,11 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <math.h>
-#include "include/pixel.h"
-#include "include/utils.h"
-#include "include/geometry.h"
-#include "include/matrix.h"
-#include "include/image_processing.h"
+#include "pixel.h"
+#include "utils.h"
+#include "geometry.h"
+#include "matrix.h"
+#include "image_processing.h"
 
 //threshold: applies a fixed threshold treatment to a SDL_Surface
 void threshold(SDL_Surface* image, float threshold)

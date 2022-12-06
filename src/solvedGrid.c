@@ -3,8 +3,8 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <ctype.h>
-#include "Solver/tools.h"
-#include "include/image_loading.h"
+#include "tools.h"
+#include "image_loading.h"
 
 void display_grid(char* unsolved, char* solved)
 {
@@ -186,9 +186,11 @@ void display_grid(char* unsolved, char* solved)
     fclose(fs);
 }
 
+/*
 int main(int argc, char** argv)
 {
     if (argc != 3)
         printf("Too few arguments");
     display_grid(argv[1], argv[2]);
 }
+*/

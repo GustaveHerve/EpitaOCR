@@ -1,8 +1,8 @@
 #include <math.h>
 #include <stdlib.h>
 #include <SDL2/SDL.h>
-#include "include/geometry.h"
-#include "include/pixel.h"
+#include "geometry.h"
+#include "pixel.h"
 
 //polar_intersection: computes intersection point x,y of line1 and line2
 //returns 1 if success, 0 if no intersection point exists

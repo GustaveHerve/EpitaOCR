@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <SDL2/SDL.h>
-#include "include/utils.h"
-#include "include/pixel.h"
+#include "utils.h"
+#include "pixel.h"
 #include <err.h>
 
 int max2(int a, int b)

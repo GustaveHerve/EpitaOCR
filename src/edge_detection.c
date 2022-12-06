@@ -1,11 +1,11 @@
 #include <stdlib.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
-#include "include/pixel.h"
-#include "include/matrix.h"
-#include "include/image_processing.h"
-#include "include/edge_detection.h"
-#include "include/thresholding.h"
+#include "pixel.h"
+#include "matrix.h"
+#include "image_processing.h"
+#include "edge_detection.h"
+#include "thresholding.h"
 
 #define WEAK 100
 #define STRONG 255

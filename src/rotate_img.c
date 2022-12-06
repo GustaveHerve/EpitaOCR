@@ -3,9 +3,9 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <math.h>
-#include "include/pixel.h"
-#include "include/matrix.h"
-#include "include/geometry.h"
+#include "pixel.h"
+#include "matrix.h"
+#include "geometry.h"
 
 
 double deg_to_rad(double angle)
@@ -203,9 +203,10 @@ SDL_Surface *homographic_Transform(SDL_Surface *img, Square corners)
             pixels[y * (int)w +x] = old_pixel;
        }
     }
-    
+   
     free(hmatrix);
     free(newCos);
+    //IMG_SavePNG(new_img, "homographic_image.png");
 
     return new_img; 
 }
