@@ -1,5 +1,5 @@
-#include "funcs.h"
-#include "new_ai.h"
+#include "../funcs.h"
+#include "../new_ai.h"
 #include "../include/NeuralNetwork.h"
 #include <stdio.h>
 #include <stdlib.h>

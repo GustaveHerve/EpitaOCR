@@ -5,6 +5,6 @@
 #ifndef NeuralNetwork_H
 #define NeuralNetwork_H
 
-int NeuralNetwork(int argc, char **argv);
+int NeuralNetwork(int argc, char *argv);
 
 #endif

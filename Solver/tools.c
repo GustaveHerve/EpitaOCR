@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <ctype.h>
+#include "../include/tools.h"
 
 #define SIZE 9
 #define SQUARE 3

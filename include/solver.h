@@ -3,5 +3,3 @@
 
 int Solver(int argc, char *argv);
 
-
-#endif

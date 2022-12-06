@@ -1,6 +1,3 @@
-#ifndef TOOLS_H
-#define TOOLS_H
-
 #include <stdio.h>
 #include <ctype.h>
 
@@ -8,5 +5,3 @@
 
 int CheckNumber(long grid[SIZE][SIZE], long row, long col, long val);
 int solve(long grid[SIZE][SIZE], long row, long col);
-
-#endif
