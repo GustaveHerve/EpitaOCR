@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <ctype.h>
 #include "tools.h"
+#include "../include/solver.h"
 
 #define SIZE 9
 
@@ -29,7 +30,7 @@ void Output(long arr[SIZE][SIZE])
 }
 
 
-int main(int argc, char *argv[])
+int Solver(int argc, char *argv)
 {
  FILE *fp;
  char *filename;
@@ -44,7 +45,7 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-   filename = argv[1];
+   filename = argv;
 
    // Open file in read-only mode
    fp = fopen(filename,"r");
