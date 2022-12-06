@@ -143,6 +143,7 @@ void blur_convolution(SDL_Surface *image, double ker[], int rows,
 	free(pixels);
 }
 
+//cofactor(p,q) of a matrix m is matrix m without p line and q cols
 double* get_cofactor(double* mat, double* res, int p, int q, int dim)
 {
 	int i = 0;
@@ -186,7 +187,7 @@ double get_determinant(double* mat, int dim)
         return det;
 }
 
-
+//adjoint matrix is the transpose of the cofactor matrix
 double* get_adjoint(double* mat, double* adjoint, int dim)
 {
     if(dim == 1)
@@ -208,7 +209,7 @@ double* get_adjoint(double* mat, double* adjoint, int dim)
     return adjoint;
 }
 
-
+//inverse of matrix is the adjoint of matrix divided by determinant
 double* inverseMat(double* mat, int dim)
 {
     double* inverse = malloc(sizeof(double)*dim*dim);
@@ -216,7 +217,7 @@ double* inverseMat(double* mat, int dim)
    
     if(det == 0)
     {
-        printf("Can't inverse singular matrix..\n");
+        printf("Can't inverse that matrix..\n");
         return inverse; 
     }
 
