@@ -27,7 +27,7 @@ int NeuralNetwork(int argc, char *argv)
         d = opendir(argv);
         FILE * fp;
         int* arr = (int*)malloc(81 * sizeof(int));
-        int i = 0;      
+        int i = 0;
         if (d)
         {
             while ((dir = readdir(d)) != NULL)
@@ -37,9 +37,12 @@ int NeuralNetwork(int argc, char *argv)
                 {
                     char fn[100];
                     strcpy( fn, argv );
+                    char tmp[2];
+                    tmp[0] = dir->d_name[0];
+                    tmp[1] = dir->d_name[1];
+                    i = atoi(tmp);
                     char* s = strcat(fn,dir->d_name);
                     arr[i] = ai(2,s,NULL);
-                    i++;
                 }
             }
 

@@ -51,10 +51,13 @@ int main(int argc, char **argv)
                 {
                     char fn[100];
                     strcpy( fn, argv[1] );
+                    char tmp[2];
+                    tmp[0] = dir->d_name[0];
+                    tmp[1] = dir->d_name[1];
+                    i = atoi(tmp);
                     char* s = strcat(fn,dir->d_name);
                     printf("%s \n", s);
                     arr[i] = ai(2,s,NULL);
-                    i++;
                     //fprintf(fp, "%d\n", ai(2,s));
                     //Train(2,s);
                 }
