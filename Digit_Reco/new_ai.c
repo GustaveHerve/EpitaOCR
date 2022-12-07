@@ -213,7 +213,7 @@ int ai(int argc, char *argv, char **im)
     double* hBias = (double*)malloc(nHiddenNodes * sizeof(double));
     double* oBias = (double*)malloc(nOutputs * sizeof(double));
 
-    int numberOfTimes = 200;
+    int numberOfTimes = 100;
     if (argc)
         numberOfTimes = 1;
 
