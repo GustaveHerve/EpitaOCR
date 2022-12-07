@@ -30,7 +30,7 @@
 #include "../include/solver.h"
 #include "../include/funcs.h"
 #include "../include/new_ai.h"
-#include "./tools.h"
+#include "../include/tools.h"
 #include "../include/solvedGrid.h"
 
 // Global Declarations : 
@@ -631,9 +631,9 @@ void changeS() // Will take the steps, and then change the images
 			}
 			else
 			{
-				gtk_widget_hide(image2);
-				gtk_container_remove(GTK_CONTAINER(fixedImg),image2);
-				img = load_image("../bin/.temp/homoT.png");
+				// gtk_widget_hide(image2);
+				// gtk_container_remove(GTK_CONTAINER(fixedImg),image2);
+				// img = load_image("../bin/.temp/homoT.png");
 
 				Square homorect;
 				TupleInt a = { 0, 0 };
@@ -647,19 +647,23 @@ void changeS() // Will take the steps, and then change the images
 				extract_cells(&homorect, homoT, "../bin/.temp/cells/");
 
 
-				IMG_SavePNG(homoT,"t../bin/.emp/extarct_cells.png");
-				pixImg = gdk_pixbuf_new_from_file_at_scale("../bin/.temp/homoT.png",widx,widy,TRUE,NULL);
-				image2 = gtk_image_new_from_pixbuf(pixImg); 
-				gtk_widget_show(image2);
-				gtk_container_add(GTK_CONTAINER(fixedImg),image2);
+				// IMG_SavePNG(homoT,"../bin/.emp/extract_cells.png");
+				// pixImg = gdk_pixbuf_new_from_file_at_scale("../bin/.temp/homoT.png",widx,widy,TRUE,NULL);
+				// image2 = gtk_image_new_from_pixbuf(pixImg); 
+				// gtk_widget_show(image2);
+				// gtk_container_add(GTK_CONTAINER(fixedImg),image2);
 				gtk_label_set_text(infoLabel,"[9] Cells Extraction Applied!");
 			}
 			break;
 
 		case 10:
 			gtk_label_set_text(infoLabel,"[10] Initializing Neural Network...");
-			if (access("../NN/Brain", F_OK) == 0)	
+			if (access("Brain", F_OK) == 0)	
 			{
+				// char *saved_locale;
+				// saved_locale = setlocale(LC_NUMERIC, "C");
+				// /* do your strtod thing */
+				// setlocale(LC_NUMERIC, saved_locale);
 				NeuralNetwork(2,"../bin/.temp/cells/");
 				printf("UwU\n");
 			}
@@ -667,23 +671,24 @@ void changeS() // Will take the steps, and then change the images
 			{
 				NeuralNetwork(1,"../bin/.temp/cells/");
 			}
-			gtk_widget_hide(image2);
-			gtk_container_remove(GTK_CONTAINER(fixedImg) , image2);
-			pixImg = gdk_pixbuf_new_from_file_at_scale("../bin/.temp/homoT.png",widx,widy,TRUE,NULL);
-			image2 = gtk_image_new_from_pixbuf(pixImg);
-			gtk_widget_show(image2);
-			gtk_container_add(GTK_CONTAINER(fixedImg),image2);
+			// gtk_widget_hide(image2);
+			// gtk_container_remove(GTK_CONTAINER(fixedImg) , image2);
+			// pixImg = gdk_pixbuf_new_from_file_at_scale("../bin/.temp/homoT.png",widx,widy,TRUE,NULL);
+			// image2 = gtk_image_new_from_pixbuf(pixImg);
+			// gtk_widget_show(image2);
+			// gtk_container_add(GTK_CONTAINER(fixedImg),image2);
 			gtk_label_set_text(infoLabel,"[10] Neural Network Initialized!");
 			break;
 
 		case 11:
 			gtk_label_set_text(infoLabel,"[11] Solving the Sudoku...");
-			 if (access("grid.result", F_OK) != 0)	
-			 {
+			if (access("grid.result", F_OK) != 0)	
+			{
 				Solver(2,"grid_00");
-			 }
+			}
 			gtk_label_set_text(infoLabel,"[11] Sudoku Solved!");
 			break;
+
 		case 12:
 			if (access("grid_solved.png", F_OK) != 0)	
 			{
