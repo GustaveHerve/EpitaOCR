@@ -32,31 +32,41 @@ void greyscale(SDL_Surface *image)
 	}
 }
 
-/*
-void gauss_ker1D(int size, double sigma, double x[], double y[])
+void gauss_ker1D(int size, double sigma, double ker[])
 {
 	double r = 0, s = 2.0 * sigma * sigma;
-	double sum;
+	double sum = 0;
 
 	int beg = size/2;
 	for (int x = -beg; x <= beg; x++)
 	{
-		for (int y = -beg; y <= beg; y++)
-		{
-			r = sqrt(x * x + y * y);
-			ker[(x+beg) * size + y + beg] = (exp(-(r * r) / s)) / (M_PI * s);
-			sum += ker[(x+beg) * size + y + beg];
-		}
+		r = x * x;
+		ker[x+beg] = (exp(-r / s)); // / (M_PI * s);
+		sum += ker[x+beg];
 	}
 
 	for (int i = 0; i < size; i++)
-	{
-		for (int j = 0; j < size; j++)
-			ker[i*size + j] /= sum;
-	}
+		ker[i] /= sum;
 
 }
-*/
+
+void gauss_blur1D(SDL_Surface* img, int size, double sigma)
+{
+    int *b = malloc(sizeof(int) * img->w * img->h);
+	if (sigma == -1)
+		sigma = 0.3 * ((size-1) * 0.5 - 1) + 0.8;
+
+	double *ker = calloc(size, sizeof(double));
+	gauss_ker1D(size, sigma, ker);
+
+	blur_convolution(img, ker, 1, size, b);
+	apply_convolution_int(img, b, (size_t) img->h, (size_t) img->w);
+	blur_convolution(img, ker, size, 1, b);
+	apply_convolution_int(img, b, (size_t) img->h, (size_t) img->w);
+	free(b);
+	free(ker);
+}
+
 void gauss_ker(int size, double sigma, double ker[])
 {
 	double r = 0, s = 2.0 * sigma * sigma;
@@ -68,7 +78,7 @@ void gauss_ker(int size, double sigma, double ker[])
 		for (int y = -beg; y <= beg; y++)
 		{
 			r = x * x + y * y;
-			ker[(x+beg) * size + y + beg] = (exp(-(r) / s)) / (M_PI * s);
+			ker[(x+beg) * size + y + beg] = (exp(-(r) / s)); // (M_PI * s);
 			sum += ker[(x+beg) * size + y + beg];
 		}
 	}

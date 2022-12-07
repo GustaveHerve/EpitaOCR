@@ -93,11 +93,33 @@ int find_digit(Uint8* arr, int size, int tolerance, TupleShort *s)
 	return 1;
 }
 
+/*
+Span *cell_fillv2(Uint8* arr, int size, TupleShort seed)
+{
+	Span *s = malloc(sizeof(DigitInfo));
+	digit->xmin = seed.x, digit->xmax = seed.x;
+	digit->ymin = seed.y, digit->ymax = seed.y;
+	digit->size = 0;
+	Stack *s = NULL;
+	s = stack_init(s);
+	Uint8 grey = 120;
+	stack_push(s, seed);
+	while (!stack_isempty(s))
+	{
+		Span *e = { 0, 0, 0, 0
+
+	}
+
+
+}
+*/
+
 DigitInfo *cell_fill(Uint8* arr, int size, TupleShort seed)
 {
 	DigitInfo *digit = malloc(sizeof(DigitInfo));
 	digit->xmin = seed.x, digit->xmax = seed.x;
 	digit->ymin = seed.y, digit->ymax = seed.y;
+	digit->size = 0;
 	Stack *s = NULL;
 	s = stack_init(s);
 	Uint8 grey = 120;
@@ -106,6 +128,7 @@ DigitInfo *cell_fill(Uint8* arr, int size, TupleShort seed)
 	{
 		TupleShort e = { 0, 0 };
 		stack_pop(s, &e);
+		digit->size++;
 
 		if (e.y < digit->ymin)
 			digit->ymin = e.y;
@@ -186,7 +209,7 @@ SDL_Surface *normalize_digit(SDL_Surface *cell, DigitInfo *d)
 	SDL_Surface *crop_tmp =
 			SDL_CreateRGBSurface(0, xlen, ylen, 32, 0, 0, 0, 0);
     SDL_Surface *crop =
-				SDL_ConvertSurfaceFormat(crop_tmp, SDL_PIXELFORMAT_RGB888, 0);
+			SDL_ConvertSurfaceFormat(crop_tmp, SDL_PIXELFORMAT_RGB888, 0);
 	SDL_FreeSurface(crop_tmp);
 
 	SDL_BlitSurface(cell, &rect, crop, NULL);
@@ -195,9 +218,9 @@ SDL_Surface *normalize_digit(SDL_Surface *cell, DigitInfo *d)
 	xlen *= coeff;
 	ylen = 28;
 	SDL_Surface *stretch_tmp =
-				SDL_CreateRGBSurface(0, xlen, ylen, 32, 0, 0, 0, 0);
+			SDL_CreateRGBSurface(0, xlen, ylen, 32, 0, 0, 0, 0);
     SDL_Surface *stretch =
-				SDL_ConvertSurfaceFormat(stretch_tmp, SDL_PIXELFORMAT_RGB888, 0);
+			SDL_ConvertSurfaceFormat(stretch_tmp, SDL_PIXELFORMAT_RGB888, 0);
 	SDL_FreeSurface(stretch_tmp);
 
 	SDL_BlitScaled(crop, NULL, stretch, NULL);
@@ -224,11 +247,7 @@ void clean_cell(SDL_Surface *img)
 	if (success)
 	{
 		DigitInfo *d = cell_fill(arr, img->h, seed);
-		int xlen = d->xmax - d->xmin;
-		int ylen = d->ymax - d->ymin;
-		if ((float)xlen * (float)ylen / (float)size < 0.03 
-				&& (float)xlen / (float)xlen < 0.1 
-				&& (float)ylen / (float)ylen < 0.1)
+		if ((float) d->size / (float) size < 0.03)
 		{
 			Uint32 color = SDL_MapRGB(img->format, 255, 255, 255);
 			SDL_FillRect(img, NULL, color);
@@ -303,7 +322,7 @@ void extract_cells(Square *sq, SDL_Surface *image, char* path)
 			SDL_Rect rect = { x0, y0, len, len };
 
 			SDL_BlitSurface(image, &rect, temp, NULL);
-			gauss_blur(temp, 17, -1);
+			gauss_blur1D(temp, 17, -1);
 			adaptive_gaussthresholding(temp, 15, 6);
 			closing(temp, 5);
 			clean_cell(temp);

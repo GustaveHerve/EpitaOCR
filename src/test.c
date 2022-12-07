@@ -55,7 +55,9 @@ int main(int argc, char** argv)
 	greyscale(test);
 	opening(test, 7);
 
-	gauss_blur(test, 17, -1);
+	//gauss_blur(test, 17, -1);
+
+	gauss_blur1D(test, 17, -1);
 
     IMG_SavePNG(test, ".temp/blur.png");
 

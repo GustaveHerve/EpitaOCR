@@ -3,6 +3,7 @@
 
 #include <SDL2/SDL.h>
 #include <err.h>
+#include "geometry.h"
 
 int max2(int a, int b);
 int max3(int a, int b, int c);
@@ -16,10 +17,13 @@ typedef struct Histo{
 void histo_init(Histo* hist);
 void histo_compute(SDL_Surface* image, Histo* hist);
 
+
+/*
 typedef struct TupleInt{
 	int x;
 	int y;
 } TupleInt;
+*/
 
 typedef struct TupleShort{
 	short x;
@@ -54,5 +58,32 @@ void stack_free(Stack* s);
 void stack_doublesize(Stack *s);
 void stack_push(Stack *s, TupleShort x);
 int stack_pop(Stack *s, TupleShort *x);
+
+typedef struct Span 
+{
+	short x1;
+	short x2;
+	short y;
+	short dy;
+	short xmin;
+	short xmax;
+	short ymin;
+	short ymax;
+	int size;
+
+} Span;
+typedef struct StackS{
+	int size;
+	int capacity;
+	Span *data;
+} StackS;
+
+StackS *stacks_init();
+int stacks_isempty(StackS* s);
+void stacks_free(StackS* s);
+void stacks_doublesize(StackS *s);
+void stacks_push(StackS *s, Span x);
+int stacks_pop(StackS *s, Span *x);
+
 
 #endif

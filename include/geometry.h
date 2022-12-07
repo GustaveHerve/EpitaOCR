@@ -1,7 +1,12 @@
 #ifndef GEOMETRY_H
 #define GEOMETRY_H
 
-#include "utils.h"
+//#include "utils.h"
+
+typedef struct TupleInt{
+	int x;
+	int y;
+} TupleInt;
 
 typedef struct Line
 {
@@ -29,6 +34,7 @@ typedef struct DigitInfo
 	short xmax;
 	short ymin;
 	short ymax;
+	int size;
 
 } DigitInfo;
 

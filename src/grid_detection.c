@@ -360,6 +360,33 @@ Square get_blobs(Line* lines, int len, int width, int height)
 	return grid;
 }
 
+/*
+int flood_fillv2(Uint8* total, Uint8* copy, TupleShort *size, TupleShort seed)
+{
+	StackS *s = NULL;
+	s = stacks_init(s);
+	Uint8 grey = 120;
+	int res = 0;
+	Span seed = { seed.x, seed.x, seed.y, 1 };
+	Span seed2 = { seed.x, seed.x, seed.y - 1, -1 };
+	stack_push(s, seed);
+	stack_push(s, seed2);
+	while (!stack_isempty(s))
+	{
+		Span e = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+		stacks_pop(s, &e);
+		short x = s->x1;
+		short y = s->y;
+		size_t c = x * size->x + y;
+		if (copy[c] = 255)
+		{
+			while (copy[c-1] 
+
+		}
+	}
+
+}
+*/
 
 int flood_fill(Uint8* total, Uint8* copy, TupleShort *size, TupleShort seed)
 {

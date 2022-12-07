@@ -215,3 +215,53 @@ int stack_pop(Stack *s, TupleShort *x)
 	s->size--;
 	return 1;
 }
+
+//Span Stack
+
+StackS *stacks_init()
+{
+	StackS *s = malloc(sizeof(StackS));
+	s->size = 0;
+	s->capacity = 1;
+	s->data = malloc(sizeof(Span));
+	return s;
+}
+
+int stacks_isempty(StackS* s)
+{
+	if (s->size == 0)
+		return 1;
+	return 0;
+
+}
+
+void stacks_free(StackS* s)
+{
+	free(s->data);
+	free(s);
+}
+
+void stacks_doublesize(StackS *s)
+{
+	s->capacity *= 2;
+	s->data = realloc(s->data, sizeof(Span) * s->capacity);
+	if (s->data == NULL)
+		errx(1, "Not enough memory for stack");
+}
+
+void stacks_push(StackS *s, Span x)
+{
+	s->size++;
+	if (s->size > s->capacity)
+		stacks_doublesize(s);
+	s->data[s->size-1] = x;
+}
+
+int stacks_pop(StackS *s, Span *x)
+{
+	if (stacks_isempty(s))
+		return 0;
+	*x = s->data[s->size-1];
+	s->size--;
+	return 1;
+}

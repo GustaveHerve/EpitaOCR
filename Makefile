@@ -1,11 +1,13 @@
 CC= gcc
 CPPFLAGS= -Iinclude -INN -ISolver
-CFLAGS= -Wall -Wextra 
+CFLAGS= -Wall -Wextra -g -O3
 LDFLAGS= -lSDL2 -lSDL2_image -lm 
 
 SRC_DIR= src
 OBJ_DIR= obj
 BIN_DIR= bin
+
+DEBUG= -g
 
 TEMP_DIR= ${BIN_DIR}/.temp/cells
 
@@ -19,7 +21,7 @@ EXE= ${BIN_DIR}/sudoku
 all: ${EXE} 
 
 ${EXE}: ${BIN_DIR} ${OBJ}
-	${CC} ${CPPFLAGS} ${OBJ} -o ${EXE} ${LDFLAGS}
+	${CC} ${DEBUG} ${CPPFLAGS} ${OBJ} -o ${EXE} ${LDFLAGS}
 
 ${BIN_DIR}:
 	mkdir -p ${TEMP_DIR}
