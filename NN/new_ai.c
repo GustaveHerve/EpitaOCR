@@ -7,6 +7,7 @@
 #include "../include/image_loading.h"
 #include "../include/pixel.h"
 #include <dirent.h>
+#include <locale.h>
 
 
 // define the number of each type of nodes
@@ -28,6 +29,8 @@ void InputValues(char* file, double **hWeights,
  fp = fopen(filename, "r");
  if (fp)
  {   // Input the previous values of weights and bias if they exist
+ 
+     char *s = setlocale(LC_NUMERIC,"C");
 
      double myvariable;
 
@@ -84,6 +87,8 @@ void InputValues(char* file, double **hWeights,
      // end
 
      fclose(fp);
+     setlocale(LC_NUMERIC,s);
+     
  }
  else
  { // If there is no "Brain" file that means that it's the first time that
@@ -160,7 +165,7 @@ void OutputValues(char* file, double **hWeights,
 void fill(char **arr, DIR *d, struct dirent *dir, char *name)
 {
     int i = 0;
-    char* fn = (char*)malloc(25 * sizeof(char));
+    char* fn = (char*)malloc(50 * sizeof(char));
     while ((dir = readdir(d)) != NULL && i < IMAGES)
     {
         if (strstr(dir->d_name, "png") != NULL || strstr(dir->d_name, "jpeg") != NULL)
