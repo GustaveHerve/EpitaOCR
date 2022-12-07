@@ -21,8 +21,8 @@ void display_grid(char* unsolved, char* solved)
 
     SDL_Rect dstrect = {16, 16, 150, 150};
 
-    SDL_Surface *grid = load_image("templates/template.png");
-    
+    SDL_Surface *grid = load_image("../templates/template.png");
+
     if(fn && fs)
     {
         while((chn = fgetc(fn)) != EOF && (chs = fgetc(fs)) != EOF)
@@ -32,40 +32,40 @@ void display_grid(char* unsolved, char* solved)
             {
                 SDL_Surface *digit;
                 if(chn == '1')
-                {    
-                    digit= load_image("templates/black/1.png");
+                {
+                    digit= load_image("../templates/black/1.png");
                 }
                 else if(chn == '2')
-                {    
-                    digit= load_image("templates/black/2.png");
+                {
+                    digit= load_image("../templates/black/2.png");
                 }
                 else if(chn == '3')
-                {    
-                    digit= load_image("templates/black/3.png");
+                {
+                    digit= load_image("../templates/black/3.png");
                 }
                 else if(chn == '4')
-                {    
-                    digit= load_image("templates/black/4.png");
+                {
+                    digit= load_image("../templates/black/4.png");
                 }
                 else if(chn == '5')
-                {    
-                    digit= load_image("templates/black/5.png");
+                {
+                    digit= load_image("../templates/black/5.png");
                 }
                 else if(chn == '6')
-                {    
-                    digit= load_image("templates/black/6.png");
+                {
+                    digit= load_image("../templates/black/6.png");
                 }
                 else if(chn == '7')
-                {    
-                    digit= load_image("templates/black/7.png");
+                {
+                    digit= load_image("../templates/black/7.png");
                 }
                 else if(chn == '8')
-                {    
-                    digit= load_image("templates/black/8.png");
+                {
+                    digit= load_image("../templates/black/8.png");
                 }
                 else
-                {    
-                    digit= load_image("templates/black/9.png");
+                {
+                    digit= load_image("../templates/black/9.png");
                 }
 
                 SDL_BlitSurface(digit, NULL, grid, &dstrect);
@@ -108,39 +108,39 @@ void display_grid(char* unsolved, char* solved)
                 SDL_Surface *digit = NULL;
                 if(chs == '1')
                 {    
-                    digit= load_image("templates/red/1.png");
+                    digit= load_image("../templates/red/1.png");
                 }
                 else if(chs == '2')
                 {    
-                    digit= load_image("templates/red/2.png");
+                    digit= load_image("../templates/red/2.png");
                 }
                 else if(chs == '3')
                 {    
-                    digit= load_image("templates/red/3.png");
+                    digit= load_image("../templates/red/3.png");
                 }
                 else if(chs == '4')
                 {    
-                    digit= load_image("templates/red/4.png");
+                    digit= load_image("../templates/red/4.png");
                 }
                 else if(chs == '5')
                 {    
-                    digit= load_image("templates/red/5.png");
+                    digit= load_image("../templates/red/5.png");
                 }
                 else if(chs == '6')
                 {    
-                    digit= load_image("templates/red/6.png");
+                    digit= load_image("../templates/red/6.png");
                 }
                 else if(chs == '7')
                 {    
-                    digit= load_image("templates/red/7.png");
+                    digit= load_image("../templates/red/7.png");
                 }
                 else if(chs == '8')
                 {    
-                    digit= load_image("templates/red/8.png");
+                    digit= load_image("../templates/red/8.png");
                 }
                 else
                 {    
-                    digit= load_image("templates/red/9.png");
+                    digit= load_image("../templates/red/9.png");
                 }
 
                 SDL_BlitSurface(digit, NULL, grid, &dstrect);
