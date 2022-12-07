@@ -394,6 +394,7 @@ void changeS() // Will take the steps, and then change the images
 				gtk_container_remove(GTK_CONTAINER(fixedImg),image2);
 				img = load_image(path);
 				greyscale(img);
+                opening(img, 7);
 				IMG_SavePNG(img,"../bin/.temp/grayscale.png");
 				pixImg = gdk_pixbuf_new_from_file_at_scale("../bin/.temp/grayscale.png",widx,widy,TRUE,NULL);
 				image2 = gtk_image_new_from_pixbuf(pixImg); 
@@ -421,7 +422,7 @@ void changeS() // Will take the steps, and then change the images
 				gtk_label_set_text(infoLabel,"[2] Applying Gaussian Blur...");
 				gtk_container_remove(GTK_CONTAINER(fixedImg),image2);
 				img = load_image("../bin/.temp/grayscale.png");
-				gauss_blur(img,11,2.5);
+				gauss_blur(img, 17, -1);
 				IMG_SavePNG(img,"../bin/.temp/blur.png");
 				pixImg = gdk_pixbuf_new_from_file_at_scale("../bin/.temp/blur.png",widx,widy,TRUE,NULL);
 				image2 = gtk_image_new_from_pixbuf(pixImg); 
@@ -448,7 +449,7 @@ void changeS() // Will take the steps, and then change the images
 				gtk_widget_hide(image2);
 				gtk_container_remove(GTK_CONTAINER(fixedImg),image2);
 				img = load_image("../bin/.temp/blur.png");
-				adaptive_gaussthresholding(img,11,2);
+				adaptive_gaussthresholding(img,13,3);
 				IMG_SavePNG(img,"../bin/.temp/thresh.png");
 				pixImg = gdk_pixbuf_new_from_file_at_scale("../bin/.temp/thresh.png",widx,widy,TRUE,NULL);
 				image2 = gtk_image_new_from_pixbuf(pixImg); 
@@ -475,7 +476,8 @@ void changeS() // Will take the steps, and then change the images
 				gtk_widget_hide(image2);
 				gtk_container_remove(GTK_CONTAINER(fixedImg),image2);
 				img = load_image("../bin/.temp/thresh.png");
-				dilate(img,3);
+				//dilate(img,3);
+                closing(img, 5);
 				IMG_SavePNG(img,"../bin/.temp/dilate.png");
 				pixImg = gdk_pixbuf_new_from_file_at_scale("../bin/.temp/dilate.png",widx,widy,TRUE,NULL);
 				image2 = gtk_image_new_from_pixbuf(pixImg); 
@@ -690,17 +692,21 @@ void changeS() // Will take the steps, and then change the images
 			break;
 
 		case 12:
-			if (access("grid_solved.png", F_OK) != 0)	
-			{
-				display_grid("grid_00","grid.result");
-			}
+            printf("Test");
+			if (access("grid.result", F_OK))
+            {
+                printf("Sudoku is not Solvable!");
+                gtk_label_set_text(infoLabel,"Sudoku is not Solvable");
+            }
+            printf("UwU2");
+			display_grid("grid_00","grid.result");
 			gtk_widget_hide(image2);
 			gtk_container_remove(GTK_CONTAINER(fixedImg) , image2);
-			pixImg = gdk_pixbuf_new_from_file_at_scale("grid_solved.png",widx,widy,TRUE,NULL);
-			image2 = gtk_image_new_from_pixbuf(pixImg);
-			gtk_widget_show(image2);
-			gtk_container_add(GTK_CONTAINER(fixedImg),image2);
-			gtk_label_set_text(infoLabel,"[12] Final Grid Constructed!");
+            pixImg = gdk_pixbuf_new_from_file_at_scale("grid_solved.png",widx,widy,TRUE,NULL);
+            image2 = gtk_image_new_from_pixbuf(pixImg);
+            gtk_widget_show(image2);
+            gtk_container_add(GTK_CONTAINER(fixedImg),image2);
+            gtk_label_set_text(infoLabel,"[12] Final Grid Constructed!");
 			break;
 
 		default:
