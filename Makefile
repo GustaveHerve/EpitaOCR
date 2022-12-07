@@ -1,7 +1,7 @@
 CC= gcc
-CPPFLAGS= -Iinclude -INN -ISolver
-CFLAGS= -Wall -Wextra -g
-LDFLAGS= -lSDL2 -lSDL2_image -lm
+CPPFLAGS= -Iinclude
+CFLAGS= -Wall -Wextra -g `pkg-config --cflags gtk+-3.0` -rdynamic
+LDFLAGS= -lSDL2 -lSDL2_image -lm `pkg-config --libs gtk+-3.0`
 
 SRC_DIR= src
 OBJ_DIR= obj
@@ -18,7 +18,7 @@ OBJ= $(patsubst ${SRC_DIR}/%.c, ${OBJ_DIR}/%.o, ${SRC})
 EXE= ${BIN_DIR}/sudoku
 
 .PHONY: all
-all: ${EXE} 
+all: ${EXE}
 
 ${EXE}: ${BIN_DIR} ${OBJ}
 	${CC} ${DEBUG} ${CPPFLAGS} ${OBJ} -o ${EXE} ${LDFLAGS}
