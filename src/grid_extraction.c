@@ -329,7 +329,7 @@ void extract_cells(Square *sq, SDL_Surface *image, char* path)
 			SDL_BlitScaled(temp, NULL, crop, NULL);
 
 			char *ext = ".png";
-			char *pathres = calloc(50 ,sizeof(char));
+			char *pathres = calloc(70 ,sizeof(char));
 			strcat(pathres, path);
 			strcat(pathres, name);
 			strcat(pathres, ext);
