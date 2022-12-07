@@ -152,6 +152,10 @@ void on_impButton_clicked()
 	  	{
 			if(im1)
 			{
+				system("exec rm .temp/cells/*.png");
+				system("exec rm .temp/*.png");
+				system("exec rm grid_00 grid.result grid_solved.png");
+
 				gtk_widget_hide(image);
 				im1 = FALSE;
 				im2 = TRUE;
@@ -170,6 +174,8 @@ void on_impButton_clicked()
 			}
 			else
 			{
+				system("exec rm .temp/cells/*.png");
+				system("exec rm .temp/*.png");
 				im2 = TRUE;
 				// GdkPixbuf* src = gdk_pixbuf_new_from_file(path,&error);
 				// GdkPixbuf *pixImage = gdk_pixbuf_scale_simple(src,widx,widy,GDK_INTERP_BILINEAR);
@@ -208,9 +214,6 @@ void on_delButton_clicked()
 		image = gtk_image_new_from_file("img/no-image.png");
 		gtk_container_add(GTK_CONTAINER(fixedImg),image);
 		gtk_widget_show(image);
-
-		system("exec rm .temp/cells/*.png");
-		system("exec rm .temp/*.png");
 
 
 		gtk_label_set_text(infoLabel,"[Action] Image successfully deleted!");
@@ -362,7 +365,7 @@ void changeS() // Will take the steps, and then change the images
 		return;
 	}
 
-	printf("Current step is step n%d\n", step);
+	// printf("Current step is step n%d\n", step);
 	switch(step)
 	{
 		case 0:
@@ -665,7 +668,7 @@ void changeS() // Will take the steps, and then change the images
 				// /* do your strtod thing */
 				// setlocale(LC_NUMERIC, saved_locale);
 				NeuralNetwork(2,".temp/cells/");
-				printf("UwU\n");
+				// printf("UwU\n");
 			}
 			else
 			{
@@ -686,6 +689,12 @@ void changeS() // Will take the steps, and then change the images
 			{
 				Solver(2,"grid_00");
 			}
+			gtk_widget_hide(image2);
+			gtk_container_remove(GTK_CONTAINER(fixedImg) , image2);
+			pixImg = gdk_pixbuf_new_from_file_at_scale(".temp/homoT.png",widx,widy,TRUE,NULL);
+			image2 = gtk_image_new_from_pixbuf(pixImg);
+			gtk_widget_show(image2);
+			gtk_container_add(GTK_CONTAINER(fixedImg),image2);
 			gtk_label_set_text(infoLabel,"[11] Sudoku Solved!");
 			break;
 
