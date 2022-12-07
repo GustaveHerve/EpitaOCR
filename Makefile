@@ -1,7 +1,7 @@
 CC= gcc
 CPPFLAGS= -Iinclude -INN -ISolver
-CFLAGS= -Wall -Wextra -g -O3
-LDFLAGS= -lSDL2 -lSDL2_image -lm 
+CFLAGS= -Wall -Wextra -g
+LDFLAGS= -lSDL2 -lSDL2_image -lm
 
 SRC_DIR= src
 OBJ_DIR= obj

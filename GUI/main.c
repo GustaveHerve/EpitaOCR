@@ -422,7 +422,7 @@ void changeS() // Will take the steps, and then change the images
 				gtk_label_set_text(infoLabel,"[2] Applying Gaussian Blur...");
 				gtk_container_remove(GTK_CONTAINER(fixedImg),image2);
 				img = load_image("../bin/.temp/grayscale.png");
-				gauss_blur(img, 17, -1);
+				gauss_blur1D(img, 17, -1);
 				IMG_SavePNG(img,"../bin/.temp/blur.png");
 				pixImg = gdk_pixbuf_new_from_file_at_scale("../bin/.temp/blur.png",widx,widy,TRUE,NULL);
 				image2 = gtk_image_new_from_pixbuf(pixImg); 
@@ -608,7 +608,6 @@ void changeS() // Will take the steps, and then change the images
 				gtk_widget_hide(image2);
 				gtk_container_remove(GTK_CONTAINER(fixedImg),image2);
 				img = load_image(path);
-				erose(img,3);
 				homoT = homographic_Transform(img,blobtest);
 				IMG_SavePNG(homoT,"../bin/.temp/homoT.png");
 				pixImg = gdk_pixbuf_new_from_file_at_scale("../bin/.temp/homoT.png",widx,widy,TRUE,NULL);

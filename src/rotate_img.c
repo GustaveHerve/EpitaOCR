@@ -208,5 +208,5 @@ SDL_Surface *homographic_Transform(SDL_Surface *img, Square corners)
     free(newCos);
     //IMG_SavePNG(new_img, "homographic_image.png");
 
-    return new_img; 
+    return new_img;
 }

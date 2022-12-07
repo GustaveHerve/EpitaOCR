@@ -64,7 +64,6 @@ int main(int argc, char** argv)
 	//canny(test);
 	adaptive_gaussthresholding(test, 13, 3);
     IMG_SavePNG(test, ".temp/canny.png");
-	
 	/*
 
 	SDL_Surface *morph_tmp =
