@@ -705,7 +705,6 @@ void changeS() // Will take the steps, and then change the images
                 printf("Sudoku is not Solvable!");
                 gtk_label_set_text(infoLabel,"Sudoku is not Solvable");
             }
-            printf("UwU2");
 			display_grid("grid_00","grid.result");
 			gtk_widget_hide(image2);
 			gtk_container_remove(GTK_CONTAINER(fixedImg) , image2);
