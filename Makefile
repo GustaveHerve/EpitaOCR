@@ -1,6 +1,6 @@
 CC= gcc
 CPPFLAGS= -Iinclude
-CFLAGS= -Wall -Wextra `pkg-config --cflags gtk+-3.0` -rdynamic -O3
+CFLAGS= -Wall -Wextra `pkg-config --cflags gtk+-3.0` -rdynamic
 LDFLAGS= -lSDL2 -lSDL2_image -lm `pkg-config --libs gtk+-3.0` -rdynamic
 
 SRC_DIR= src

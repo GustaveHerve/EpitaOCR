@@ -29,7 +29,7 @@ void InputValues(char* file, double **hWeights,
  fp = fopen(filename, "r");
  if (fp)
  {   // Input the previous values of weights and bias if they exist
- 
+
      char *s = setlocale(LC_NUMERIC,"C");
 
      double myvariable;
@@ -50,29 +50,25 @@ void InputValues(char* file, double **hWeights,
             oWeights[i][j] = myvariable;
          }
 
-    
-
      for (int j = 0; j < nOutputs; j++)
      {
         fscanf(fp,"%lf",&myvariable);
         oBias[j] = myvariable;
      }
 
-     
-        
      // This part i'm not sure !
      for (int j = 0; j < nHiddenNodes; j++)
      {
-        fscanf(fp,"%lf",&myvariable);                                           
+        fscanf(fp,"%lf",&myvariable);
         hBias[j] = myvariable;
      }
 
      // Layers
-     /* 
+     /*
      for (int j = 0; j < nHiddenNodes; j++)
      {
         fscanf(fp,"%lf",&myvariable);                                           
-        hLayer[j] = myvariable;  
+        hLayer[j] = myvariable;
      }
 
      for (int j = 0; j < nOutputs; j++)

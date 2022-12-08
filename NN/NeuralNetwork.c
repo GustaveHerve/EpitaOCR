@@ -8,11 +8,11 @@
 #include <dirent.h>
 #include <string.h>
 
-#define savefile "grid_00"              
+#define savefile "grid_00"
 
 int NeuralNetwork(int argc, char *argv)
 {
-    
+
     /* If no arguments, then we train */
 
     if (argc < 2)
@@ -20,7 +20,7 @@ int NeuralNetwork(int argc, char *argv)
 
     /*If there is a folder path in argument then we get number of each image*/
 
-    else 
+    else
     {
         DIR *d;
         struct dirent *dir;
@@ -32,7 +32,7 @@ int NeuralNetwork(int argc, char *argv)
         {
             while ((dir = readdir(d)) != NULL)
             {
-                if (strstr(dir->d_name, "png") != NULL || 
+                if (strstr(dir->d_name, "png") != NULL ||
                         strstr(dir->d_name, "jpeg") != NULL)
                 {
                     char fn[100];
