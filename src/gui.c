@@ -32,7 +32,7 @@
 #include "tools.h"
 #include "solvedGrid.h"
 
-// Global Declarations : 
+// Global Declarations :
 GtkWidget *window = NULL;
 GtkLabel *infoLabel = NULL;
 GtkWidget *impButton = NULL;
@@ -53,7 +53,7 @@ GtkFileChooserButton *chooser = NULL;
 gchar* path = NULL;
 Square blobtest;
 SDL_Surface *homoT = NULL;
-isLastStep = FALSE;
+bool isLastStep = FALSE;
 GtkFileChooserButton *saveButton = NULL;
 
 /////////////////////////////
@@ -70,7 +70,8 @@ int rotateImg(char* path, double angle)
 			h = w;
 		else
 			w = h;
-		cairo_surface_t* tgt = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, w, h);
+		cairo_surface_t* tgt =
+            cairo_image_surface_create(CAIRO_FORMAT_ARGB32, w, h);
 		cairo_t *cr = cairo_create(tgt);
 		cairo_translate(cr, w/2.0, h/2.0);
 		cairo_rotate (cr, angle * (double)(M_PI/180));
@@ -79,19 +80,20 @@ int rotateImg(char* path, double angle)
 		cairo_paint(cr);
 		cairo_surface_write_to_png(tgt,"image_rotated.png");
 		cairo_destroy(cr);
+        return 0;
 }
 
 
 int main(int argc, char *argv [])
 {
 
-	gchar *filename = NULL;
- 
+	//gchar *filename = NULL;
+
 	/* Initialisation of GTK library. */
-	 
+
 	gtk_init(&argc, &argv);
- 
- 
+
+
 		/* Chargement du fichier test.glade. */
 	builder = gtk_builder_new_from_file("config.glade");
 	/*sty = gtk_css_provider_new();
@@ -109,28 +111,29 @@ int main(int argc, char *argv [])
 	delButton = GTK_WIDGET(gtk_builder_get_object(builder, "delButton"));
 	adju = GTK_ADJUSTMENT(gtk_builder_get_object(builder, "adjustment"));
 	rotscale = GTK_SCALE(gtk_builder_get_object(builder,"resizement"));
-	chooser = GTK_FILE_CHOOSER_BUTTON(gtk_builder_get_object(builder,"chooser"));
-	saveButton = GTK_FILE_CHOOSER_BUTTON(gtk_builder_get_object(builder,"saveButton"));
-	  
- 
+	chooser =
+        GTK_FILE_CHOOSER_BUTTON(gtk_builder_get_object(builder,"chooser"));
+	saveButton =
+        GTK_FILE_CHOOSER_BUTTON(gtk_builder_get_object(builder,"saveButton"));
+
 	/* signal "destroy" for the window to close */
 	g_signal_connect (G_OBJECT (window), "destroy",
 		(GCallback)gtk_main_quit, NULL);
 	gtk_builder_connect_signals(builder,NULL);
- 
+
 	/* Displaying the Main Window */
 	gtk_widget_show(window);
 	image2 = NULL;
 
 	printf("Launched !\n");
- 
+
 	gtk_main();
- 
+
 	return 0;
 }
 
 
-void onChooser() 
+void onChooser()
 {
 	path = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(chooser));
 }
@@ -152,7 +155,8 @@ void on_impButton_clicked()
 		int widy = gtk_widget_get_allocated_height(fixedImg);
 	  	if (im2)
 	  	{
-				gtk_label_set_text(infoLabel, "[Warning] Image already imported");  
+				gtk_label_set_text
+                    (infoLabel, "[Warning] Image already imported");
 	  	}
 	  	else
 	  	{
@@ -177,9 +181,11 @@ void on_impButton_clicked()
 				//image2 = gtk_image_new_from_file("img/image.png");
 
 				// GdkPixbuf* src = gdk_pixbuf_new_from_file(path,&error);
-				// GdkPixbuf *pixImage = gdk_pixbuf_scale_simple(src,widx,widy,GDK_INTERP_BILINEAR);
-				GdkPixbuf *pixImage = gdk_pixbuf_new_from_file_at_scale(path,widx,widy,TRUE,NULL);
-				image2 = gtk_image_new_from_pixbuf(pixImage); 
+				// GdkPixbuf *pixImage
+                // = gdk_pixbuf_scale_simple(src,widx,widy,GDK_INTERP_BILINEAR);
+				GdkPixbuf *pixImage =
+                    gdk_pixbuf_new_from_file_at_scale(path,widx,widy,TRUE,NULL);
+				image2 = gtk_image_new_from_pixbuf(pixImage);
 
 				gtk_container_add(GTK_CONTAINER(fixedImg),image2);
 
@@ -200,12 +206,14 @@ void on_impButton_clicked()
 					system("exec rm grid.result");
 				im2 = TRUE;
 				// GdkPixbuf* src = gdk_pixbuf_new_from_file(path,&error);
-				// GdkPixbuf *pixImage = gdk_pixbuf_scale_simple(src,widx,widy,GDK_INTERP_BILINEAR);
+				// GdkPixbuf *pixImage =
+                // gdk_pixbuf_scale_simple(src,widx,widy,GDK_INTERP_BILINEAR);
 
-				GdkPixbuf *pixImage = gdk_pixbuf_new_from_file_at_scale(path,widx,widy,TRUE,NULL);
+				GdkPixbuf *pixImage =
+                    gdk_pixbuf_new_from_file_at_scale(path,widx,widy,TRUE,NULL);
 
-				image2 = gtk_image_new_from_pixbuf(pixImage); 
-				
+				image2 = gtk_image_new_from_pixbuf(pixImage);
+
 				gtk_container_add(GTK_CONTAINER(fixedImg),image2);
 				gtk_widget_show(image2);
 				gtk_label_set_text(infoLabel,"[Action] Image Imported.");
@@ -241,7 +249,6 @@ void on_delButton_clicked()
 
 
 		gtk_label_set_text(infoLabel,"[Action] Image successfully deleted!");
-		
 	}
 	else if (im1)
 	{
@@ -275,9 +282,11 @@ void mResize()
 		// rotateImg("img/image.png",value);
 		// image2 = gtk_image_new_from_file("image_rotated.png");
 
-		GdkPixbuf* test = gdk_pixbuf_new_from_file_at_scale("image_rotated.png",widx,widy,TRUE,NULL);
+		GdkPixbuf* test =
+            gdk_pixbuf_new_from_file_at_scale
+            ("image_rotated.png",widx,widy,TRUE,NULL);
 
-		image2 = gtk_image_new_from_pixbuf(test); 
+		image2 = gtk_image_new_from_pixbuf(test);
 		gtk_widget_show(image2);
 
 
@@ -298,10 +307,12 @@ void mResize()
 		// rotateImg("img/image.png",value);
 		//image2 = gtk_image_new_from_file("image_rotated.png");
 
-		GdkPixbuf* test = gdk_pixbuf_new_from_file_at_scale("image_rotated.png",widx,widy,TRUE,NULL);
+		GdkPixbuf* test = gdk_pixbuf_new_from_file_at_scale
+            ("image_rotated.png",widx,widy,TRUE,NULL);
 		// GdkPixbuf* src = gdk_pixbuf_new_from_file("image_rotated.png",&error);
-		// GdkPixbuf *pixImage = gdk_pixbuf_scale_simple(src,widx,widy,GDK_INTERP_BILINEAR);
-		image2 = gtk_image_new_from_pixbuf(test); 
+		// GdkPixbuf *pixImage = gdk_pixbuf_scale_simple
+        // (src,widx,widy,GDK_INTERP_BILINEAR);
+		image2 = gtk_image_new_from_pixbuf(test);
 		gtk_widget_show(image2);
 
 		gtk_container_add(GTK_CONTAINER(fixedImg),image2);
@@ -317,10 +328,13 @@ void mResize()
 		rotateImg(path,value);
 		//image2 = gtk_image_new_from_file("image_rotated.png");
 
-		GdkPixbuf* test = gdk_pixbuf_new_from_file_at_scale("image_rotated.png",widx,widy,TRUE,&error);
-		// GdkPixbuf* src = gdk_pixbuf_new_from_file("image_rotated.png",&error);
-		// GdkPixbuf *pixImage = gdk_pixbuf_scale_simple(src,widx,widy,GDK_INTERP_BILINEAR);
-		image2 = gtk_image_new_from_pixbuf(test); 
+		GdkPixbuf* test = gdk_pixbuf_new_from_file_at_scale
+            ("image_rotated.png",widx,widy,TRUE,&error);
+		// GdkPixbuf* src =
+        // gdk_pixbuf_new_from_file("image_rotated.png",&error);
+		// GdkPixbuf *pixImage =
+        // gdk_pixbuf_scale_simple(src,widx,widy,GDK_INTERP_BILINEAR);
+		image2 = gtk_image_new_from_pixbuf(test);
 		gtk_widget_show(image2);
 
 		gtk_container_add(GTK_CONTAINER(fixedImg),image2);
@@ -352,7 +366,7 @@ void onForward() // Forward Button Clicked
 		step++;
 	else
 	{
-		step = 12;	
+		step = 12;
 		gtk_label_set_text(infoLabel,"[Warning] You are already at the last step");
 	}
 
@@ -376,14 +390,15 @@ void onLast() // Last Button Clicked
 
 void onSaveButton()
 {
-	char* p2 = gtk_file_chooser_get_current_folder(GTK_FILE_CHOOSER(saveButton));
+	char* p2 =
+        gtk_file_chooser_get_current_folder(GTK_FILE_CHOOSER(saveButton));
 	if(isLastStep)
 	{
 		SDL_Surface *surf = NULL;
 		surf = load_image("grid_solved.png");
 		char *pimg = strcat(p2,"/grid_solved.png");
 		IMG_SavePNG(surf,pimg);
-	}	
+	}
 }
 
 
@@ -411,19 +426,21 @@ void changeS() // Will take the steps, and then change the images
 			gtk_widget_hide(image2);
 			gtk_label_set_text(infoLabel,"[0] Raw Image");
 			gtk_container_remove(GTK_CONTAINER(fixedImg),image2);
-			GdkPixbuf* pixImg = gdk_pixbuf_new_from_file_at_scale(path,widx,widy,TRUE,NULL);
-			image2 = gtk_image_new_from_pixbuf(pixImg); 
+			pixImg =
+                gdk_pixbuf_new_from_file_at_scale(path,widx,widy,TRUE,NULL);
+			image2 = gtk_image_new_from_pixbuf(pixImg);
 			gtk_widget_show(image2);
 			gtk_container_add(GTK_CONTAINER(fixedImg),image2);
 			break;
 
 		case 1:
 			gtk_label_set_text(infoLabel,"[1] Applying Greyscale...");
-			if (access(".temp/grayscale.png", F_OK) == 0)	
+			if (access(".temp/grayscale.png", F_OK) == 0)
 			{
 				gtk_widget_hide(image2);
 				gtk_container_remove(GTK_CONTAINER(fixedImg) , image2);
-				pixImg = gdk_pixbuf_new_from_file_at_scale(".temp/grayscale.png",widx,widy,TRUE,NULL);
+				pixImg = gdk_pixbuf_new_from_file_at_scale
+                    (".temp/grayscale.png",widx,widy,TRUE,NULL);
 				image2 = gtk_image_new_from_pixbuf(pixImg);
 				gtk_widget_show(image2);
 				gtk_container_add(GTK_CONTAINER(fixedImg),image2);
@@ -437,8 +454,9 @@ void changeS() // Will take the steps, and then change the images
 				greyscale(img);
                 opening(img, 7);
 				IMG_SavePNG(img,".temp/grayscale.png");
-				pixImg = gdk_pixbuf_new_from_file_at_scale(".temp/grayscale.png",widx,widy,TRUE,NULL);
-				image2 = gtk_image_new_from_pixbuf(pixImg); 
+				pixImg = gdk_pixbuf_new_from_file_at_scale
+                    (".temp/grayscale.png",widx,widy,TRUE,NULL);
+				image2 = gtk_image_new_from_pixbuf(pixImg);
 				gtk_widget_show(image2);
 				gtk_container_add(GTK_CONTAINER(fixedImg),image2);
 				gtk_label_set_text(infoLabel,"[1] Greyscale Applied!");
@@ -451,7 +469,8 @@ void changeS() // Will take the steps, and then change the images
 			{
 				gtk_widget_hide(image2);
 				gtk_container_remove(GTK_CONTAINER(fixedImg) , image2);
-				pixImg = gdk_pixbuf_new_from_file_at_scale(".temp/blur.png",widx,widy,TRUE,NULL);
+				pixImg = gdk_pixbuf_new_from_file_at_scale
+                    (".temp/blur.png",widx,widy,TRUE,NULL);
 				image2 = gtk_image_new_from_pixbuf(pixImg);
 				gtk_widget_show(image2);
 				gtk_container_add(GTK_CONTAINER(fixedImg),image2);
@@ -465,7 +484,8 @@ void changeS() // Will take the steps, and then change the images
 				img = load_image(".temp/grayscale.png");
 				gauss_blur1D(img, 17, -1);
 				IMG_SavePNG(img,".temp/blur.png");
-				pixImg = gdk_pixbuf_new_from_file_at_scale(".temp/blur.png",widx,widy,TRUE,NULL);
+				pixImg = gdk_pixbuf_new_from_file_at_scale
+                    (".temp/blur.png",widx,widy,TRUE,NULL);
 				image2 = gtk_image_new_from_pixbuf(pixImg);
 				gtk_widget_show(image2);
 				gtk_container_add(GTK_CONTAINER(fixedImg),image2);
@@ -479,7 +499,8 @@ void changeS() // Will take the steps, and then change the images
 			{
 				gtk_widget_hide(image2);
 				gtk_container_remove(GTK_CONTAINER(fixedImg) , image2);
-				pixImg = gdk_pixbuf_new_from_file_at_scale(".temp/thresh.png",widx,widy,TRUE,NULL);
+				pixImg = gdk_pixbuf_new_from_file_at_scale
+                    (".temp/thresh.png",widx,widy,TRUE,NULL);
 				image2 = gtk_image_new_from_pixbuf(pixImg);
 				gtk_widget_show(image2);
 				gtk_container_add(GTK_CONTAINER(fixedImg),image2);
@@ -492,7 +513,8 @@ void changeS() // Will take the steps, and then change the images
 				img = load_image(".temp/blur.png");
 				adaptive_gaussthresholding(img,13,3);
 				IMG_SavePNG(img,".temp/thresh.png");
-				pixImg = gdk_pixbuf_new_from_file_at_scale(".temp/thresh.png",widx,widy,TRUE,NULL);
+				pixImg = gdk_pixbuf_new_from_file_at_scale
+                    (".temp/thresh.png",widx,widy,TRUE,NULL);
 				image2 = gtk_image_new_from_pixbuf(pixImg);
 				gtk_widget_show(image2);
 				gtk_container_add(GTK_CONTAINER(fixedImg),image2);
@@ -502,11 +524,12 @@ void changeS() // Will take the steps, and then change the images
 
 		case 4:
 			gtk_label_set_text(infoLabel,"[4] Applying Dilatation...");
-			if (access(".temp/dilate.png", F_OK) == 0)	
+			if (access(".temp/dilate.png", F_OK) == 0)
 			{
 				gtk_widget_hide(image2);
 				gtk_container_remove(GTK_CONTAINER(fixedImg) , image2);
-				pixImg = gdk_pixbuf_new_from_file_at_scale(".temp/dilate.png",widx,widy,TRUE,NULL);
+				pixImg =
+                    gdk_pixbuf_new_from_file_at_scale(".temp/dilate.png",widx,widy,TRUE,NULL);
 				image2 = gtk_image_new_from_pixbuf(pixImg);
 				gtk_widget_show(image2);
 				gtk_container_add(GTK_CONTAINER(fixedImg),image2);
@@ -520,7 +543,8 @@ void changeS() // Will take the steps, and then change the images
 				//dilate(img,3);
                 closing(img, 5);
 				IMG_SavePNG(img,".temp/dilate.png");
-				pixImg = gdk_pixbuf_new_from_file_at_scale(".temp/dilate.png",widx,widy,TRUE,NULL);
+				pixImg = gdk_pixbuf_new_from_file_at_scale
+                    (".temp/dilate.png",widx,widy,TRUE,NULL);
 				image2 = gtk_image_new_from_pixbuf(pixImg);
 				gtk_widget_show(image2);
 				gtk_container_add(GTK_CONTAINER(fixedImg),image2);
@@ -534,7 +558,8 @@ void changeS() // Will take the steps, and then change the images
 			{
 				gtk_widget_hide(image2);
 				gtk_container_remove(GTK_CONTAINER(fixedImg) , image2);
-				pixImg = gdk_pixbuf_new_from_file_at_scale(".temp/blob.png",widx,widy,TRUE,NULL);
+				pixImg = gdk_pixbuf_new_from_file_at_scale
+                    (".temp/blob.png",widx,widy,TRUE,NULL);
 				image2 = gtk_image_new_from_pixbuf(pixImg);
 				gtk_widget_show(image2);
 				gtk_container_add(GTK_CONTAINER(fixedImg),image2);
@@ -547,7 +572,8 @@ void changeS() // Will take the steps, and then change the images
 				img = load_image(".temp/dilate.png");
 				SDL_Surface *blob = blob_detection(img);
 				IMG_SavePNG(blob,".temp/blob.png");
-				pixImg = gdk_pixbuf_new_from_file_at_scale(".temp/blob.png",widx,widy,TRUE,NULL);
+				pixImg = gdk_pixbuf_new_from_file_at_scale
+                    (".temp/blob.png",widx,widy,TRUE,NULL);
 				image2 = gtk_image_new_from_pixbuf(pixImg);
 				gtk_widget_show(image2);
 				gtk_container_add(GTK_CONTAINER(fixedImg),image2);
@@ -561,7 +587,8 @@ void changeS() // Will take the steps, and then change the images
 			{
 				gtk_widget_hide(image2);
 				gtk_container_remove(GTK_CONTAINER(fixedImg) , image2);
-				pixImg = gdk_pixbuf_new_from_file_at_scale(".temp/erose.png",widx,widy,TRUE,NULL);
+				pixImg = gdk_pixbuf_new_from_file_at_scale
+                    (".temp/erose.png",widx,widy,TRUE,NULL);
 				image2 = gtk_image_new_from_pixbuf(pixImg);
 				gtk_widget_show(image2);
 				gtk_container_add(GTK_CONTAINER(fixedImg),image2);
@@ -574,7 +601,8 @@ void changeS() // Will take the steps, and then change the images
 				img = load_image(".temp/blob.png");
 				erose(img,3);
 				IMG_SavePNG(img,".temp/erose.png");
-				pixImg = gdk_pixbuf_new_from_file_at_scale(".temp/erose.png",widx,widy,TRUE,NULL);
+				pixImg = gdk_pixbuf_new_from_file_at_scale
+                    (".temp/erose.png",widx,widy,TRUE,NULL);
 				image2 = gtk_image_new_from_pixbuf(pixImg);
 				gtk_widget_show(image2);
 				gtk_container_add(GTK_CONTAINER(fixedImg),image2);
@@ -588,7 +616,8 @@ void changeS() // Will take the steps, and then change the images
 			{
 				gtk_widget_hide(image2);
 				gtk_container_remove(GTK_CONTAINER(fixedImg) , image2);
-				pixImg = gdk_pixbuf_new_from_file_at_scale(".temp/lines.png",widx,widy,TRUE,NULL);
+				pixImg = gdk_pixbuf_new_from_file_at_scale
+                    (".temp/lines.png",widx,widy,TRUE,NULL);
 				image2 = gtk_image_new_from_pixbuf(pixImg);
 				gtk_widget_show(image2);
 				gtk_container_add(GTK_CONTAINER(fixedImg),image2);
@@ -610,9 +639,11 @@ void changeS() // Will take the steps, and then change the images
 			    int *hough = calloc(angle_precision * rows, sizeof(int));
 				hough_lines(img, angle_precision, 1, hough);
 
-				int hough_threshold = get_biggest_bin(hough, rows, angle_precision) * 0.7;
+				int hough_threshold =
+                    get_biggest_bin(hough, rows, angle_precision) * 0.7;
 				Line *lines = calloc(angle_precision * rows, sizeof(Line));
-				int line_nb = hough_filter(hough, rows, angle_precision, hough_threshold, lines);
+				int line_nb = hough_filter
+                    (hough, rows, angle_precision, hough_threshold, lines);
 				free(hough);
 
 				// Draw Lines
@@ -622,9 +653,10 @@ void changeS() // Will take the steps, and then change the images
 				IMG_SavePNG(img,".temp/lines.png");
 
 				blobtest = get_blobs(lines, line_nb, (int)width, (int)height);
-		
-		
-				pixImg = gdk_pixbuf_new_from_file_at_scale(".temp/lines.png",widx,widy,TRUE,NULL);
+
+
+				pixImg = gdk_pixbuf_new_from_file_at_scale
+                    (".temp/lines.png",widx,widy,TRUE,NULL);
 				image2 = gtk_image_new_from_pixbuf(pixImg);
 				gtk_widget_show(image2);
 				gtk_container_add(GTK_CONTAINER(fixedImg),image2);
@@ -633,16 +665,19 @@ void changeS() // Will take the steps, and then change the images
 			break;
 
 		case 8:
-			gtk_label_set_text(infoLabel,"[8] Applying Homographic Transform...");
+			gtk_label_set_text
+                (infoLabel,"[8] Applying Homographic Transform...");
 			if (access(".temp/homoT.png", F_OK) == 0)
 			{
 				gtk_widget_hide(image2);
 				gtk_container_remove(GTK_CONTAINER(fixedImg) , image2);
-				pixImg = gdk_pixbuf_new_from_file_at_scale(".temp/homoT.png",widx,widy,TRUE,NULL);
+				pixImg = gdk_pixbuf_new_from_file_at_scale
+                    (".temp/homoT.png",widx,widy,TRUE,NULL);
 				image2 = gtk_image_new_from_pixbuf(pixImg);
 				gtk_widget_show(image2);
 				gtk_container_add(GTK_CONTAINER(fixedImg),image2);
-				gtk_label_set_text(infoLabel,"[8] Homographic Transform Applied");
+				gtk_label_set_text
+                    (infoLabel,"[8] Homographic Transform Applied");
 			}
 			else
 			{
@@ -651,11 +686,13 @@ void changeS() // Will take the steps, and then change the images
 				img = load_image(path);
 				homoT = homographic_Transform(img,blobtest);
 				IMG_SavePNG(homoT,".temp/homoT.png");
-				pixImg = gdk_pixbuf_new_from_file_at_scale(".temp/homoT.png",widx,widy,TRUE,NULL);
+				pixImg = gdk_pixbuf_new_from_file_at_scale
+                    (".temp/homoT.png",widx,widy,TRUE,NULL);
 				image2 = gtk_image_new_from_pixbuf(pixImg);
 				gtk_widget_show(image2);
 				gtk_container_add(GTK_CONTAINER(fixedImg),image2);
-				gtk_label_set_text(infoLabel,"[8] Homographic Transform Applied");
+				gtk_label_set_text
+                    (infoLabel,"[8] Homographic Transform Applied");
 			}
 			break;
 
@@ -665,7 +702,8 @@ void changeS() // Will take the steps, and then change the images
 			{
 				gtk_widget_hide(image2);
 				gtk_container_remove(GTK_CONTAINER(fixedImg) , image2);
-				pixImg = gdk_pixbuf_new_from_file_at_scale(".temp/homoT.png",widx,widy,TRUE,NULL);
+				pixImg = gdk_pixbuf_new_from_file_at_scale
+                    (".temp/homoT.png",widx,widy,TRUE,NULL);
 				image2 = gtk_image_new_from_pixbuf(pixImg);
 				gtk_widget_show(image2);
 				gtk_container_add(GTK_CONTAINER(fixedImg),image2);
@@ -690,7 +728,8 @@ void changeS() // Will take the steps, and then change the images
 
 
 				// IMG_SavePNG(homoT,"../bin/.emp/extract_cells.png");
-				// pixImg = gdk_pixbuf_new_from_file_at_scale("../bin/.temp/homoT.png",widx,widy,TRUE,NULL);
+				// pixImg = gdk_pixbuf_new_from_file_at_scale
+                // ("../bin/.temp/homoT.png",widx,widy,TRUE,NULL);
 				// image2 = gtk_image_new_from_pixbuf(pixImg);
 				// gtk_widget_show(image2);
 				// gtk_container_add(GTK_CONTAINER(fixedImg),image2);
@@ -715,7 +754,8 @@ void changeS() // Will take the steps, and then change the images
 			}
 			// gtk_widget_hide(image2);
 			// gtk_container_remove(GTK_CONTAINER(fixedImg) , image2);
-			// pixImg = gdk_pixbuf_new_from_file_at_scale("../bin/.temp/homoT.png",widx,widy,TRUE,NULL);
+			// pixImg = gdk_pixbuf_new_from_file_at_scale
+            // ("../bin/.temp/homoT.png",widx,widy,TRUE,NULL);
 			// image2 = gtk_image_new_from_pixbuf(pixImg);
 			// gtk_widget_show(image2);
 			// gtk_container_add(GTK_CONTAINER(fixedImg),image2);
@@ -730,7 +770,8 @@ void changeS() // Will take the steps, and then change the images
 			}
 			gtk_widget_hide(image2);
 			gtk_container_remove(GTK_CONTAINER(fixedImg) , image2);
-			pixImg = gdk_pixbuf_new_from_file_at_scale(".temp/homoT.png",widx,widy,TRUE,NULL);
+			pixImg = gdk_pixbuf_new_from_file_at_scale
+                (".temp/homoT.png",widx,widy,TRUE,NULL);
 			image2 = gtk_image_new_from_pixbuf(pixImg);
 			gtk_widget_show(image2);
 			gtk_container_add(GTK_CONTAINER(fixedImg),image2);
@@ -748,7 +789,8 @@ void changeS() // Will take the steps, and then change the images
 			display_grid("grid_00","grid.result");
 			gtk_widget_hide(image2);
 			gtk_container_remove(GTK_CONTAINER(fixedImg) , image2);
-            pixImg = gdk_pixbuf_new_from_file_at_scale("grid_solved.png",widx,widy,TRUE,NULL);
+            pixImg = gdk_pixbuf_new_from_file_at_scale
+                ("grid_solved.png",widx,widy,TRUE,NULL);
             image2 = gtk_image_new_from_pixbuf(pixImg);
             gtk_widget_show(image2);
             gtk_container_add(GTK_CONTAINER(fixedImg),image2);

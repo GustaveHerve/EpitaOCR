@@ -1,13 +1,11 @@
 CC= gcc
 CPPFLAGS= -Iinclude
-CFLAGS= -Wall -Wextra -g `pkg-config --cflags gtk+-3.0` -rdynamic
+CFLAGS= -Wall -Wextra `pkg-config --cflags gtk+-3.0` -rdynamic
 LDFLAGS= -lSDL2 -lSDL2_image -lm `pkg-config --libs gtk+-3.0` -rdynamic
 
 SRC_DIR= src
 OBJ_DIR= obj
 BIN_DIR= bin
-
-DEBUG= -g
 
 TEMP_DIR= ${BIN_DIR}/.temp/cells
 
@@ -40,3 +38,6 @@ clean:
 	rm -rf ${OBJ_DIR}
 	rm -rf ${EXE}
 	rm -rf ${TEMP}
+	rm ${BIN_DIR}/grid_00
+	rm ${BIN_DIR}/grid.result
+	rm ${BIN_DIR}/grid_solved.png
