@@ -151,7 +151,8 @@ double* get_hMatrix(int* old, int* new)
     hmatrix = inverseMat(hmatrix, 3);
 
     free(hmatrixc);
-    return hmatrix; 
+    free(inverse);
+    return hmatrix;
 }
 
 SDL_Surface *homographic_Transform(SDL_Surface *img, Square corners)

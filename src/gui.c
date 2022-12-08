@@ -653,6 +653,7 @@ void changeS() // Will take the steps, and then change the images
 				IMG_SavePNG(img,".temp/lines.png");
 
 				blobtest = get_blobs(lines, line_nb, (int)width, (int)height);
+                free(lines);
 
 
 				pixImg = gdk_pixbuf_new_from_file_at_scale
