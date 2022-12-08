@@ -53,6 +53,8 @@ GtkFileChooserButton *chooser = NULL;
 gchar* path = NULL;
 Square blobtest;
 SDL_Surface *homoT = NULL;
+isLastStep = FALSE;
+GtkFileChooserButton *saveButton = NULL;
 
 /////////////////////////////
 
@@ -108,6 +110,7 @@ int main(int argc, char *argv [])
 	adju = GTK_ADJUSTMENT(gtk_builder_get_object(builder, "adjustment"));
 	rotscale = GTK_SCALE(gtk_builder_get_object(builder,"resizement"));
 	chooser = GTK_FILE_CHOOSER_BUTTON(gtk_builder_get_object(builder,"chooser"));
+	saveButton = GTK_FILE_CHOOSER_BUTTON(gtk_builder_get_object(builder,"saveButton"));
 	  
  
 	/* signal "destroy" for the window to close */
@@ -142,6 +145,9 @@ void on_impButton_clicked()
 	}
 	else
 	{
+		isLastStep = FALSE;
+		// if(gtk_widget_get_sensitive(GTK_WIDGET(saveButton)))
+	    //     gtk_widget_set_sensitive(GTK_WIDGET(saveButton),FALSE);
 		int widx = gtk_widget_get_allocated_width(fixedImg);
 		int widy = gtk_widget_get_allocated_height(fixedImg);
 	  	if (im2)
@@ -152,9 +158,17 @@ void on_impButton_clicked()
 	  	{
 			if(im1)
 			{
-				system("exec rm .temp/cells/*.png");
-				system("exec rm .temp/*.png");
-				system("exec rm grid_00 grid.result grid_solved.png");
+
+				if (access(".temp/cells/00.png", F_OK) == 0)
+					system("exec rm .temp/cells/*.png");
+				if (access(".temp/grayscale.png", F_OK) == 0)
+					system("exec rm .temp/*.png");
+				if (access("grid_solved.png", F_OK) == 0)
+					system("exec rm grid_00 grid.result grid_solved.png");
+				if (access("grid_00", F_OK) == 0)
+					system("exec rm grid_00");
+				if (access(".grid.result", F_OK) == 0)
+					system("exec rm grid.result");
 
 				gtk_widget_hide(image);
 				im1 = FALSE;
@@ -174,8 +188,16 @@ void on_impButton_clicked()
 			}
 			else
 			{
-				system("exec rm .temp/cells/*.png");
-				system("exec rm .temp/*.png");
+				if (access(".temp/cells/00.png", F_OK) == 0)
+					system("exec rm .temp/cells/*.png");
+				if (access(".temp/grayscale.png", F_OK) == 0)
+					system("exec rm .temp/*.png");
+				if (access("grid_solved.png", F_OK) == 0)
+					system("exec rm grid_00 grid.result grid_solved.png");
+				if (access(".grid_00", F_OK) == 0)
+					system("exec rm grid_00");
+				if (access("grid.result", F_OK) == 0)
+					system("exec rm grid.result");
 				im2 = TRUE;
 				// GdkPixbuf* src = gdk_pixbuf_new_from_file(path,&error);
 				// GdkPixbuf *pixImage = gdk_pixbuf_scale_simple(src,widx,widy,GDK_INTERP_BILINEAR);
@@ -197,6 +219,8 @@ void on_delButton_clicked()
 {
 	if(im2)
 	{
+		if(gtk_widget_get_sensitive(GTK_WIDGET(saveButton)))
+	        gtk_widget_set_sensitive(GTK_WIDGET(saveButton),FALSE);
 		step = 0;
 		im1 = TRUE;
 		im2 = FALSE;
@@ -340,11 +364,26 @@ void onForward() // Forward Button Clicked
 
 void onLast() // Last Button Clicked
 {
-	step = 12; //Last step
+	if(isLastStep)
+		step = 12; //Last step
+	else
+		gtk_label_set_text(infoLabel,"[Error] Step 12 must be firstly initialized");
 
 	// char applying[50] = "";
 	// sprintf(applying,"%s%d%s","[Action] Applying step ", step, "...");
 	// gtk_label_set_text(infoLabel,applying);
+}
+
+void onSaveButton()
+{
+	char* p2 = gtk_file_chooser_get_current_folder(GTK_FILE_CHOOSER(saveButton));
+	if(isLastStep)
+	{
+		SDL_Surface *surf = NULL;
+		surf = load_image("grid_solved.png");
+		char *pimg = strcat(p2,"/grid_solved.png");
+		IMG_SavePNG(surf,pimg);
+	}	
 }
 
 
@@ -699,7 +738,8 @@ void changeS() // Will take the steps, and then change the images
 			break;
 
 		case 12:
-            printf("Test");
+            // printf("Test");
+            gtk_widget_set_sensitive(GTK_WIDGET(saveButton),TRUE);
 			if (access("grid.result", F_OK))
             {
                 printf("Sudoku is not Solvable!");
@@ -713,6 +753,7 @@ void changeS() // Will take the steps, and then change the images
             gtk_widget_show(image2);
             gtk_container_add(GTK_CONTAINER(fixedImg),image2);
             gtk_label_set_text(infoLabel,"[12] Final Grid Constructed!");
+            isLastStep = TRUE;
 			break;
 
 		default:
