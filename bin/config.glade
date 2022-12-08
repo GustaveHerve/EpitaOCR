@@ -19,6 +19,17 @@
     <property name="value-pos">bottom</property>
     <signal name="value-changed" handler="mResize" swapped="no"/>
   </object>
+  <object class="GtkFileFilter" id="filter">
+    <mime-types>
+      <mime-type>image/*</mime-type>
+    </mime-types>
+    <patterns>
+      <pattern>*.jpeg</pattern>
+      <pattern>*.jpg</pattern>
+      <pattern>*.png</pattern>
+      <pattern>*.bmp</pattern>
+    </patterns>
+  </object>
   <object class="GtkWindow" id="mainwindow">
     <property name="can-focus">False</property>
     <property name="title" translatable="yes">OCR | 4D Generates</property>
@@ -248,6 +259,7 @@
                   <object class="GtkFileChooserButton" id="chooser">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
+                    <property name="filter">filter</property>
                     <property name="local-only">False</property>
                     <property name="title" translatable="yes">Choose your Picture</property>
                     <signal name="file-set" handler="onChooser" swapped="no"/>
