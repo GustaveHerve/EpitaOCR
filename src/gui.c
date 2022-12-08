@@ -80,13 +80,14 @@ int rotateImg(char* path, double angle)
 		cairo_paint(cr);
 		cairo_surface_write_to_png(tgt,"image_rotated.png");
 		cairo_destroy(cr);
+        return 0;
 }
 
 
 int main(int argc, char *argv [])
 {
 
-	gchar *filename = NULL;
+	//gchar *filename = NULL;
 
 	/* Initialisation of GTK library. */
 
@@ -425,7 +426,7 @@ void changeS() // Will take the steps, and then change the images
 			gtk_widget_hide(image2);
 			gtk_label_set_text(infoLabel,"[0] Raw Image");
 			gtk_container_remove(GTK_CONTAINER(fixedImg),image2);
-			GdkPixbuf* pixImg =
+			pixImg =
                 gdk_pixbuf_new_from_file_at_scale(path,widx,widy,TRUE,NULL);
 			image2 = gtk_image_new_from_pixbuf(pixImg);
 			gtk_widget_show(image2);

@@ -11,7 +11,7 @@ void init_sdl(){
 		exit(1);
 	}
 	//Init SDL_image
-	if (IMG_Init == 0){
+	if (IMG_Init(IMG_INIT_PNG) == 0){
 		printf("Error initialiazing SDL_image");
 		exit(1);
 	}

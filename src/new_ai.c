@@ -18,9 +18,9 @@
 #define IMAGES 300
 #define STRING 100
 
-void InputValues(char* file, double **hWeights,
+void InputValues(double **hWeights,
     double **oWeights, double oBias[nOutputs],
-    double hBias[], double hLayer[], double oLayer[])
+    double hBias[])
 {
     // this function is the beggining of the NN, it intputs the starting values
     // to the weights and output bias
@@ -113,9 +113,9 @@ void InputValues(char* file, double **hWeights,
  }
 }
 
-void OutputValues(char* file, double **hWeights,
+void OutputValues(double **hWeights,
       double **oWeights, double oBias[nOutputs],
-      double hBias[], double hLayer[], double oLayer[])
+      double hBias[])
 {
     // This function "saves" the values of weights and bias in a file so that
     // the NN will keep his "knowledge" or "memory"
@@ -227,15 +227,21 @@ int ai(int argc, char *argv, char **im)
 
     double** hWeights = (double**)malloc(nInputs * sizeof(double*));
     for (int i = 0; i < nInputs; i++)
+    {
         hWeights[i] = (double*)malloc(nHiddenNodes * sizeof(double));
+    }
 
     double** oWeights = (double**)malloc(nHiddenNodes * sizeof(double*));
     for (int i = 0; i < nHiddenNodes; i++)
+    {
         oWeights[i] = (double*)malloc(nOutputs * sizeof(double));
+    }
 
     double** trainInput = (double**)malloc(trainSets * sizeof(double*));
     for (int i = 0; i < trainSets; i++)
+    {
         trainInput[i] = (double*)malloc(nInputs * sizeof(double));
+    }
 
 	double trainOutputs[10][nOutputs] =
     {
@@ -344,7 +350,7 @@ int ai(int argc, char *argv, char **im)
 
     }
 
-    InputValues(filename, hWeights, oWeights, oBias, hBias, hLayer, oLayer);
+    InputValues(hWeights, oWeights, oBias, hBias);
 	int trainingSetOrder[] = {0,1,2,3,4,5,6,7,8,9};
 
 	//TRAINING TIME
@@ -462,7 +468,7 @@ int ai(int argc, char *argv, char **im)
     // Finally we save the values of Weights and output bias in a file.
     if (!argc)
     {
-        OutputValues(filename, hWeights, oWeights, oBias, hBias, hLayer, oLayer);
+        OutputValues(hWeights, oWeights, oBias, hBias);
     }
 
     for (int i = 0; i < nInputs;i++)
@@ -509,8 +515,8 @@ int Call()
     char** arr0 = (char**)malloc(IMAGES * sizeof(char*));
     for (int i = 0; i < IMAGES; i++)
         arr0[i] = (char*)malloc(STRING * sizeof(char));
-    DIR *d;
-    struct dirent *dir;
+    DIR *d = NULL;
+    struct dirent *dir = NULL;
     d = opendir("training_data/0/");
     fill(arr0,d,dir,"training_data/0/");
     //int n = sizeof(arr0) / sizeof(arr0[0]);
