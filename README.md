@@ -2,21 +2,19 @@
 
 OCR project of 4D Generates.
 
-## I - Rotating an image
-Execute `make rotation` to create the rotation binary
+## I - Compiling
+Execute `make` to create the `sudoku` binary in bin folder.
 
-## II - Grill Detection + Image processing 
-Execute `make` to create the debug binary
-
-For grid saving to work, a folder named "temp/" needs to exist
+## II - Executing 
+Simply use `./sudoku` in the bin folder, you must be in the bin folder for it
+to work correctly.
 
 # III - Neural networks
 
 XOr: make in Xor folder
 ./main
 
-Digit AI: make in Digit_Rec
-./main
+Digit Recognition:
+You can try the digit recognition in standalone by executing `make` in the
+Digit_Reco folder.
 
-# IV - GUI
-make in GUI folder
