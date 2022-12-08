@@ -40,3 +40,6 @@ clean:
 	rm -rf ${OBJ_DIR}
 	rm -rf ${EXE}
 	rm -rf ${TEMP}
+	rm ${BIN_DIR}/grid_00
+	rm ${BIN_DIR}/grid.result
+	rm ${BIN_DIR}/grid_solved.png
