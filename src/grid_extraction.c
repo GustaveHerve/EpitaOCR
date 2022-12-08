@@ -286,9 +286,13 @@ void extract_cells(Square *sq, SDL_Surface *image, char* path)
 	int avgx = ((sq->NE.x - sq->NW.x) + (sq->SE.x - sq->SW.x)) / 2 / 9;
     int len = 0;
     if (avgy > avgx)
+    {
         len = avgy;
+    }
     else
+    {
         len = avgx;
+    }
 	int counter = 0;
 	int x0 = sq->NW.x;
 	int y0 = sq->NW.y;

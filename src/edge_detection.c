@@ -10,12 +10,12 @@
 #define WEAK 100
 #define STRONG 255
 
-/* gradient: computes edge and angle gradient values from two matrices of 
+/* gradient: computes edge and angle gradient values from two matrices of
  * same size
-*  stores the result in edges[] and angles[] (so it doesn't affect the 
+*  stores the result in edges[] and angles[] (so it doesn't affect the
 *  image directly)
 */
-void gradient(int r1[], int r2[], int edges[], Uint8 angles[], size_t rows, 
+void gradient(int r1[], int r2[], int edges[], Uint8 angles[], size_t rows,
 		size_t cols)
 {
 	for (size_t i = 0; i < rows; i++)
@@ -27,19 +27,17 @@ void gradient(int r1[], int r2[], int edges[], Uint8 angles[], size_t rows,
 			double s2 = (double)r2[current] * (double)r2[current];
 			double temp = sqrt(s1+s2);
 			//faster compute but less precise
-			//double temp = fabs(r1[current]) + fabs(r2[current]); 
+			//double temp = fabs(r1[current]) + fabs(r2[current]);
 			edges[current] = temp;
 
 			float tan = atan2(r2[current], r1[current]);
 			float dtan = 0;
 			dtan = tan * 180 / M_PI;
 			if (dtan < 0)
-				dtan += 180; //get opposite point in triogo circle for 
+				dtan += 180; //get opposite point in triogo circle for
 							 //easier comparisons
-							 
-			   
 			Uint8 angle = 0;
-			if ((dtan >= 0 && dtan < 22.5) || (dtan <= 180 && dtan >= 157.5)) 
+			if ((dtan >= 0 && dtan < 22.5) || (dtan <= 180 && dtan >= 157.5))
 				angle = 0;
 			else if (dtan >= 22.5 && dtan < 67.5)
 				angle = 45;
@@ -48,9 +46,8 @@ void gradient(int r1[], int r2[], int edges[], Uint8 angles[], size_t rows,
 			else if (dtan >= 112.5 && dtan < 157.5)
 				angle = 135;
 
-				
 			angles[current] = angle;
-		}	
+		}
 	}
 }
 //Compute sobel and returns result in place in edges and angles
@@ -61,7 +58,7 @@ void sobel_c(SDL_Surface* surf, int* edges, Uint8* angles)
     int *r2 = malloc(sizeof(int) * surf->w * surf->h);
 
 	double kerx[] = { 1, 0, -1, 2, 0, -2, 1, 0, -1};
-    double kery[] = { -1, -2, -1, 0, 0, 0, 1, 2, 1};  
+    double kery[] = { -1, -2, -1, 0, 0, 0, 1, 2, 1};
 
 	convolution(surf, kerx, 3, 3, r1, 1);
     convolution(surf, kery, 3, 3, r2, 1);
@@ -109,10 +106,10 @@ void non_maxima_suppr(int edges[], Uint8 angles[], size_t rows, size_t cols,
 				break;
 
 			case 45:
-				if ((j+1 < (int)cols && i+1 < (int)rows) && (i-1 >= 0 
+				if ((j+1 < (int)cols && i+1 < (int)rows) && (i-1 >= 0
 							&& j-1 >= 0))
 				{
-					if (!(edges[c] >= edges[(i-1)*cols+j+1] 
+					if (!(edges[c] >= edges[(i-1)*cols+j+1]
 								&& edges[c] >= edges[(i+1)*cols+j-1]))
 						res[c] = 0;
 					else
@@ -123,7 +120,7 @@ void non_maxima_suppr(int edges[], Uint8 angles[], size_t rows, size_t cols,
 			case 90:
 				if (i+1 < (int)cols && i-1 >= 0)
 				{
-					if (!(edges[c] >= edges[(i-1)*cols+j] 
+					if (!(edges[c] >= edges[(i-1)*cols+j]
 								&& edges[c] >= edges[(i+1)*cols+j]))
 						res[c] = 0;
 					else
@@ -132,10 +129,10 @@ void non_maxima_suppr(int edges[], Uint8 angles[], size_t rows, size_t cols,
 				break;
 
 			case 135:
-				if ((j-1 >= 0 && i+1 < (int)rows ) 
+				if ((j-1 >= 0 && i+1 < (int)rows )
 						&& (j+1 < (int)cols && i-1 >= 0))
 				{
-					if (!(edges[c] >= edges[(i-1)*cols+j-1] 
+					if (!(edges[c] >= edges[(i-1)*cols+j-1]
 								&& edges[c] >= edges[(i+1)*cols+j+1]))
 						res[c] = 0;
 					else
@@ -143,14 +140,13 @@ void non_maxima_suppr(int edges[], Uint8 angles[], size_t rows, size_t cols,
 				}
 				break;
 
-					
 			}
 
 		}
 	}
 }
 
-void double_thresholding(int *edges, size_t rows, size_t cols, 
+void double_thresholding(int *edges, size_t rows, size_t cols,
 		float lowratio, float highratio)
 {
 	int highvalue = highratio * 255;
@@ -166,12 +162,11 @@ void double_thresholding(int *edges, size_t rows, size_t cols,
 			if (edges[c] >= highvalue)
 			{
 				edges[c] = STRONG;
-				TupleInt e = {i,j}; 
+				TupleInt e = {i,j};
 				stackTint_push(s, e);
 			}
 			else if (edges[c] >= lowvalue)
 				edges[c] = WEAK;
-			
 			else
 				edges[c] = 0;
 
@@ -181,14 +176,15 @@ void double_thresholding(int *edges, size_t rows, size_t cols,
 	//hysteresis(edges, rows, cols, s);
 
 }
+/*
 
 void hysteresis(int *edges, size_t rows, size_t cols, Stack_Tint* s)
 {
 	while (!stackTint_is_empty(s))
 	{
 		TupleInt e = stackTint_pop(s);
-		size_t i = e.x;
-		size_t j = e.y;
+		int i = e.x;
+		int j = e.y;
 
 		if (i-1 >= 0)
 		{
@@ -203,7 +199,7 @@ void hysteresis(int *edges, size_t rows, size_t cols, Stack_Tint* s)
 			__hysteresis(edges, rows, cols, i, j-1); //W
 		if (j+1 < cols)
 			__hysteresis(edges, rows, cols, i, j+1); //E
-		
+                                                     //
 		if (i+1 < rows)
 		{
 			__hysteresis(edges, rows, cols, i+1, j); //S
@@ -237,7 +233,6 @@ void __hysteresis(int *edges, size_t rows, size_t cols, size_t i, size_t j)
 			__hysteresis(edges, rows, cols, i, j-1); //W
 		if (j+1 < cols)
 			__hysteresis(edges, rows, cols, i, j+1); //E
-		
 		if (i+1 < rows){
 			__hysteresis(edges, rows, cols, i+1, j); //S
 			if (j-1 >= 0)
@@ -278,3 +273,4 @@ void canny(SDL_Surface *image)
 	free(angles);
 
 }
+*/

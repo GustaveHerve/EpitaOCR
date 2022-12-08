@@ -29,7 +29,7 @@ void InputValues(char* file, double **hWeights,
  fp = fopen(filename, "r");
  if (fp)
  {   // Input the previous values of weights and bias if they exist
- 
+
      char *s = setlocale(LC_NUMERIC,"C");
 
      double myvariable;
@@ -50,7 +50,6 @@ void InputValues(char* file, double **hWeights,
             oWeights[i][j] = myvariable;
          }
 
-    
 
      for (int j = 0; j < nOutputs; j++)
      {
@@ -58,21 +57,19 @@ void InputValues(char* file, double **hWeights,
         oBias[j] = myvariable;
      }
 
-     
-        
      // This part i'm not sure !
      for (int j = 0; j < nHiddenNodes; j++)
      {
-        fscanf(fp,"%lf",&myvariable);                                           
+        fscanf(fp,"%lf",&myvariable);
         hBias[j] = myvariable;
      }
 
      // Layers
-     /* 
+     /*
      for (int j = 0; j < nHiddenNodes; j++)
      {
-        fscanf(fp,"%lf",&myvariable);                                           
-        hLayer[j] = myvariable;  
+        fscanf(fp,"%lf",&myvariable);
+        hLayer[j] = myvariable;
      }
 
      for (int j = 0; j < nOutputs; j++)
@@ -82,13 +79,11 @@ void InputValues(char* file, double **hWeights,
      }
      */
 
-         
 
      // end
 
      fclose(fp);
      setlocale(LC_NUMERIC,s);
-     
  }
  else
  { // If there is no "Brain" file that means that it's the first time that
@@ -111,8 +106,8 @@ void InputValues(char* file, double **hWeights,
      for (int j = 0; j < nOutputs; j++)
          oLayer[j] = initWeights();
 
-     for (int j = 0; j < nHiddenNodes; j++)                                         
-         hLayer[j] = initWeights(); 
+     for (int j = 0; j < nHiddenNodes; j++)
+         hLayer[j] = initWeights();
      */
 
  }
@@ -125,7 +120,6 @@ void OutputValues(char* file, double **hWeights,
     // This function "saves" the values of weights and bias in a file so that
     // the NN will keep his "knowledge" or "memory"
     // used after the training section
-    
      FILE * fp;
 
      fp = fopen(filename, "w");
@@ -138,27 +132,23 @@ void OutputValues(char* file, double **hWeights,
      for(int j = 0; j < nHiddenNodes; j++)
         for(int k = 0; k < nOutputs; k++)
             fprintf(fp, "%lf\n", oWeights[j][k]);
-    
 
      for (int j = 0; j < nOutputs; j++)
           fprintf(fp,"%lf\n",oBias[j]);
 
-     
      for (int j = 0; j < nHiddenNodes; j++)
           fprintf(fp,"%lf\n",hBias[j]);
- 
+
     /*
      for (int j = 0; j < nHiddenNodes; j++)
           fprintf(fp,"%lf\n",hLayer[j]);
- 
+
 
      for (int j = 0; j < nOutputs; j++)
           fprintf(fp,"%lf\n",oLayer[j]);
      */
-     
 
      fclose(fp);
-
 
 }
 
@@ -168,7 +158,8 @@ void fill(char **arr, DIR *d, struct dirent *dir, char *name)
     char* fn = (char*)malloc(50 * sizeof(char));
     while ((dir = readdir(d)) != NULL && i < IMAGES)
     {
-        if (strstr(dir->d_name, "png") != NULL || strstr(dir->d_name, "jpeg") != NULL)
+        if (strstr(dir->d_name, "png") != NULL
+                || strstr(dir->d_name, "jpeg") != NULL)
         {
             strcpy( fn, name);
             char* s = strcat(fn,dir->d_name);
@@ -228,7 +219,6 @@ int ai(int argc, char *argv, char **im)
     int trainSets = 10;
     if (argc)
         trainSets = 1;
-    
 
     //double* memory =
         //(double*)malloc((numberOfTimes*trainSets) * sizeof(double));
@@ -297,7 +287,7 @@ int ai(int argc, char *argv, char **im)
 
      else
      {
-     
+
      image = load_image(im[0]);
      parcours_pixel(image,trainInput[0]);
      SDL_FreeSurface(image);
@@ -306,41 +296,41 @@ int ai(int argc, char *argv, char **im)
      image1 = load_image(im[1]);
      parcours_pixel(image1,trainInput[1]);
      SDL_FreeSurface(image1);
-    //for (int i = 0; i < nInputs; i++)                                        
-         //printf("%lf",trainInput[1][i]);  
-     SDL_Surface* image2; 
+    //for (int i = 0; i < nInputs; i++)
+         //printf("%lf",trainInput[1][i]);
+     SDL_Surface* image2;
      image2 = load_image(im[2]);
      parcours_pixel(image2,trainInput[2]);
      SDL_FreeSurface(image2);
      //for (int i = 0; i < nInputs; i++)
-         //printf("%lf",trainInput[2][i]);  
-    SDL_Surface* image3; 
+         //printf("%lf",trainInput[2][i]);
+    SDL_Surface* image3;
      image3 = load_image(im[3]);
      parcours_pixel(image3,trainInput[3]);
     SDL_FreeSurface(image3);
     //for (int i = 0; i < nInputs; i++)
-         //printf("%lf",trainInput[3][i]);   
-    SDL_Surface* image4; 
+         //printf("%lf",trainInput[3][i]);
+    SDL_Surface* image4;
      image4 = load_image(im[4]);
      parcours_pixel(image4,trainInput[4]);
      SDL_FreeSurface(image4);
 
-     SDL_Surface* image5; 
+     SDL_Surface* image5;
      image5 = load_image(im[5]);
      parcours_pixel(image5,trainInput[5]);
      SDL_FreeSurface(image5);
 
-     SDL_Surface* image6; 
+     SDL_Surface* image6;
      image6 = load_image(im[6]);
      parcours_pixel(image6,trainInput[6]);
      SDL_FreeSurface(image6);
 
-     SDL_Surface* image7; 
+     SDL_Surface* image7;
      image7 = load_image(im[7]);
      parcours_pixel(image7,trainInput[7]);
      SDL_FreeSurface(image7);
 
-     SDL_Surface* image8; 
+     SDL_Surface* image8;
      image8 = load_image(im[8]);
      parcours_pixel(image8,trainInput[8]);
      SDL_FreeSurface(image8);
@@ -348,8 +338,8 @@ int ai(int argc, char *argv, char **im)
      SDL_Surface* image9;
      image9 = load_image(im[9]);
      parcours_pixel(image9,trainInput[9]);
-    //for (int i = 0; i < nInputs; i++)                                         
-         //printf("%lf",trainInput[9][i]); 
+    //for (int i = 0; i < nInputs; i++)
+         //printf("%lf",trainInput[9][i]);
      SDL_FreeSurface(image9);
 
     }
@@ -399,7 +389,7 @@ int ai(int argc, char *argv, char **im)
             Result = GetMax(nOutputs, oLayer);
             memory[memo_val] = (Result == i); //modify
             memo_val++;
-            /*           
+            /*
             if (!argc)
 			    printf("Input : %d  Output: %d \n",
                     i,Result);
@@ -636,7 +626,7 @@ int Call()
     res[6] = a[6];
     res[7] = a[7];
     res[8] = a[8];
-    res[9] = a[9]; 
+    res[9] = a[9];
     ai(1,NULL,res);
     printf("testing 2\n");
     ai(2,"final/SET6/14.png",NULL);
@@ -669,6 +659,3 @@ int Call()
     free(arr9);
     return 0;
 }
-
-
-
